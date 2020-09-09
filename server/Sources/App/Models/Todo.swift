@@ -7,7 +7,7 @@ final class Todo: Model, Content {
     @ID(key: .id)
     var id: UUID?
 
-    @Field(key: "title")
+    @Field(key: "teste")
     var title: String
 
     init() { }
