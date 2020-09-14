@@ -22,12 +22,14 @@ class NetworkManager: WebSocketLogic{
         webSocketTask = socketSession.webSocketTask(with: url)
     }
         
-    func connect(){
+    func connect() -> ServiceTypes.Connection?{
         webSocketTask.resume()
         ping()
+        return nil
     }
     
-    func send<Type>(data: Type) -> ServiceTypes.Dispatch.Response {
+    @discardableResult
+    func send<SendType>(data: SendType) -> ServiceTypes.Dispatch.Response? {
         print("Sending a Message to Server")
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
             self.send(data: "welcome")
@@ -39,9 +41,11 @@ class NetworkManager: WebSocketLogic{
                 }
             }
         }
+        return nil
     }
     
-    func receive<Destination>(destination: Destination?) {
+    @discardableResult
+    func receive<Destination>(destination: Destination?) -> ServiceTypes.Receive.Response? {
         self.webSocketTask.receive { result in
             switch result {
             case .success(let message):
@@ -58,6 +62,8 @@ class NetworkManager: WebSocketLogic{
             }
             self.receive(destination: "")
         }
+        
+        return nil
     }
     
     

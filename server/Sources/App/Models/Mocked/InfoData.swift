@@ -8,5 +8,5 @@
 import Vapor
 
 struct InfoData: Content {
-    let data: String
+    let dataString: String
 }

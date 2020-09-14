@@ -16,7 +16,7 @@ func routes(_ app: Application) throws {
         NetworkManager().connect()
         print("Received")
         let data = try req.content.decode(InfoData.self)
-        return "hello \(data.data)"
+        return "hello \(data.dataString)"
         
     }
     try app.register(collection: TerrainController())
