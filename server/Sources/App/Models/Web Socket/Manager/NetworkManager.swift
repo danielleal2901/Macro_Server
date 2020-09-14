@@ -11,7 +11,7 @@ class NetworkManager: WebSocketLogic{
 
     typealias Builder = (WebSocketDelegate,URLSession,URLSessionWebSocketTask) -> NetworkManager
     
-    let url = URL(string: "wss://echo.websocket.org")!
+    let urls = URL(string: "wss://echo.websocket.org")!
     private let webSocketDelegate: WebSocketDelegate
     private let socketSession: URLSession
     private var webSocketTask: URLSessionWebSocketTask!
@@ -19,13 +19,13 @@ class NetworkManager: WebSocketLogic{
     // Currently Builder Functions, for Testing
     init(){
         webSocketDelegate = WebSocketDelegate()
-        socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())
+        socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())        
     //    webSocketTask = socketSession.webSocketTask(with: url)
     }
         
     @discardableResult
     func connect(url: URL) -> ServiceTypes.Connection?{
-        webSocketTask = socketSession.webSocketTask(with: url)
+        webSocketTask = socketSession.webSocketTask(with: urls)
         webSocketTask.resume()
         return nil
     }
