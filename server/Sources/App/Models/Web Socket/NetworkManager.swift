@@ -27,7 +27,7 @@ class NetworkManager: WebSocketLogic{
         ping()
     }
     
-    func send() {
+    func send<Type>(data: Type) {
         print("Sending a Message to Server")
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
             self.send()
@@ -40,7 +40,7 @@ class NetworkManager: WebSocketLogic{
         }
     }
     
-    func receive() {
+    func receive<Destination>(destination: Destination) {
         self.webSocketTask.receive { result in
             switch result {
             case .success(let message):
@@ -58,7 +58,7 @@ class NetworkManager: WebSocketLogic{
     }
     
     
-    func ping() {
+    func ping() ->  {
         self.webSocketTask.sendPing { error in
             if let error = error {
                 print("Error when sending PING \(error)")
