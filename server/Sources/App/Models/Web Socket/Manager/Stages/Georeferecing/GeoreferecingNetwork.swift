@@ -7,8 +7,6 @@
 
 import Foundation
 
-class TerrainNetwork{
-    
-    
+class GeoreferecingNetwork: NetworkManager{
     
 }

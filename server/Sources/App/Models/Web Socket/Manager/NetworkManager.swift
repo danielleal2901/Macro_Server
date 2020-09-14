@@ -8,8 +8,7 @@
 import Vapor
 
 class NetworkManager: WebSocketLogic{
-   
-    
+
     typealias Builder = (WebSocketDelegate,URLSession,URLSessionWebSocketTask) -> NetworkManager
     
     let url = URL(string: "wss://echo.websocket.org")!
