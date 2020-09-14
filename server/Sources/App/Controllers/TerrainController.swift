@@ -31,12 +31,12 @@ struct TerrainController: RouteCollection {
     }
     
     func fetchTerrainById(req: Request) throws -> EventLoopFuture<Terrain> {
-        return Terrain.find(req.parameters.get(TerrainRoutes.id.rawValue), on: req.db)
+        return Terrain.find(req.parameters.get(TerrainParameters.idTerrain.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
     }
     
     func deleteTerrainById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(TerrainRoutes.id.rawValue, as: UUID.self) else {
+        guard let id = req.parameters.get(TerrainParameters.idTerrain.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
@@ -47,7 +47,7 @@ struct TerrainController: RouteCollection {
     }
     
     func updateTerrainById(req: Request) throws -> EventLoopFuture<Terrain> {
-        guard let id = req.parameters.get(TerrainRoutes.id.rawValue, as: UUID.self) else {
+        guard let id = req.parameters.get(TerrainParameters.idTerrain.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         

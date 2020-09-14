@@ -15,3 +15,7 @@ enum TerrainRoutes: String {
         return PathComponent(stringLiteral: route.rawValue)
     }
 }
+
+enum TerrainParameters: String {
+    case idTerrain = "terrainID"
+}
