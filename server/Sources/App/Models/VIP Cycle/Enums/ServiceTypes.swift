@@ -16,14 +16,18 @@ enum ServiceTypes{
         struct Request{
             var data: DataTypes
         }
-        var response: Bool
+        struct Response{
+            var actionStatus: ActionTypes
+        }
     }
     
     struct Receive{
         struct Request{
             var data: DataTypes
         }
-        var response: Bool
+        struct Response{
+            var actionStatus: ActionTypes
+        }
     }
 }
 

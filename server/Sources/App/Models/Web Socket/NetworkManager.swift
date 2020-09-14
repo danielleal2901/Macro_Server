@@ -27,12 +27,13 @@ class NetworkManager: WebSocketLogic{
         ping()
     }
     
-    func send<Type>(data: Type) {
+    func send<Type>(data: Type) -> ServiceTypes.Dispatch.Response {
         print("Sending a Message to Server")
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-            self.send()
-            self.receive()
-            self.webSocketTask.send(.string("Lorem Ipsum Gui")) { error in
+            self.send(data: "welcome")
+            self.receive(destination: "")
+            // Fix current casting
+            self.webSocketTask.send(.string(data as! String)) { error in
                 if let error = error {
                     print("Error when sending a message \(error)")
                 }
@@ -40,7 +41,7 @@ class NetworkManager: WebSocketLogic{
         }
     }
     
-    func receive<Destination>(destination: Destination) {
+    func receive<Destination>(destination: Destination?) {
         self.webSocketTask.receive { result in
             switch result {
             case .success(let message):
@@ -49,16 +50,18 @@ class NetworkManager: WebSocketLogic{
                     print("Data received from Server: \(data)")
                 case .string(let text):
                     print("Text received from Server: \(text)")
+                @unknown default:
+                    fatalError()
                 }
             case .failure(let error):
                 print("Error when receiving \(error)")
             }
-            self.receive()
+            self.receive(destination: "")
         }
     }
     
     
-    func ping() ->  {
+    func ping()  {
         self.webSocketTask.sendPing { error in
             if let error = error {
                 print("Error when sending PING \(error)")
@@ -66,7 +69,7 @@ class NetworkManager: WebSocketLogic{
                 print("Pinged with Success")
                 DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
                     self.ping()
-                    self.send()
+                    self.send(data: "message")
                 }
             }
         }
