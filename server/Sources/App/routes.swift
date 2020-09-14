@@ -9,4 +9,6 @@ func routes(_ app: Application) throws {
 
     
     try app.register(collection: TerrainController())
+    try app.register(collection: GeoController())
+
 }

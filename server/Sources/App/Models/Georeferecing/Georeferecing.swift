@@ -17,16 +17,16 @@ final class Georeferecing: Model, Content {
     var id: UUID?
     
     @Parent(key: "terrain_id")
-    var terreno: Terrain
+    var terrain: Terrain
     
     @Field(key: "name")
     var name: String
     
     init() {}
     
-    init(name: String, terrenoID: UUID) {
+    init(name: String, terrainID: UUID) {
         self.id = UUID()
-        self.$terreno.id = terrenoID
         self.name = name
+        self.$terrain.id = terrainID
     }
 }

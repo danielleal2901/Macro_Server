@@ -14,6 +14,7 @@ public func configure(_ app: Application) throws {
         database: "macro_challenge_dev"), as: .psql)
 
     app.migrations.add(CreateTerrain())
+    app.migrations.add(CreateGeoreferecing())
 
     // register routes
     try routes(app)

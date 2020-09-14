@@ -13,7 +13,7 @@ struct CreateGeoreferecing: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         return database.schema("georeferecings")
             .id()
-            .field("terrain_id", .uuid, .required, .references("terrain", "id"))
+            .field("terrain_id", .uuid, .required, .references("terrains", "id"))
             .field("name", .string, .required)
             .create()
     }
