@@ -44,7 +44,7 @@ class GeoController: RouteCollection {
     
     func fetchGeoByTerrainID(req: Request) throws -> EventLoopFuture<Georeferecing> {
         
-        guard let terrainId = req.parameters.get(GeoRoutes.terrainId.rawValue, as: UUID.self) else {
+        guard let terrainId = req.parameters.get(GeoParameters.terrainId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
