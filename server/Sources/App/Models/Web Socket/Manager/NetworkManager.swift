@@ -20,7 +20,7 @@ class NetworkManager: WebSocketLogic{
     init(){
         webSocketDelegate = WebSocketDelegate()
         socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())        
-    //    webSocketTask = socketSession.webSocketTask(with: url)
+        //webSocketTask = socketSession.webSocketTask(with: urls)
     }
         
     @discardableResult
@@ -60,6 +60,7 @@ class NetworkManager: WebSocketLogic{
     
     @discardableResult
     func receive<Destination>(destination: Destination?) -> ServiceTypes.Receive.Response? {
+        print("Receiving 2")
         self.webSocketTask.receive { result in
             switch result {
             case .success(let message):

@@ -10,9 +10,7 @@ import Vapor
 class WebSocketDelegate: NSObject, URLSessionWebSocketDelegate{
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         print("Web Socket did connect")
-        print(session)
-        receive(wt: webSocketTask)
-        
+        receive(wt: webSocketTask)        
     }
     
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
