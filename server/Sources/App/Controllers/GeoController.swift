@@ -28,8 +28,12 @@ class GeoController: RouteCollection {
     }
     
     func insertGeoreferecing(req: Request) throws -> EventLoopFuture<Georeferecing> {
-        let geoPost = try req.content.decode(GeoreferecingPost.self)
-        let geo = Georeferecing(name: geoPost.name, terrainID: geoPost.terrainId)
+        let geoPost = try req.content.decode(PostGeoreferecing.self)
+        guard let id = UUID(uuidString: geoPost.terrain.id) else {
+            Abort(.badRequest)
+            return
+        }
+        let geo = Georeferecing(name: geoPost.name, terrainID: id)
         return geo.create(on: req.db).map({ geo })
     }
     
