@@ -35,7 +35,10 @@ func webSockets(_ app: Application) throws{
     app.webSocket("echo"){ request,ws in
         ws.onText { ws, texto in
             print(texto)
+            ws.send
         }
+        
+        
         
         ws.onClose.whenComplete { result in
             print("ended")

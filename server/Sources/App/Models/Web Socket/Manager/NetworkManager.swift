@@ -19,8 +19,7 @@ class NetworkManager: WebSocketLogic{
     // Currently Builder Functions, for Testing
     init(){
         webSocketDelegate = WebSocketDelegate()
-        socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())        
-        //webSocketTask = socketSession.webSocketTask(with: urls)
+        socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())
     }
         
     @discardableResult

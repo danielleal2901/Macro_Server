@@ -25,13 +25,9 @@ public func configure(_ app: Application) throws {
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
     
-    
-    
-    
     // register routes
     try routes(app)
     try webSockets(app)
-    
     
 }
 
