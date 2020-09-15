@@ -9,7 +9,12 @@ import Foundation
 
 enum ServiceTypes{
     struct Connection{
-        var response: Bool
+        struct Response{
+            var status: Bool
+        }
+        struct activeSession{
+            var sessionID: Int
+        }
     }
     
     struct Dispatch{

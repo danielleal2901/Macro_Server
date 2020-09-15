@@ -8,23 +8,37 @@
 import Vapor
 
 class NetworkManager: WebSocketLogic{
+
     typealias Builder = (WebSocketDelegate,URLSession,URLSessionWebSocketTask) -> NetworkManager
     
     let url = URL(string: "wss://echo.websocket.org")!
     private let webSocketDelegate: WebSocketDelegate
     private let socketSession: URLSession
-    private let webSocketTask: URLSessionWebSocketTask
+    private var webSocketTask: URLSessionWebSocketTask!
     
     // Currently Builder Functions, for Testing
     init(){
         webSocketDelegate = WebSocketDelegate()
         socketSession = URLSession(configuration: .default, delegate: webSocketDelegate, delegateQueue: OperationQueue())
-        webSocketTask = socketSession.webSocketTask(with: url)
+    //    webSocketTask = socketSession.webSocketTask(with: url)
     }
         
-    func connect() -> ServiceTypes.Connection?{
+    @discardableResult
+    func connect(url: URL) -> ServiceTypes.Connection?{
+        webSocketTask = socketSession.webSocketTask(with: url)
         webSocketTask.resume()
-        ping()
+        return nil
+    }
+
+    func disconnect(activeSession: String) -> ServiceTypes.Connection? {
+        // add Logic of Active Session
+        webSocketTask.cancel()
+        return nil
+    }
+    
+    func suspend(activeSession: String) -> ServiceTypes.Connection? {
+        // add Logic of Active Session
+        webSocketTask.suspend()
         return nil
     }
     
