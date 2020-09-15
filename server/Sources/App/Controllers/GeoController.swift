@@ -27,26 +27,31 @@ class GeoController: RouteCollection {
         }
     }
     
-    func insertGeoreferecing(req: Request) throws -> EventLoopFuture<Georeferecing> {
-        let geoPost = try req.content.decode(PostGeoreferecing.self)
-        guard let id = UUID(uuidString: geoPost.terrain.id) else {
-            Abort(.badRequest)
-            return
+    func insertGeoreferecing(req: Request) throws -> EventLoopFuture<Georeferecing.Output> {
+        let input = try req.content.decode(Georeferecing.Input.self)
+        guard let id = UUID(uuidString: input.terrain) else {
+            throw Abort(.badRequest)
         }
-        let geo = Georeferecing(name: geoPost.name, terrainID: id)
-        return geo.create(on: req.db).map({ geo })
+        let geo = Georeferecing(name: input.name, terrainID: id)
+        return geo.save(on: req.db)
+            .map {Georeferecing.Output(id: geo.id!.uuidString, name: geo.name, terrain: geo.$terrain.id.uuidString)}
     }
     
-    func fetchAllGeo(req: Request) throws -> EventLoopFuture<[Georeferecing]> {
-        return Georeferecing.query(on: req.db).all()
+    func fetchAllGeo(req: Request) throws -> EventLoopFuture<[Georeferecing.Output]> {
+        return Georeferecing.query(on: req.db).all().map { geos in
+            let outputs = geos.map { geo in
+                Georeferecing.Output(id: geo.id!.uuidString, name: geo.name, terrain: geo.$terrain.id.uuidString)
+            }
+            return outputs
+        }
     }
     
-    func fetchGeoById(req: Request) throws -> EventLoopFuture<Georeferecing> {
-        return Georeferecing.find(req.parameters.get(GeoRoutes.id.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
+    func fetchGeoById(req: Request) throws -> EventLoopFuture<Georeferecing.Output> {
+        return Georeferecing.find(req.parameters.get(GeoParameters.geoId.rawValue), on: req.db)
+            .unwrap(or: Abort(.notFound)).map {Georeferecing.Output(id: $0.id!.uuidString, name: $0.name, terrain: $0.$terrain.id.uuidString)}
     }
     
-    func fetchGeoByTerrainID(req: Request) throws -> EventLoopFuture<Georeferecing> {
+    func fetchGeoByTerrainID(req: Request) throws -> EventLoopFuture<Georeferecing.Output> {
         
         guard let terrainId = req.parameters.get(GeoParameters.terrainId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
@@ -54,14 +59,12 @@ class GeoController: RouteCollection {
         
         return Georeferecing.query(on: req.db)
             .filter("terrain_id", .equal, terrainId).first().unwrap(or: Abort(.badRequest))
-            .map { optionalGeo in
-                Georeferecing(name: optionalGeo.name, terrainID: terrainId)
-        }
-        
+            .map { Georeferecing.Output(id: $0.id!.uuidString, name: $0.name, terrain: $0.$terrain.id.uuidString) }
     }
     
+    
     func deleteGeoById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(GeoRoutes.id.rawValue, as: UUID.self) else {
+        guard let id = req.parameters.get(GeoParameters.geoId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
@@ -72,7 +75,7 @@ class GeoController: RouteCollection {
     }
     
     func updateGeoById(req: Request) throws -> EventLoopFuture<Georeferecing> {
-        guard let id = req.parameters.get(GeoRoutes.id.rawValue, as: UUID.self) else {
+        guard let id = req.parameters.get(GeoParameters.geoId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         

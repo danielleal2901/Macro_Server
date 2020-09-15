@@ -13,6 +13,17 @@ final class Georeferecing: Model, Content {
     
     static let schema = "georeferecings"
     
+    struct Input: Content {
+        let name: String
+        let terrain: String
+    }
+    
+    struct Output: Content {
+        let id: String
+        let name: String
+        let terrain: String
+    }
+    
     @ID(key: .id)
     var id: UUID?
     
@@ -24,8 +35,7 @@ final class Georeferecing: Model, Content {
     
     init() {}
     
-    init(name: String, terrainID: UUID) {
-        self.id = UUID()
+    init(id: UUID? = nil, name: String, terrainID: UUID) {
         self.name = name
         self.$terrain.id = terrainID
     }
