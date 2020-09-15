@@ -74,17 +74,18 @@ class GeoController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateGeoById(req: Request) throws -> EventLoopFuture<Georeferecing> {
+    func updateGeoById(req: Request) throws -> EventLoopFuture<Georeferecing.Output> {
         guard let id = req.parameters.get(GeoParameters.geoId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        let newGeoreferecing = try req.content.decode(Georeferecing.self)
+        let input = try req.content.decode(Georeferecing.Input.self)
         return Georeferecing.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (oldGeoreferecing) -> EventLoopFuture<Georeferecing> in
-                oldGeoreferecing.name = newGeoreferecing.name
-                return oldGeoreferecing.save(on: req.db).map({ oldGeoreferecing })
+            .flatMap { geo in
+                geo.name = input.name
+                return geo.save(on: req.db)
+                    .map { Georeferecing.Output(id: geo.id!.uuidString, name: geo.name, terrain: geo.$terrain.id.uuidString)}
         }
     }
 }
