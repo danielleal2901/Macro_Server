@@ -26,19 +26,18 @@ func routes(_ app: Application) throws {
     }
     try app.register(collection: TerrainController())
     try app.register(collection: GeoController())
-
+ 
 }
 
 
 func webSockets(_ app: Application) throws{
     print("Creating connection")
+    
     app.webSocket("echo"){ request,ws in
         ws.onText { ws, texto in
             print(texto)
-            ws.send
+            ws.send("Message")
         }
-        
-        
         
         ws.onClose.whenComplete { result in
             print("ended")
