@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GeoreferecingPost : Codable{
+struct PostGeoreferecing : Codable{
     let name: String
-    let terrainId: UUID
+    let terrain: TerrainRequests
 }
