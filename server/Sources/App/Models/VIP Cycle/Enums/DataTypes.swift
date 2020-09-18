@@ -8,6 +8,7 @@
 import Foundation
 
 enum DataTypes{
+    case SpecifiedData
     case String
     case Int
 }

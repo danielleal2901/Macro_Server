@@ -13,8 +13,7 @@ func routes(_ app: Application) throws {
         print(ws)
     }
 
-    app.get("hello") { req -> String in
-        NetworkManager().connect(url: URL.init(string:"localhost:8080/terrains")!)
+    app.get("hello") { req -> String in    
         return "Hello, world!"
     }
     
