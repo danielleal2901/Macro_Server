@@ -19,7 +19,7 @@ enum ServiceTypes{
     
     struct Dispatch{
         struct Request{
-            var data: DataTypes
+            var data: SpecifiedData
         }
         struct Response{
             var actionStatus: ActionTypes
