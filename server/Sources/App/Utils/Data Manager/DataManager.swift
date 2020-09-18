@@ -71,4 +71,36 @@ internal class DataManager{
         completion(response)
     }
     
+    // General Management
+    // To implement
+    
+    // WebSocket
+    // Data
+    internal func createData(){}
+    internal func fetchData(){}
+    internal func updateData(){}
+    internal func deleteData(){}
+    
+    
+    // Login Management
+    // User
+    internal func createUser(){}
+    internal func fetchUser(){}
+    internal func updateUser(){}
+    internal func deleteUser(){}
+    
+    // Login Management
+    // Team
+    internal func createTeam(){}
+    internal func fetchTeam(){}
+    internal func updateTeam(){}
+    internal func deleteTeam(){}
+    
+    
+    
+    
+    
+    
+    
+    
 }
