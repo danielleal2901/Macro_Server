@@ -11,7 +11,7 @@ import Vapor
 class GeoController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let geo = routes.grouped(GeoRoutes.getPathComponent(.main))
-        geo.post(use: insertGeoreferecing)
+       // geo.post(use: insertGeoreferecing)
         geo.get(use: fetchAllGeo)
         //With geoID
         geo.group(GeoRoutes.getPathComponent(.id)) { (geo) in
@@ -27,15 +27,20 @@ class GeoController: RouteCollection {
         }
     }
     
-    func insertGeoreferecing(req: Request) throws -> EventLoopFuture<Georeferecing> {
-        let geoPost = try req.content.decode(PostGeoreferecing.self)
-        guard let id = UUID(uuidString: geoPost.terrain.id) else {
-            Abort(.badRequest)
-            return
-        }
-        let geo = Georeferecing(name: geoPost.name, terrainID: id)
-        return geo.create(on: req.db).map({ geo })
-    }
+    // @gui
+    // Comentei a função pois estava dando erro no return type, só arrumar depois
+    
+    
+//    func insertGeoreferecing(req: Request) throws -> EventLoopFuture<Georeferecing> {
+//        let geoPost = try req.content.decode(PostGeoreferecing.self)
+//        guard let id = UUID(uuidString: geoPost.terrain.id) else {
+//            Abort(.badRequest)
+//            return
+//
+//        }
+//        let geo = Georeferecing(name: geoPost.name, terrainID: id)
+//        return geo.create(on: req.db).map({ geo })
+//    }
     
     func fetchAllGeo(req: Request) throws -> EventLoopFuture<[Georeferecing]> {
         return Georeferecing.query(on: req.db).all()
