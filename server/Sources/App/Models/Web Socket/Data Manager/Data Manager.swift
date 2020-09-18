@@ -25,15 +25,34 @@ internal class DataManager{
         self.connection = [String]()
     }
     
-    internal func fetch(request: ServiceTypes.Receive.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
-        var response:  ServiceTypes.Receive.Response?
+    internal func fetchData(request: ServiceTypes.Receive.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
+        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
     
         if let data = self.datas.filter({
             $0.id == request.id
         }).first {
-            response = .init(dataReceived: .some(data), actionStatus: .Sended)            
+            response.dataReceived = data
+            response.actionStatus = .Completed
+            
         } else{
-            response = .init(dataReceived: .none, actionStatus: .Error)
+            response.dataReceived = .none
+            response.actionStatus = .Error
+        }
+        completion(response)
+    }
+    
+    // Change Request to Request type of Vip Cycle
+    internal func appendData(request: SpecifiedData,completion: (ServiceTypes.Receive.Response?) -> ()){
+        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
+        let previousCount = datas.count
+        
+                
+        self.datas.append(request)
+        
+        if  self.datas.count > previousCount {
+            response.actionStatus = .Completed
+        } else{
+            response.actionStatus = .Error
         }
         
         completion(response)

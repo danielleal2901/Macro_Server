@@ -10,6 +10,6 @@ import Foundation
 enum ActionTypes{
     case Requesting
     case Sending
-    case Sended
+    case Completed
     case Error
 }
