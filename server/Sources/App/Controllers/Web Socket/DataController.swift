@@ -12,8 +12,8 @@ internal class DataController{
     
     var dataSample = SpecifiedData(id: 0)
     
-    internal func addData(){
-        DataManager.shared.appendData(request: .init(data:dataSample )) { (response) in
+    internal func addData(data: ServiceTypes.Dispatch.Request){
+        DataManager.shared.appendData(request: .init(data:"" )) { (response) in
             
             
             
@@ -21,12 +21,12 @@ internal class DataController{
     }
     
     internal func fetchData(){
-        DataManager.shared.fetchData(request: .init(id: 0)) { (response) in
+        DataManager.shared.fetchData(request: .init(id: "")) { (response) in
             
         }
     }
     
-    // Net Code
+   // Net Code
 //    internal func broadcast(teamID: Int){
 //        guard let connections = DataManager.shared.fetchConnections(teamID: teamID) else {return}
 //

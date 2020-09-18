@@ -16,13 +16,13 @@ internal class DataManager{
     internal static let shared = DataManager()
     /// Datas stored in the database
     /// Change to a "ViewModel"
-    internal private(set) var datas: [SpecifiedData]
+    internal private(set) var datas: [String]
     /// Connection for future use
     internal private(set) var connection: [String] // To Change
     
     // MARK - Initializer
     private init(){
-        self.datas = [SpecifiedData]()
+        self.datas = [String]()
         self.connection = [String]()
     }
     
@@ -37,7 +37,7 @@ internal class DataManager{
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
     
         if let data = self.datas.filter({
-            $0.id == request.id
+            $0 == request.id
         }).first {
             response.dataReceived = data
             response.actionStatus = .Completed
