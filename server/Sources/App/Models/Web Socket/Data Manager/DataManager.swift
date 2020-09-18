@@ -8,11 +8,6 @@
 import Vapor
 import Foundation
 
-// Remove Later
-struct SpecifiedData{
-    var id: Int
-}
-
 internal class DataManager{
     
     
@@ -59,7 +54,7 @@ internal class DataManager{
     /// Append Some Data on the Storage included on Data Manager
     /// - Parameters:
     ///   - request: Request action with Data that needs to be included in Database
-    ///   - completion: Response of Receive action, including the result of action Status    
+    ///   - completion: Response of Receive action, including the result of action Status
     internal func appendData(request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         let previousCount = datas.count

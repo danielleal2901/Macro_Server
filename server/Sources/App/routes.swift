@@ -16,13 +16,7 @@ func routes(_ app: Application) throws {
     app.get("hello") { req -> String in    
         return "Hello, world!"
     }
-    
-    app.post("WebSocketTesting"){req -> String in
-        print("Received")
-        let data = try req.content.decode(InfoData.self)
-        return "hello \(data.dataString)"
-        
-    }
+
     try app.register(collection: TerrainController())
     try app.register(collection: GeoController())
  
