@@ -9,7 +9,7 @@ import Foundation
 import Vapor
 import Fluent
 
-final class Stages: Model, Content {
+final class Stage: Model, Content {
     
     static let schema = "stages"
     
@@ -21,6 +21,7 @@ final class Stages: Model, Content {
     struct Output: Content {
         let id: String
         let terrain: String
+        let stageType: String
     }
     
     @ID(key: .id)
