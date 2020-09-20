@@ -14,13 +14,12 @@ final class Stages: Model, Content {
     static let schema = "stages"
     
     struct Input: Content {
-        let name: String
         let terrain: String
+        let stageType: String
     }
     
     struct Output: Content {
         let id: String
-        let name: String
         let terrain: String
     }
     
@@ -30,13 +29,13 @@ final class Stages: Model, Content {
     @Parent(key: "terrain_id")
     var terrain: Terrain
     
-    @Field(key: "name")
-    var name: String
+    @Enum (key: "type")
+    var type: StageTypes
     
     init() {}
     
-    init(id: UUID? = nil, name: String, terrainID: UUID) {
-        self.name = name
+    init(id: UUID? = nil, type: StageTypes, terrainID: UUID) {
+        self.type = type
         self.$terrain.id = terrainID
     }
 }
