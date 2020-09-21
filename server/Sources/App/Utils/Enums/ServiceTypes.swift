@@ -9,12 +9,17 @@ import Foundation
 
 enum ServiceTypes{
     struct Connection{
-        var response: Bool
+        struct Response{
+            var status: Bool
+        }
+        struct activeSession{
+            var sessionID: Int
+        }
     }
     
     struct Dispatch{
         struct Request{
-            var data: DataTypes
+            var data: String // Change to DataType
         }
         struct Response{
             var actionStatus: ActionTypes
@@ -23,9 +28,11 @@ enum ServiceTypes{
     
     struct Receive{
         struct Request{
-            var data: DataTypes
+            // Change to proper ID var
+            var id: String
         }
         struct Response{
+            var dataReceived: String?
             var actionStatus: ActionTypes
         }
     }

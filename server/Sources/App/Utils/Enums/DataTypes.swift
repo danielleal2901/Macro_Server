@@ -7,9 +7,8 @@
 
 import Foundation
 
-enum ActionTypes{
-    case Requesting
-    case Sending
-    case Sended
-    case Error
+enum DataTypes{
+    case SpecifiedData
+    case String
+    case Int
 }
