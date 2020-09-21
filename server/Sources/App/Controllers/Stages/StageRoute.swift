@@ -8,19 +8,18 @@
 import Foundation
 import Vapor
 
-struct StageRoute {
-    let main = "stages"
-    let stageName = ":stageName"
-    let stageId = ":stageId"
-    let withTerrain = "terrain"
-    let terrainId = ":terrainId"
-    let parameters: Parameters
+enum StageRoute : String {
+    case main = "stages"
+    case stageName = ":stageName"
+    case stageId = ":stageId"
+    case withTerrain = "terrain"
+    case terrainId = ":terrainId"
 }
 
-struct Parameters {
-    let stageName = "stageName"
-    let stageId = "stageId"
-    let terrainId = "terrainId"
+enum StageParameters: String {
+    case stageName = "stageName"
+    case stageId = "stageId"
+    case terrainId = "terrainId"
 }
     
 //    var stage: StageTypes

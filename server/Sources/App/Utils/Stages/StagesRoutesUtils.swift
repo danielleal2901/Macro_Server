@@ -8,25 +8,70 @@
 import Foundation
 import Vapor
 
-enum StageRoutesType {
-    case simple
-    case stageId
-    case terrainId
-}
-
 class StagesRoutesUtils {
     
-    static func verifyStageRequest(req: Request) throws -> StageTypes {
-        let path = req.url.path
-        let lowerBound = path.index(path.startIndex, offsetBy: 8)
-        let upperBound = path.index(path.startIndex, offsetBy: path.count)
-        let stagePath = String(path[lowerBound..<upperBound])
-        
-        guard let verifyStagePath = StageTypes(rawValue: stagePath) else {
+    static func verifySimpleRoute(req: Request) throws -> Stage{
+
+        guard let reqParameter = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
             throw Abort(.badRequest)
         }
         
-        return verifyStagePath
+        //Verifica se o tipo da url eh um tipo de stage
+        guard let verifyStagePath = StageTypes(rawValue: reqParameter)  else {
+            throw Abort(.badRequest)
+        }
+        
+        //Verifica se consegue dar decode no input
+        let input = try req.content.decode(Stage.Input.self)
+        
+        //Verifica se o id no input eh um uuid
+        guard let id = UUID(uuidString: input.terrain) else {
+            throw Abort(.badRequest)
+        }
+        
+        //Verifica se o tipo da url eh igual ao tipo do content
+        guard let stageType = StageTypes(rawValue: input.stageType), verifyStagePath == stageType else {
+            throw Abort(.badRequest)
+        }
+        
+        let stage = Stage(type: stageType, terrainID: id)
+        
+        return stage
+
     }
+    
+    static func verifyRouteWithStageId(req: Request) throws {
+                    
+        guard let stageType = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
+            throw Abort(.badRequest)
+        }
+
+        //Verifica se a stage passada eh uma stage valida
+        guard StageTypes(rawValue: stageType) != nil else {
+            throw Abort(.badRequest)
+        }
+                
+        return
+    }
+    
+    static func verifyRouteWithTerrainId(req: Request) throws {
+
+        
+        
+    }
+    
+//
+//    static func verifyRouteWithTerrainId(path: String) throws -> StageTypes{
+//        if let index = path.index(of: "stages/") {
+//            let substring = path[index...]
+//            let stagePath = String(substring)
+//            guard let verifyStagePath = StageTypes(rawValue: stagePath) else {
+//                throw Abort(.badRequest)
+//            }
+//        }
+//        throw Abort(.badRequest)
+//    }
+
+    
     
 }
