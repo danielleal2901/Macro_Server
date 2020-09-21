@@ -30,12 +30,14 @@ func webSockets(_ app: Application) throws{
         
         let dataController = DataController()
         
+        
+        
+        
         let firstData = request.session.data["firstData"] ?? "First Data nil"
         let secondData = request.session.data["secondData"] ?? "Second Data nil"
         
         dataController.addData(data: .init(data: firstData))
         dataController.addData(data: .init(data: secondData))
-        
         
         ws.onText { (ws, data) in            
             //if let receivedData = data.data(using: .utf8),
@@ -43,23 +45,45 @@ func webSockets(_ app: Application) throws{
             print("Message received")
             print("Client: \(data)")
             
-            ws.send("Server sending message back")
+            dataController.fetchData(record: "terrains")
             
-            // Receive the Data from the Client and Decode it
-            // Save to DATABASE
-            // Must get Team ID,
-        }
+            
+            var eventTerrains: EventLoopFuture<[Terrain]>
+            var testingTerrain: [TestingTerrain] = []
+            
+            do{
+                let eventTerrains = try TerrainController().fetchAllTerrains(req: request)
+                
+                eventTerrains.whenSuccess { (terrains) in
+                    testingTerrain.append(TestingTerrain(id: terrains[0].id!, name: terrains[0].name))
+                    let data = try! JSONEncoder().encode(terrains)
+                    let jsonString = String(data: data,encoding: .utf8)
+                    ws.send(jsonString!)
+                    print("message Sended with Success")
+                }
+               
+            }
+                    
+         catch(let fatalError) {
+            print(fatalError)
+            }
         
-        ws.onBinary { (ws, binary) in
-            print(binary)
-        }
         
-        
-        ws.onClose.whenComplete { result in
-            print("Ended Connection")
-        }
-        
+        // Receive the Data from the Client and Decode it
+        // Save to DATABASE
+        // Must get Team ID,
+    }
+    
+    ws.onBinary { (ws, binary) in
+        print(binary)
     }
     
     
+    ws.onClose.whenComplete { result in
+        print("Ended Connection")
+    }
+    
+}
+
+
 }
