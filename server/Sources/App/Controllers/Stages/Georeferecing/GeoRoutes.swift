@@ -7,14 +7,14 @@
 
 import Vapor
 
-enum GeoRoutes: String {
+enum GeoRoutes: String, PathComponents {
     case main = "georeferecings"
     case id = ":geoId"
     case withTerrain = "terrain"
     case terrainId = ":terrainId"
     
-    static func getPathComponent(_ route: GeoRoutes) -> PathComponent {
-        return PathComponent(stringLiteral: route.rawValue)
+    var getPath : PathComponent{
+        return PathComponent(stringLiteral: self.rawValue)
     }
 }
 

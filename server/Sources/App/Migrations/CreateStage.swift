@@ -15,12 +15,12 @@ struct CreateStage: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         
         
-        return database.enum("teste").read().flatMap { stageType in
+        return database.enum("stagetypes").read().flatMap { stageType in
             database.schema("stages")
                 .id()
                 .field("type", stageType, .required)
-                .field("terrain_id", .uuid, .required, .references("terrains", "id"))
-                .field("name", .string, .required)
+                .field("terrain_id", .uuid, .required)
+                .foreignKey("terrain_id", references: "terrains", "id", onDelete: .cascade)
                 .create()
         }
     }
