@@ -35,6 +35,8 @@ internal class DataManager{
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
     internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
+        // Change Evnnt Data for DataTypes conforming to Enunm
+        //var eventData: EventLoopFuture<[DataTypes]>
         
         switch dataRequest.id{
         case "terrains":
@@ -45,26 +47,17 @@ internal class DataManager{
                 response.actionStatus = .Completed
                 completion(response)
             }
-            
-            response.actionStatus = .Completed
-        case "":
-            print()
+        case "georeferecing":
+            let eventData = try! GeoController().fetchAllGeo(req: sessionRequest)
+            eventData.whenSuccess { (terrains) in
+                let encodedValue = self.encodeToString(valueToEncode: terrains)
+                response.dataReceived = encodedValue
+                response.actionStatus = .Completed
+                completion(response)
+            }
         default:
             print()
-        }
-        
-        if let data = self.datas.filter({
-            $0 == dataRequest.id
-        }).first {
-            response.dataReceived = data
-            response.actionStatus = .Completed
-            
-        } else{
-            response.dataReceived = .none
-            response.actionStatus = .Error
-        }
-        
-        completion(response)
+        }                              
     }
     
     // Change Request to Request type of Vip Cycle

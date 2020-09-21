@@ -7,8 +7,7 @@
 
 import Foundation
 
-enum DataTypes{
-    case SpecifiedData
-    case String
-    case Int
+enum DataTypes: Any{
+    case Terrain
+    case Georeferencing
 }
