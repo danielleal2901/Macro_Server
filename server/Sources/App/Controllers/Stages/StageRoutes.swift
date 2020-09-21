@@ -27,6 +27,8 @@ struct StageRoutes {
         case enviroment
         case evaluation
         case car
+        case register
+        case resident
     }
     
     var stage: StageType
@@ -40,6 +42,10 @@ struct StageRoutes {
             return Route(main: "cars", id: ":carId", parameters: Parameters(stageId: "carId"))
         case .evaluation:
             return Route(main: "evaluations", id: ":evaluationId", parameters: Parameters(stageId: "evaluationId"))
+        case .register:
+            return Route(main: "registers", id: ":register", parameters: Parameters(stageId: "registerId"))
+        case .resident:
+            return Route(main: "residents", id: ":residentId", parameters: Parameters(stageId: "residentId"))
         }
     }
 

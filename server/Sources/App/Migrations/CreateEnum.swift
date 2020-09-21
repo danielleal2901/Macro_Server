@@ -17,13 +17,13 @@ struct CreateEnum: Migration {
         .case("car")
         .case("evaluation")
         .case("enviroment")
-        .case("registry")
+        .case("register")
         .case("resident")
             .create().transform(to: ())
         
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema("georeferecings").delete()
+        return database.enum("stageTypes").delete()
     }
 }
