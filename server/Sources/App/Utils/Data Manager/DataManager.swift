@@ -33,11 +33,28 @@ internal class DataManager{
     /// - Parameters:
     ///   - request: Request of Receive action, having id for search in database
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
-    internal func fetchData(request: ServiceTypes.Receive.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
+    internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
-    
+        
+        switch dataRequest.id{
+        case "terrains":
+            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
+            eventData.whenSuccess { (terrains) in
+                let encodedValue = self.encodeToString(valueToEncode: terrains)
+                response.dataReceived = encodedValue
+                response.actionStatus = .Completed
+                completion(response)
+            }
+            
+            response.actionStatus = .Completed
+        case "":
+            print()
+        default:
+            print()
+        }
+        
         if let data = self.datas.filter({
-            $0 == request.id
+            $0 == dataRequest.id
         }).first {
             response.dataReceived = data
             response.actionStatus = .Completed
@@ -46,6 +63,7 @@ internal class DataManager{
             response.dataReceived = .none
             response.actionStatus = .Error
         }
+        
         completion(response)
     }
     
@@ -58,7 +76,7 @@ internal class DataManager{
     internal func appendData(request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         let previousCount = datas.count
-                        
+        
         self.datas.append(request.data)
         
         // May be Useless, to Check
@@ -69,6 +87,12 @@ internal class DataManager{
         }
         
         completion(response)
+    }
+    
+    func encodeToString<T>(valueToEncode: T) -> String where T: Encodable{
+        let data = try! JSONEncoder().encode(valueToEncode)
+        let jsonString = String(data: data,encoding: .utf8)
+        return jsonString ?? "Error"
     }
     
     // General Management
