@@ -25,6 +25,7 @@ public func configure(_ app: Application) throws {
     
     app.migrations.add(CreateTerrain())
     app.migrations.add(CreateStage())
+    app.migrations.add(CreateDocument())
 //    app.migrations.add(CreateEnum())
 
     // register routes
