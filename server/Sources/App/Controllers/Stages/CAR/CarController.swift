@@ -10,7 +10,9 @@ import Vapor
 import Fluent
 
 class CarController: RouteCollection, StageRoutesProtocol {
+    let stageRoute: StageRoutes = StageRoutes(stage: .car)
+    
     func boot(routes: RoutesBuilder) throws {
-        
+        setupRoutesBuilder(routes: routes)
     }
 }

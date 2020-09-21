@@ -12,13 +12,13 @@ import FluentPostgresDriver
 
 struct CreateEnum: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        return database.enum("stagetypes")
+        return database.enum("stageTypes")
         .case("georeferecing")
         .case("car")
-        .case("avaliation")
-        .case("enviromental")
-        .case("registryIndividualization")
-        .case("residentData")
+        .case("evaluation")
+        .case("enviroment")
+        .case("registry")
+        .case("resident")
             .create().transform(to: ())
         
     }

@@ -13,9 +13,9 @@ enum OverviewRoutes: String {
     case withStage = "stage"
     case stageId = ":stageId"
     
-    static func getPathComponent(_ route: GeoRoutes) -> PathComponent {
-        return PathComponent(stringLiteral: route.rawValue)
-    }
+//    static func getPathComponent(_ route: GeoRoutes) -> PathComponent {
+//        return PathComponent(stringLiteral: route.rawValue)
+//    }
 }
 
 enum OverviewParameters : String {
