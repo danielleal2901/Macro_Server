@@ -24,11 +24,9 @@ public func configure(_ app: Application) throws {
     print(app.http.server.configuration.tlsConfiguration?.privateKey)
     
     app.migrations.add(CreateTerrain())
-    app.migrations.add(CreateGeoreferecing())
-    
-    //app.middleware.use(app.sessions.middleware)
-    //app.sessions.use(.memory)
-    
+    app.migrations.add(CreateStage())
+//    app.migrations.add(CreateEnum())
+
     // register routes
     try routes(app)
     try webSockets(app)
