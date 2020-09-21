@@ -14,8 +14,7 @@ import FluentPostgresDriver
 struct CreateStage: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         
-        
-        return database.enum("stagetypes").read().flatMap { stageType in
+        return database.enum("stages_types").read().flatMap { stageType in
             database.schema("stages")
                 .id()
                 .field("type", stageType, .required)

@@ -12,7 +12,7 @@ import FluentPostgresDriver
 
 struct CreateEnum: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        return database.enum("stageTypes")
+        return database.enum("stages_types")
         .case("georeferecing")
         .case("car")
         .case("evaluation")
@@ -20,7 +20,6 @@ struct CreateEnum: Migration {
         .case("register")
         .case("resident")
             .create().transform(to: ())
-        
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {

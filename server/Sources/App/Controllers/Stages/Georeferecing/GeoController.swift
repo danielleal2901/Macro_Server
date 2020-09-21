@@ -10,7 +10,7 @@ import Vapor
 import Fluent
 
 class GeoController: RouteCollection, StageRoutesProtocol {
-    let stageRoute: StageRoutes = StageRoutes(stage: .geo)
+    let stageRoute: StageRoutes = StageRoutes(stage: .georeferecing)
     
     func boot(routes: RoutesBuilder) throws {
         setupRoutesBuilder(routes: routes)

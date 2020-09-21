@@ -22,19 +22,10 @@ struct StageRoutes {
         var terrainId = "terrainId"
     }
     
-    enum StageType {
-        case geo
-        case enviroment
-        case evaluation
-        case car
-        case register
-        case resident
-    }
-    
-    var stage: StageType
+    var stage: StageTypes
     var route: Route {
         switch self.stage {
-        case .geo:
+        case .georeferecing:
             return Route(main: "georeferecings", id: ":geoId", parameters: Parameters(stageId: "geoId"))
         case .enviroment:
             return Route(main: "enviroments", id: ":enviromentId", parameters: Parameters(stageId: "enviromentId"))
