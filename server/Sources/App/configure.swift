@@ -15,13 +15,9 @@ public func configure(_ app: Application) throws {
         username: "postgres",
         password: "",
         database: "macro_challenge_dev"), as: .psql)
-        
     
-    
-
     app.http.server.configuration.hostname = "127.0.0.1"    
     app.http.server.configuration.port = 8080
-    
     
     app.migrations.add(CreateTerrain())
     app.migrations.add(CreateGeoreferecing())

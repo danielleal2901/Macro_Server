@@ -30,18 +30,26 @@ func webSockets(_ app: Application) throws{
         
         let dataController = DataController()
         
+        let userID = request.session.data["username"] ?? "User 001"
+        let teamID = request.session.data["team"] ?? "Empty Team"
+        
+        //let message = DataMessage(from: )
+        
+        dataController.enteredUser(userID: userID,teamID: teamID)
         
         
-        
-        let firstData = request.session.data["firstData"] ?? "First Data nil"
-        let secondData = request.session.data["secondData"] ?? "Second Data nil"
-        
-        dataController.addData(data: .init(data: firstData))
-        dataController.addData(data: .init(data: secondData))
         
         ws.onText { (ws, data) in
             print("Message received")
             print("Client: \(data)")
+            let jsonDecoder = JSONDecoder()
+            
+            if let dataCov = data.data(using: .ascii){
+                let message = try? jsonDecoder.decode(DataMessage.self, from: dataCov)
+                print(message)
+            }
+            
+            TerrainController().fetchSome(req: request)
             
             dataController.fetchData(sessionID: request, recordID: .init(id: data)) { (response) in
                 switch response.actionStatus{
@@ -54,7 +62,6 @@ func webSockets(_ app: Application) throws{
                     
                 }
             }
-            
             // Receive the Data from the Client and Decode it
             // Save to DATABASE
             // Must get Team ID,

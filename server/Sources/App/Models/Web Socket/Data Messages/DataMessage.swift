@@ -10,7 +10,7 @@ import Foundation
 internal struct DataMessage: Codable{
     
     // MARK - Variables
-    internal private(set) var data: SpecifiedData
+    internal private(set) var data: String
     internal private(set) var destTeamID: Int
     internal private(set) var respUser: Int
     
@@ -20,12 +20,12 @@ internal struct DataMessage: Codable{
         case destTeamID = "destination"
         case respUser = "user"
     }
-    
+        
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        data = try values.decode(SpecifiedData.self,forKey: .data)
-        destTeamID = try values.decode(Int.self,forKey: .data)
-        respUser = try values.decode(Int.self,forKey: .data)
+        data = try values.decode(String.self,forKey: .data)
+        destTeamID = try values.decode(Int.self,forKey: .destTeamID)
+        respUser = try values.decode(Int.self,forKey: .respUser)
     }
     
 }

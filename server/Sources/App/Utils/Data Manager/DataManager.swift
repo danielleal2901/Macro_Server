@@ -37,9 +37,8 @@ internal class DataManager{
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         // Change Evnnt Data for DataTypes conforming to Enunm
         //var eventData: EventLoopFuture<[DataTypes]>
-        
         switch dataRequest.id{
-        case "terrains":
+        case "terrain":
             let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = self.encodeToString(valueToEncode: terrains)
@@ -57,7 +56,7 @@ internal class DataManager{
             }
         default:
             print()
-        }                              
+        }
     }
     
     // Change Request to Request type of Vip Cycle
@@ -80,13 +79,15 @@ internal class DataManager{
         }
         
         completion(response)
-    }
+    }        
     
     func encodeToString<T>(valueToEncode: T) -> String where T: Encodable{
         let data = try! JSONEncoder().encode(valueToEncode)
         let jsonString = String(data: data,encoding: .utf8)
         return jsonString ?? "Error"
     }
+    
+    func decode<T>(valueToDecode: T){}
     
     // General Management
     // To implement

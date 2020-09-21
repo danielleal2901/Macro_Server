@@ -9,9 +9,7 @@ import Vapor
 import Foundation
 
 internal class DataController{
-    
-    var dataSample = SpecifiedData(id: 0)
-    
+            
     internal func addData(data: ServiceTypes.Dispatch.Request){
         DataManager.shared.appendData(request: .init(data:"" )) { (response) in
             
@@ -25,6 +23,12 @@ internal class DataController{
             completion(response ?? ServiceTypes.Receive.Response.init(dataReceived: "Error", actionStatus: .Error))
         }
     }
+    
+    internal func enteredUser(userID: String,teamID: String){
+        
+    }
+    
+    internal func broadcast(){}
     
    // Net Code
 //    internal func broadcast(teamID: Int){
