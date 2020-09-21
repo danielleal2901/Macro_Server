@@ -28,10 +28,6 @@ func webSockets(_ app: Application) throws{
     
     app.webSocket("DataExchange"){ request,ws in
         
-        ws.onText { ws, data in
-            ws.send("Message Received")
-        }
-        
         let dataController = DataController()
         
         let firstData = request.session.data["firstData"] ?? "First Data nil"
@@ -42,12 +38,20 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onText { (ws, data) in            
-            if let receivedData = data.data(using: .utf8),
-                let decodedData = try? JSONDecoder().decode(SpecifiedData.self, from: receivedData){
-                // Receive the Data from the Client and Decode it
-                // Save to DATABASE
-                // Must get Team ID,
-            }
+            //if let receivedData = data.data(using: .utf8),
+            //   let decodedData = try? JSONDecoder().decode(SpecifiedData.self, from: receivedData){
+            print("Message received")
+            print("Client: \(data)")
+            
+            ws.send("Server sending message back")
+            
+            // Receive the Data from the Client and Decode it
+            // Save to DATABASE
+            // Must get Team ID,
+        }
+        
+        ws.onBinary { (ws, binary) in
+            print(binary)
         }
         
         
