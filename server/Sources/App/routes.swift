@@ -24,6 +24,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: ResidentController())
     try app.register(collection: RegisterController())
 
+}
 
 func webSockets(_ app: Application) throws{
     print("Creating connection")
@@ -58,6 +59,5 @@ func webSockets(_ app: Application) throws{
         }
         
     }
-    
-    
+
 }
