@@ -1,18 +1,18 @@
+////
+////  File.swift
+////  
+////
+////  Created by Daniel Leal on 20/09/20.
+////
 //
-//  File.swift
-//  
+//import Foundation
+//import Vapor
+//import Fluent
 //
-//  Created by Daniel Leal on 20/09/20.
+//class EvaluationController: RouteCollection, StageRoutesProtocol {
+//    let stageRoute: StageRoutes = StageRoutes(stage: .evaluation)
 //
-
-import Foundation
-import Vapor
-import Fluent
-
-class EvaluationController: RouteCollection, StageRoutesProtocol {
-    let stageRoute: StageRoutes = StageRoutes(stage: .evaluation)
-
-    func boot(routes: RoutesBuilder) throws {
-        setupRoutesBuilder(routes: routes)
-    }
-}
+//    func boot(routes: RoutesBuilder) throws {
+////        setupRoutesBuilder(routes: routes)
+//    }
+//}

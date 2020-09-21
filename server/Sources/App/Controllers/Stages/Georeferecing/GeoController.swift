@@ -1,18 +1,18 @@
+////
+////  File.swift
+////
+////
+////  Created by Daniel Leal on 12/09/20.
+////
 //
-//  File.swift
-//  
+//import Foundation
+//import Vapor
+//import Fluent
 //
-//  Created by Daniel Leal on 12/09/20.
+//class GeoController: RouteCollection, StageRoutesProtocol {
+//    let stageRoute: StageRoutes = StageRoutes(stage: .georeferecing)
 //
-
-import Foundation
-import Vapor
-import Fluent
-
-class GeoController: RouteCollection, StageRoutesProtocol {
-    let stageRoute: StageRoutes = StageRoutes(stage: .georeferecing)
-    
-    func boot(routes: RoutesBuilder) throws {
-        setupRoutesBuilder(routes: routes)
-    }
-}
+//    func boot(routes: RoutesBuilder) throws {
+////        setupRoutesBuilder(routes: routes)
+//    }
+//}
