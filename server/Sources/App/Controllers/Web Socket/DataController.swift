@@ -9,21 +9,30 @@ import Vapor
 import Foundation
 
 internal class DataController{
-    
+    typealias Services = ServiceTypes
     
     /// Add a Data to Database
     /// - Parameter data: Data to add
-    internal func addData(data: ServiceTypes.Dispatch.Request){
-        DataManager.shared.appendData(request: .init(data:"" )) { (response) in            
+    internal func addData(data: Services.Dispatch.Request){
+        DataManager.shared.appendData(request: data) { (response) in
+            
         }
     }
-    
-    internal func fetchData(sessionID: Request,dataMessage: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response) -> ()){
+
+    ///
+    /// - Parameters:
+    ///   - sessionID:
+    ///   - dataMessage:
+    ///   - completion:
+    /// - Returns:
+    internal func fetchData(sessionID: Request,dataMessage: Services.Receive.Request,completion: @escaping (Services.Receive.Response) -> ()){
         DataManager.shared.fetchData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
-            completion(response ?? ServiceTypes.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
+            completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
         }
     }
     
+    internal func updateData(){}
+    internal func deleteData(){}
     
     /// Call Manager to perform action to add user to a certain team
     /// - Parameters:
@@ -39,6 +48,7 @@ internal class DataController{
     /// - Parameter data: Data to send to all users
     internal func broadcast(data: String){
         let connections = DataManager.shared.fetchConnections()
+        // Do not send to current id sender
         connections.forEach({ $0.webSocket.send(data)})
     }
     

@@ -10,16 +10,17 @@ import Foundation
 internal struct DataMessage: Codable{
     
     // MARK - Variables
-    
     internal private(set) var data: Data
     internal private(set) var dataID: String
     internal private(set) var destTeamID: Int
     internal private(set) var respUserID: Int
+    internal private(set) var operation: Operations.RawValue    
     
     // In doubt if using this type or another encoder
     private enum CodingKeys: String, CodingKey{
         case data
         case dataID
+        case operation
         case destTeamID = "destination"
         case respUserID = "user"
     }
@@ -31,6 +32,7 @@ internal struct DataMessage: Codable{
         dataID = try values.decode(String.self,forKey: .dataID)
         destTeamID = try values.decode(Int.self,forKey: .destTeamID)
         respUserID = try values.decode(Int.self,forKey: .respUserID)
+        operation = try values.decode(Int.self, forKey: .operation)
     }
     
 }

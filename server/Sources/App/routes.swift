@@ -40,34 +40,40 @@ func webSockets(_ app: Application) throws{
         // Add User to Specific Team Session
         dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
-                
+        
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
-            print("Message received")
-            print("Client: \(data)")
-                        
             if let dataCov = data.data(using: .ascii){
                 guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
-                // Data Decoded
-                print(message)
-                
-                dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                    print(response.actionStatus)
-                    switch response.actionStatus{
-                    case .Completed:
-                        let byte = [UInt8]((response.dataReceived)!)
-                        let convertedData = String(data: response.dataReceived!,encoding: .utf8)
-                        ws.send(convertedData!)
-                                                                                                                        
-                        dataController.broadcast(data: convertedData!)
-                    case .Error:
-                        ws.send("Error")
-                    default:
-                        ws.send("Error")
+                switch message.operation{
+                case 0:
+                    // INSERT DATA
+                    print()
+                case 1:
+                    // FETCH DATA
+                    dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                        switch response.actionStatus{
+                        case .Completed:
+                            let convertedData = String(data: response.dataReceived!,encoding: .utf8)
+                            dataController.broadcast(data: convertedData!)
+                        case .Error:
+                            ws.send("Error")
+                        default:
+                            ws.send("Error")
+                        }
                     }
-                }
+                case 2:
+                    // UPDATE DATA
+                    print()
+                case 3:
+                    // DELETE DATA
+                    print()
+                default:
+                    print()
+                    
+                }                
             }
-            
             // Receive the Data from the Client and Decode it
             // Save to DATABASE
             // Must get Team ID,
@@ -80,6 +86,7 @@ func webSockets(_ app: Application) throws{
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
+            // remover usuario
         }
         
     }

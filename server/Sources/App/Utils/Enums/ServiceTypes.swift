@@ -26,7 +26,7 @@ enum ServiceTypes{
     struct Dispatch{
          /// Data of Dispatch Request
         struct Request{
-            var data: String // Change to DataType
+            var data: DataMessage // Change to DataType
         }
         /// Response of Dispatch Request
         struct Response{

@@ -83,11 +83,13 @@ internal class DataManager{
     /// - Parameters:
     ///   - request: Request action with Data that needs to be included in Database
     ///   - completion: Response of Receive action, including the result of action Status
-    internal func appendData(request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Receive.Response?) -> ()){
-        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
+    internal func appendData(request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Dispatch.Response?) -> ()){
+        var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         let previousCount = datas.count
+            
         
-        self.datas.append(request.data)
+        
+        self.datas.append(request.data.dataID)
         
         // May be Useless, to Check
         if  self.datas.count > previousCount {
@@ -123,12 +125,6 @@ internal class DataManager{
     internal func fetchTeam(){}
     internal func updateTeam(){}
     internal func deleteTeam(){}
-    
-    
-    
-    
-    
-    
     
     
 }
