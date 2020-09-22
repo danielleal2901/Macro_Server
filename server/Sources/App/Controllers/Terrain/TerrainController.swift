@@ -22,7 +22,9 @@ struct TerrainController: RouteCollection {
     }
     
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
-        let terrain = try req.content.decode(Terrain.self)
+        let terrainInput = try req.content.decode(Terrain.Input.self)
+        
+        let terrain = Terrain(id: UUID(), name: terrainInput.name)
         return terrain.create(on: req.db).map({ terrain })
     }
     
