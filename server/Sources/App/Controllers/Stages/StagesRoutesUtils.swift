@@ -10,8 +10,11 @@ import Vapor
 
 class StagesRoutesUtils {
     
-    static func verifySimpleRoute(req: Request) throws -> Stage{
-
+    /// Method used to validate and get content from uploads request.
+    /// - Parameter req: upload request
+    /// - Throws: a possible error in validation
+    /// - Returns: a stage get from request content
+    static func verifyUploadRoutes(req: Request) throws -> Stage{
         guard let reqParameter = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
             throw Abort(.badRequest)
         }
@@ -37,41 +40,26 @@ class StagesRoutesUtils {
         let stage = Stage(type: stageType, terrainID: id)
         
         return stage
-
     }
     
-    static func verifyRouteWithStageId(req: Request) throws {
-                    
-        guard let stageType = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
+    /// Method used to validate and get a stage type from data request
+    /// - Parameter req: data request
+    /// - Throws: possible error in validation
+    /// - Returns: returns a stage type getted from url
+    static func verifyDataRoutes(req: Request) throws -> StageTypes{
+        
+        //Verifica se consegue pegar o parametro da url
+        guard let reqParameter = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
             throw Abort(.badRequest)
         }
-
-        //Verifica se a stage passada eh uma stage valida
-        guard StageTypes(rawValue: stageType) != nil else {
+        
+        //Verifica se o tipo informado no parametro da url eh um tipo de stage
+        guard let verifyStagePath = StageTypes(rawValue: reqParameter)  else {
             throw Abort(.badRequest)
         }
-                
-        return
-    }
-    
-    static func verifyRouteWithTerrainId(req: Request) throws {
-
         
-        
+        return verifyStagePath
     }
-    
-//
-//    static func verifyRouteWithTerrainId(path: String) throws -> StageTypes{
-//        if let index = path.index(of: "stages/") {
-//            let substring = path[index...]
-//            let stagePath = String(substring)
-//            guard let verifyStagePath = StageTypes(rawValue: stagePath) else {
-//                throw Abort(.badRequest)
-//            }
-//        }
-//        throw Abort(.badRequest)
-//    }
-
-    
+ 
     
 }
