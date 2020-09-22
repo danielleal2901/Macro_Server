@@ -26,24 +26,26 @@ func routes(_ app: Application) throws {
 func webSockets(_ app: Application) throws{
     print("Creating connection")
     
+    /// Aiming to add to a class
+    /// Active session for Web Socket Connection
     app.webSocket("DataExchange"){ request,ws in
         
+        // MARK - Variables
         let dataController = DataController()
         
+        // User Info to get via connection Request and register automatically
         let user = request.session.data["username"] ?? "User 001"
         let team = request.session.data["team"] ?? "Empty Team"
         
-        //let message = DataMessage(from: )
-        
+        // Add User to Specific Team Session
         dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
                 
-        
+        // Actions for control of User Sessions
         ws.onText { (ws, data) in
             print("Message received")
             print("Client: \(data)")
-            
-            
+                        
             if let dataCov = data.data(using: .ascii){
                 guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
                 // Data Decoded
