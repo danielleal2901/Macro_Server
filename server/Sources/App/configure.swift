@@ -15,10 +15,7 @@ public func configure(_ app: Application) throws {
         username: "postgres",
         password: "",
         database: "macro_challenge_dev"), as: .psql)
-        
     
-    
-
     app.http.server.configuration.hostname = "127.0.0.1"    
     app.http.server.configuration.port = 8080
     print(app.http.server.configuration.tlsConfiguration?.privateKey)
