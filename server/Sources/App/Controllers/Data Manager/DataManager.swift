@@ -59,11 +59,20 @@ internal class DataManager{
         }
     }
     
+    
+    /// Add a user to a group (currently using one instance)
+    /// - Parameters:
+    ///   - userID: user identification
+    ///   - teamID: team identification
+    ///   - socket: websocket
     func addUser(userID: String,teamID: String,socket: WebSocket){
         let connection = TeamConnection(name: userID, teamName: teamID, webSocket: socket)
         self.connections.append(connection)
     }
     
+    
+    /// Fetch all connections active (current using one instance)
+    /// - Returns: intended connection
     func fetchConnections() -> [TeamConnection]{
         return self.connections
     }
