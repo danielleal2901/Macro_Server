@@ -18,12 +18,12 @@ internal class DataManager{
     /// Change to a "ViewModel"
     internal private(set) var datas: [String]
     /// Connection for future use
-    internal private(set) var connection: [String] // To Change
+    internal private(set) var connections: [TeamConnection] // To Change
     
     // MARK - Initializer
     private init(){
         self.datas = [String]()
-        self.connection = [String]()
+        self.connections = [TeamConnection]()
     }
     
     
@@ -59,6 +59,15 @@ internal class DataManager{
         }
     }
     
+    func addUser(userID: String,teamID: String,socket: WebSocket){
+        let connection = TeamConnection(id: 0, name: userID, webSocket: socket)
+        self.connections.append(connection)
+    }
+    
+    func fetchConnections() -> [TeamConnection]{
+        return self.connections
+    }
+    
     // Change Request to Request type of Vip Cycle
     
     /// Append Some Data on the Storage included on Data Manager
@@ -88,6 +97,7 @@ internal class DataManager{
     }
     
     func decode<T>(valueToDecode: T){}
+    
     
     // General Management
     // To implement

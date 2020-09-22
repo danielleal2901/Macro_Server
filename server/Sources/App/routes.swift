@@ -35,13 +35,14 @@ func webSockets(_ app: Application) throws{
         
         //let message = DataMessage(from: )
         
-        dataController.enteredUser(userID: userID,teamID: teamID)
+        dataController.enteredUser(userID: "Guilherme", teamID: "ABPRU", connection: ws)
         
-        
+                
         
         ws.onText { (ws, data) in
             print("Message received")
             print("Client: \(data)")
+            
             
             if let dataCov = data.data(using: .ascii){
                 guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
@@ -56,6 +57,7 @@ func webSockets(_ app: Application) throws{
 //                        let value = String(bytes: byte, encoding: .utf8)
                         let convertedData = String(data: response.dataReceived!,encoding: .utf8)
                         ws.send(convertedData!)
+                        dataController.broadcast(data: convertedData!)
                     case .Error:
                         ws.send("Error")
                     default:
