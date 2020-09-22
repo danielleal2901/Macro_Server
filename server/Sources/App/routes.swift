@@ -45,7 +45,7 @@ func webSockets(_ app: Application) throws{
             print("Message received")
             print("Client: \(data)")
             
-            dataController.fetchData(record: "terrains")
+            //dataController.fetchData(record: "terrains")
             
             
             var eventTerrains: EventLoopFuture<[Terrain]>
