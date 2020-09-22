@@ -9,7 +9,7 @@ import Vapor
 
 enum TerrainRoutes: String {
     case main = "terrains"
-    case id = ":terrainID"
+    case id = ":terrainId"
     
     static func getPathComponent(_ route: TerrainRoutes) -> PathComponent {
         return PathComponent(stringLiteral: route.rawValue)
@@ -17,5 +17,5 @@ enum TerrainRoutes: String {
 }
 
 enum TerrainParameters: String {
-    case idTerrain = "terrainID"
+    case idTerrain = "terrainId"
 }

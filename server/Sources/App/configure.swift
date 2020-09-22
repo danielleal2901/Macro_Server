@@ -15,20 +15,20 @@ public func configure(_ app: Application) throws {
         username: "postgres",
         password: "",
         database: "macro_challenge_dev"), as: .psql)
-        
     
-    
-
     app.http.server.configuration.hostname = "127.0.0.1"    
     app.http.server.configuration.port = 8080
     
     
     app.migrations.add(CreateTerrain())
-    app.migrations.add(CreateGeoreferecing())
     
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
     
+    app.migrations.add(CreateStage())
+    app.migrations.add(CreateDocument())
+//    app.migrations.add(CreateEnum())
+
     // register routes
     try routes(app)
     try webSockets(app)
