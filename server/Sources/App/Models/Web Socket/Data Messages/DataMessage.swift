@@ -23,7 +23,8 @@ internal struct DataMessage: Codable{
         case destTeamID = "destination"
         case respUserID = "user"
     }
-        
+    
+    // MARK - Initializer
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         data = try values.decode(Data.self,forKey:  .data)

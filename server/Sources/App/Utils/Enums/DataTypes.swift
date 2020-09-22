@@ -7,7 +7,9 @@
 
 import Foundation
 
-enum DataTypes: Any{
+
+/// Using for identify current data requests (disabled for a while)
+enum DataTypes{
     case Terrain
     case Georeferencing
 }

@@ -89,16 +89,7 @@ internal class DataManager{
         
         completion(response)
     }        
-    
-    func encodeToString<T>(valueToEncode: T) -> String where T: Encodable{
-        let data = try! JSONEncoder().encode(valueToEncode)
-        let jsonString = String(data: data,encoding: .utf8)
-        return jsonString ?? "Error"
-    }
-    
-    func decode<T>(valueToDecode: T){}
-    
-    
+        
     // General Management
     // To implement
     
