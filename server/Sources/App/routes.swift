@@ -46,17 +46,22 @@ func webSockets(_ app: Application) throws{
             if let dataCov = data.data(using: .ascii){
                 guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
                 // Data Decoded
-                                    
-            dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                switch response.actionStatus{
-                case .Completed:
-                    ws.send((response.dataReceived?.base64EncodedString())!)                    
-                case .Error:
-                    ws.send("Error")
-                default:
-                    ws.send("Error")                    
+                print(message)
+                
+                dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                    print(response.actionStatus)
+                    switch response.actionStatus{
+                    case .Completed:
+//                        let byte = [UInt8]((response.dataReceived)!)
+//                        let value = String(bytes: byte, encoding: .utf8)
+                        let convertedData = String(data: response.dataReceived!,encoding: .utf8)
+                        ws.send(convertedData!)
+                    case .Error:
+                        ws.send("Error")
+                    default:
+                        ws.send("Error")
+                    }
                 }
-            }
             }
             
             // Receive the Data from the Client and Decode it

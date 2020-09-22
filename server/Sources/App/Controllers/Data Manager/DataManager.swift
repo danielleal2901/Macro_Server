@@ -42,7 +42,7 @@ internal class DataManager{
             let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
-                response.dataReceived? = encodedValue!
+                response.dataReceived = encodedValue!
                 response.actionStatus = .Completed
                 completion(response)
             }
