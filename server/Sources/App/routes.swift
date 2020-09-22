@@ -30,12 +30,12 @@ func webSockets(_ app: Application) throws{
         
         let dataController = DataController()
         
-        let userID = request.session.data["username"] ?? "User 001"
-        let teamID = request.session.data["team"] ?? "Empty Team"
+        let user = request.session.data["username"] ?? "User 001"
+        let team = request.session.data["team"] ?? "Empty Team"
         
         //let message = DataMessage(from: )
         
-        dataController.enteredUser(userID: "Guilherme", teamID: "ABPRU", connection: ws)
+        dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
                 
         
@@ -53,10 +53,10 @@ func webSockets(_ app: Application) throws{
                     print(response.actionStatus)
                     switch response.actionStatus{
                     case .Completed:
-//                        let byte = [UInt8]((response.dataReceived)!)
-//                        let value = String(bytes: byte, encoding: .utf8)
+                        let byte = [UInt8]((response.dataReceived)!)
                         let convertedData = String(data: response.dataReceived!,encoding: .utf8)
                         ws.send(convertedData!)
+                                                                                                                        
                         dataController.broadcast(data: convertedData!)
                     case .Error:
                         ws.send("Error")

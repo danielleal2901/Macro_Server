@@ -11,10 +11,7 @@ import Foundation
 internal class DataController{
     
     internal func addData(data: ServiceTypes.Dispatch.Request){
-        DataManager.shared.appendData(request: .init(data:"" )) { (response) in
-            
-            
-            
+        DataManager.shared.appendData(request: .init(data:"" )) { (response) in            
         }
     }
     
@@ -26,19 +23,11 @@ internal class DataController{
     
     internal func enteredUser(userID: String,teamID: String,connection: WebSocket){
         DataManager.shared.addUser(userID: userID, teamID: teamID, socket: connection)
-        
     }
     
     internal func broadcast(data: String){
-        
         let connections = DataManager.shared.fetchConnections()
-        
-        
         connections.forEach({ $0.webSocket.send(data)})
-        
-        
-        
-        
     }
     
     // Net Code

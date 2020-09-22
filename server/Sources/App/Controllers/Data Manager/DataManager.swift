@@ -60,7 +60,7 @@ internal class DataManager{
     }
     
     func addUser(userID: String,teamID: String,socket: WebSocket){
-        let connection = TeamConnection(id: 0, name: userID, webSocket: socket)
+        let connection = TeamConnection(name: userID, teamName: teamID, webSocket: socket)
         self.connections.append(connection)
     }
     
