@@ -8,7 +8,7 @@
 import Foundation
 
 enum StageTypes : String, Codable{
-    case georeferecing = "georeferecing"
+    case georeferencing = "georeferencing"
     case car = "car"
     case evaluation = "evaluation"
     case enviroment = "enviromental"

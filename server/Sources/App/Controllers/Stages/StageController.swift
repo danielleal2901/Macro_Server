@@ -134,7 +134,7 @@ class StageController: RouteCollection {
         
         return Stage.query(on: req.db)
             .filter("terrain_id", .equal, terrainId).first()
-            .unwrap(or: Abort(.badRequest))
+            .unwrap(or: Abort(.notFound))
             .flatMapThrowing {
                 if stageType != $0.type {
                     throw Abort(.badRequest)
