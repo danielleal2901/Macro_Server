@@ -18,8 +18,8 @@ internal class DataController{
         }
     }
     
-    internal func fetchData(sessionID: Request,recordID: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response) -> ()){
-        DataManager.shared.fetchData(sessionRequest: sessionID,dataRequest: recordID) { (response) in
+    internal func fetchData(sessionID: Request,dataMessage: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response) -> ()){
+        DataManager.shared.fetchData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? ServiceTypes.Receive.Response.init(dataReceived: "Error", actionStatus: .Error))
         }
     }

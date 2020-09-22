@@ -29,7 +29,7 @@ enum ServiceTypes{
     struct Receive{
         struct Request{
             // Change to proper ID var
-            var id: String
+            var data: DataMessage
         }
         struct Response{
             var dataReceived: String?

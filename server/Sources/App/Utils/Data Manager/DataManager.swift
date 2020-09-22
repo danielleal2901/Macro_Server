@@ -37,7 +37,7 @@ internal class DataManager{
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         // Change Evnnt Data for DataTypes conforming to Enunm
         //var eventData: EventLoopFuture<[DataTypes]>
-        switch dataRequest.id{
+        switch dataRequest.data.dataID{
         case "terrain":
             let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in

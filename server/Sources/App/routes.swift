@@ -42,26 +42,23 @@ func webSockets(_ app: Application) throws{
         ws.onText { (ws, data) in
             print("Message received")
             print("Client: \(data)")
-            let jsonDecoder = JSONDecoder()
             
             if let dataCov = data.data(using: .ascii){
-                let message = try? jsonDecoder.decode(DataMessage.self, from: dataCov)
-                print(message)
-            }
-            
-            TerrainController().fetchSome(req: request)
-            
-            dataController.fetchData(sessionID: request, recordID: .init(id: data)) { (response) in
+                guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
+                // Data Decoded
+                                    
+            dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
                 switch response.actionStatus{
                 case .Completed:
                     ws.send(response.dataReceived ?? "Value")
                 case .Error:
                     ws.send("Error")
                 default:
-                    ws.send("Error")
-                    
+                    ws.send("Error")                    
                 }
             }
+            }
+            
             // Receive the Data from the Client and Decode it
             // Save to DATABASE
             // Must get Team ID,
