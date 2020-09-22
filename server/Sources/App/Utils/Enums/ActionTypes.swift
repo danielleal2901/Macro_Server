@@ -7,7 +7,8 @@
 
 import Foundation
 
-enum ActionTypes{
+/// Using for track of Service States
+enum StateTypes{
     case Requesting
     case Sending
     case Completed

@@ -6,7 +6,9 @@
 //
 
 import Fluent
+import FluentPostgresDriver
 import Vapor
+
 
 struct TerrainController: RouteCollection {
     
@@ -26,6 +28,17 @@ struct TerrainController: RouteCollection {
         
         let terrain = Terrain(id: UUID(), name: terrainInput.name)
         return terrain.create(on: req.db).map({ terrain })
+    }
+    
+    
+    // Use on future, for custom sql requests
+    func fetchSome(req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ (value) in
+                print(value)
+            })
+            print(some)
+        }
     }
     
     func fetchAllTerrains(req: Request) throws -> EventLoopFuture<[Terrain]>  {
