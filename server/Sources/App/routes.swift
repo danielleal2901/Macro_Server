@@ -50,7 +50,7 @@ func webSockets(_ app: Application) throws{
             dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
                 switch response.actionStatus{
                 case .Completed:
-                    ws.send(response.dataReceived ?? "Value")
+                    ws.send((response.dataReceived?.base64EncodedString())!)                    
                 case .Error:
                     ws.send("Error")
                 default:

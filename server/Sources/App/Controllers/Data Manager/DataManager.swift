@@ -41,16 +41,16 @@ internal class DataManager{
         case "terrain":
             let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
-                let encodedValue = self.encodeToString(valueToEncode: terrains)
-                response.dataReceived = encodedValue
+                let encodedValue = try? JSONEncoder().encode(terrains)
+                response.dataReceived? = encodedValue!
                 response.actionStatus = .Completed
                 completion(response)
             }
         case "georeferecing":
             let eventData = try! GeoController().fetchAllGeo(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
-                let encodedValue = self.encodeToString(valueToEncode: terrains)
-                response.dataReceived = encodedValue
+                let encodedValue = try? JSONEncoder().encode(terrains)
+                response.dataReceived? = encodedValue!
                 response.actionStatus = .Completed
                 completion(response)
             }

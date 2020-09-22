@@ -32,7 +32,7 @@ enum ServiceTypes{
             var data: DataMessage
         }
         struct Response{
-            var dataReceived: String?
+            var dataReceived: Data?
             var actionStatus: ActionTypes
         }
     }
