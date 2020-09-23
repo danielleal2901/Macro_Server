@@ -33,7 +33,7 @@ struct TerrainController: RouteCollection {
     
     func insertTerrainSQL(terrain: TerrainModel,req: Request){
         if let sql = req.db as? PostgresDatabase{
-            _ = try! sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+            sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
                 print("Worked")
             })
         }
@@ -42,7 +42,7 @@ struct TerrainController: RouteCollection {
     func updateTerrainSQL(terrain: TerrainModel,req: Request){
         if let sql = req.db as? PostgresDatabase{
             // Check which data changed?
-            _ = try! sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
+            sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
                 print("Worked")
             })
         }
@@ -51,7 +51,7 @@ struct TerrainController: RouteCollection {
     func deleteTerrainSQL(id: UUID, req: Request){
         if let sql = req.db as? PostgresDatabase{
             // Check which data changed?
-            _ = try! sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
+            sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
                 print("Worked")
             })
         }
@@ -61,7 +61,7 @@ struct TerrainController: RouteCollection {
     // Use on future, for custom sql requests
     func fetchSome(req: Request){
         if let sql = req.db as? PostgresDatabase{
-            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ _ in
+            sql.simpleQuery("select * from terrains").whenSuccess({ _ in
                 print("Worked")
             })
         }

@@ -11,20 +11,13 @@ import Foundation
 internal class WSInteractor{
     typealias Services = ServiceTypes
     
-    /// Add a Data to Database
-    /// - Parameter data: Data to add
+
     internal func addData(sessionRequest: Request, data: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
         WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
             completion(response!)
         }
     }
 
-    ///
-    /// - Parameters:
-    ///   - sessionID:
-    ///   - dataMessage:
-    ///   - completion:
-    /// - Returns:
     internal func fetchData(sessionID: Request,dataMessage: Services.Receive.Request,completion: @escaping (Services.Receive.Response) -> ()){
         WSDataWorker.shared.fetchData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
@@ -40,7 +33,7 @@ internal class WSInteractor{
     
     internal func deleteData(sessionRequest: Request,dataID: UUID,completion: @escaping (Services.Dispatch.Response) -> ()){
         WSDataWorker.shared.deleteData(sessionRequest: sessionRequest,dataID: dataID,dataType: "terrain") { (response) in
-            completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
+            completion(response)
         }
     }
     

@@ -14,19 +14,13 @@ internal class WSDataWorker{
     // MARK - Variables
     /// Singleton
     internal static let shared = WSDataWorker()
-    /// Datas stored in the database
-    /// Change to a "ViewModel"
-    internal private(set) var datas: [String]
     /// Connection for future use
     internal private(set) var connections: [TeamConnection] // To Change
     
     // MARK - Initializer
     private init(){
-        self.datas = [String]()
         self.connections = [TeamConnection]()
     }
-    
-    
     
     // Change Request to Request type of Vip Cycle
      
@@ -41,7 +35,7 @@ internal class WSDataWorker{
         
         switch request.data.dataType{
         case "terrain":
-            let eventData = try! TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -93,7 +87,7 @@ internal class WSDataWorker{
         
         switch dataRequest.data.dataType{
         case "terrain":
-            _ = try! TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -109,7 +103,7 @@ internal class WSDataWorker{
         
         switch dataType{
         case "terrain":
-            _ = try! TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
+            TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -138,14 +132,8 @@ internal class WSDataWorker{
     func fetchConnections() -> [TeamConnection]{
         return self.connections
     }
-    
- 
-        
-    // General Management
+                 
     // To implement
-    
-    // WebSocket
-    // Data
     
     // Login Management
     // User

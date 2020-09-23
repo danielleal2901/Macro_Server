@@ -39,17 +39,18 @@ func webSockets(_ app: Application) throws{
         let dataController = WSInteractor()
         
         // User Info to get via connection Request and register automatically
-        let user = request.session.data["username"] ?? "User 001"
-        let team = request.session.data["team"] ?? "Empty Team"
+        //        let user = request.session.data["username"] ?? "User 001"
+        //        let team = request.session.data["team"] ?? "Empty Team"
         
         // Add User to Specific Team Session
-        dataController.enteredUser(userID: user, teamID: team, connection: ws)
+        //        dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
-                guard let message = try? CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
+                // Make responsability to another class
+                guard let message = CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
@@ -87,6 +88,7 @@ func webSockets(_ app: Application) throws{
                     
                 }                
             }
+            
             // Receive the Data from the Client and Decode it
             // Save to DATABASE
             // Must get Team ID,
