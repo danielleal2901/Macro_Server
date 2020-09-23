@@ -12,10 +12,13 @@ import FluentPostgresDriver
 struct CreateTerrain: Migration {
     
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        database.schema("terrains")
+        
+        return database.schema("terrains")
             .id()
             .field("name", .string)
+            .field("stages_names", .array(of: .string), .required)
             .create()
+        
     }
     
     func revert(on database: Database) -> EventLoopFuture<Void> {

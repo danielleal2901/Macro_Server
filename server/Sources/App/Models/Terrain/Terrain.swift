@@ -13,6 +13,7 @@ final class Terrain: Model, Content {
     
     struct Input: Content {
         let name: String
+        let stages: [StageTypes]
     }
     
     static let schema = "terrains"
@@ -23,10 +24,14 @@ final class Terrain: Model, Content {
     @Field(key: "name")
     var name: String
     
+    @Field(key: "stages_names")
+    var stages: [String]
+    
     init() {}
     
-    init(id: UUID? = nil, name: String) {
+    init(id: UUID? = nil, name: String, stages: [String]) {
         self.id = id
         self.name = name
+        self.stages = stages
     }
 }

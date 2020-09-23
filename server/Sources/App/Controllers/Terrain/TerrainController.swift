@@ -23,8 +23,9 @@ struct TerrainController: RouteCollection {
     
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
         let terrainInput = try req.content.decode(Terrain.Input.self)
-        
-        let terrain = Terrain(id: UUID(), name: terrainInput.name)
+                
+        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
+           
         return terrain.create(on: req.db).map({ terrain })
     }
     
@@ -53,16 +54,20 @@ struct TerrainController: RouteCollection {
             throw Abort(.badRequest)
         }
         
-        let newTerrain = try req.content.decode(Terrain.self)
+        let newTerrain = try req.content.decode(Terrain.Input.self)
         return Terrain.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (oldTerrain) -> EventLoopFuture<Terrain> in
+            .flatMapThrowing { oldTerrain in
                 oldTerrain.name = newTerrain.name
-                return oldTerrain.save(on: req.db).map({ oldTerrain })
+                oldTerrain.stages = newTerrain.stages.map{$0.rawValue}
+                
+                let _ = oldTerrain.save(on: req.db).map { (_) -> (Terrain) in
+                    Terrain(name: oldTerrain.name, stages: oldTerrain.stages)
+                }
+                
+                return oldTerrain
         }
     }
-    
-    
-    
+        
 }
 

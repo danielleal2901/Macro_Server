@@ -11,7 +11,7 @@ enum StageTypes : String, Codable{
     case georeferencing = "georeferencing"
     case car = "car"
     case evaluation = "evaluation"
-    case enviroment = "enviromental"
+    case enviroment = "enviroment"
     case register = "register"
-    case resident = "residentData"
+    case resident = "resident"
 }

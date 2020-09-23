@@ -15,7 +15,7 @@ final class Stage: Model, Content {
     
     struct Input: Content {
         let terrain: String
-        let stageType: String
+        let stageType: StageTypes
     }
     
     struct Output: Content {
