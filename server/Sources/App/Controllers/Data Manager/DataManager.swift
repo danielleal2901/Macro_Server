@@ -27,6 +27,34 @@ internal class DataManager{
     }
     
     
+    
+    // Change Request to Request type of Vip Cycle
+     
+     /// Append Some Data on the Storage included on Data Manager
+     /// - Parameters:
+     ///   - request: Request action with Data that needs to be included in Database
+     ///   - completion: Response of Receive action, including the result of action Status
+    internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Dispatch.Response?) -> ()){
+         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
+        
+        let dataDecoded = CodableAlias().decodeDataSingle(valueToDecode: request.data.data, intendedType: TerrainModel.self)
+        
+        switch request.data.dataID{
+        case "terrain":
+            let eventData = try! TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            response.actionStatus = .Completed
+            completion(response)
+        default:
+            print("Not working")
+            response.actionStatus = .Error
+            completion(response)
+        }
+        
+                 
+     }
+    
+    
+    
     // MARK - Functions
     
     /// Fetch Data of current Database Storage
@@ -60,6 +88,11 @@ internal class DataManager{
         }
     }
     
+    internal func updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
+        
+        
+    }
+    
     
     /// Add a user to a group (currently using one instance)
     /// - Parameters:
@@ -78,38 +111,14 @@ internal class DataManager{
         return self.connections
     }
     
-    // Change Request to Request type of Vip Cycle
-    
-    /// Append Some Data on the Storage included on Data Manager
-    /// - Parameters:
-    ///   - request: Request action with Data that needs to be included in Database
-    ///   - completion: Response of Receive action, including the result of action Status
-    internal func appendData(request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Dispatch.Response?) -> ()){
-        var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
-        let previousCount = datas.count
-            
-        
-        
-        self.datas.append(request.data.dataID)
-        
-        // May be Useless, to Check
-        if  self.datas.count > previousCount {
-            response.actionStatus = .Completed
-        } else{
-            response.actionStatus = .Error
-        }
-        
-        completion(response)
-    }        
+ 
         
     // General Management
     // To implement
     
     // WebSocket
     // Data
-    internal func createData(){}
-    internal func fetchData(){}
-    internal func updateData(){}
+    
     internal func deleteData(){}
     
     

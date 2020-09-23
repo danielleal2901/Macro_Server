@@ -13,9 +13,9 @@ internal class DataController{
     
     /// Add a Data to Database
     /// - Parameter data: Data to add
-    internal func addData(data: Services.Dispatch.Request){
-        DataManager.shared.appendData(request: data) { (response) in
-            
+    internal func addData(sessionRequest: Request, data: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
+        DataManager.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
+            completion(response!)
         }
     }
 
@@ -31,7 +31,15 @@ internal class DataController{
         }
     }
     
-    internal func updateData(){}
+    internal func updateData(sessionID: Request,dataMessage: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
+        DataManager.shared.updateData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
+            completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
+        }
+        
+        
+    }
+    
+    
     internal func deleteData(){}
     
     /// Call Manager to perform action to add user to a certain team

@@ -26,18 +26,25 @@ struct TerrainController: RouteCollection {
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
         let terrainInput = try req.content.decode(Terrain.Input.self)
         
-        let terrain = Terrain(id: UUID(), name: terrainInput.name)
+        let terrain = Terrain(id: UUID(), name: "gui")
         return terrain.create(on: req.db).map({ terrain })
+    }
+    
+    func insertTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            _ = try! sql.simpleQuery("insert into terrains (id,name) values ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
     }
     
     
     // Use on future, for custom sql requests
     func fetchSome(req: Request){
         if let sql = req.db as? PostgresDatabase{
-            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ (value) in
-                print(value)
+            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ _ in
+                print("Worked")
             })
-            print(some)
         }
     }
     

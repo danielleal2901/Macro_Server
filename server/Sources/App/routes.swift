@@ -49,11 +49,13 @@ func webSockets(_ app: Application) throws{
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
-                guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
+                guard let message = try? CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
-                    print()
+                    dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
