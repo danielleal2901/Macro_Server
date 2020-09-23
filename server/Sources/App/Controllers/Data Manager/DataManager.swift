@@ -49,8 +49,6 @@ internal class DataManager{
             response.actionStatus = .Error
             completion(response)
         }
-        
-                 
      }
     
     
@@ -63,7 +61,7 @@ internal class DataManager{
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
     internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
-        // Change Evnnt Data for DataTypes conforming to Enunm
+        // Change Event Data for DataTypes conforming to Enum
         //var eventData: EventLoopFuture<[DataTypes]>
         switch dataRequest.data.dataID{
         case "terrain":
@@ -89,9 +87,39 @@ internal class DataManager{
     }
     
     internal func updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
+        var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
+        let dataDecoded = CodableAlias().decodeDataSingle(valueToDecode: dataRequest.data.data, intendedType: TerrainModel.self)
+        
+        switch dataRequest.data.dataID{
+        case "terrain":
+            _ = try! TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            response.actionStatus = .Completed
+            completion(response)
+        default:
+            print("Not working")
+            response.actionStatus = .Error
+            completion(response)
+        }
         
     }
+    
+    internal func deleteData(sessionRequest: Request,dataID: UUID,dataType: String){
+        var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
+        
+        switch dataType{
+        case "terrain":
+            _ = try! TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
+            response.actionStatus = .Completed
+            completion(response)
+        default:
+            print("Not working")
+            response.actionStatus = .Error
+            completion(response)
+        }
+        
+    }
+    
     
     
     /// Add a user to a group (currently using one instance)
@@ -118,9 +146,6 @@ internal class DataManager{
     
     // WebSocket
     // Data
-    
-    internal func deleteData(){}
-    
     
     // Login Management
     // User

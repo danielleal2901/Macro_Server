@@ -35,12 +35,14 @@ internal class DataController{
         DataManager.shared.updateData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
         }
-        
-        
     }
     
     
-    internal func deleteData(){}
+    internal func deleteData(sessionRequest: Request,dataID: UUID()){
+        DataManager.shared.deleteData(sessionRequest: sessionID,dataID: dataID) { (response) in
+            completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
+        }
+    }
     
     /// Call Manager to perform action to add user to a certain team
     /// - Parameters:

@@ -32,7 +32,16 @@ struct TerrainController: RouteCollection {
     
     func insertTerrainSQL(terrain: TerrainModel,req: Request){
         if let sql = req.db as? PostgresDatabase{
-            _ = try! sql.simpleQuery("insert into terrains (id,name) values ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+            _ = try! sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func updateTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            _ = try! sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
                 print("Worked")
             })
         }
