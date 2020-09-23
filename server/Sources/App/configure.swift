@@ -18,9 +18,12 @@ public func configure(_ app: Application) throws {
     
     app.http.server.configuration.hostname = "127.0.0.1"    
     app.http.server.configuration.port = 8080
-    print(app.http.server.configuration.tlsConfiguration?.privateKey)
     
     app.migrations.add(CreateTerrain())
+    
+    app.middleware.use(app.sessions.middleware)
+    app.sessions.use(.memory)
+    
     app.migrations.add(CreateStage())
     app.migrations.add(CreateDocument())
 //    app.migrations.add(CreateEnum())

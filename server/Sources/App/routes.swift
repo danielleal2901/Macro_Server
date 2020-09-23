@@ -19,47 +19,83 @@ func routes(_ app: Application) throws {
     
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
-
-//    try app.register(collection: GeoController())
-//    try app.register(collection: EvaluationController())
-//    try app.register(collection: EnviromentController())
-//    try app.register(collection: ResidentController())
-//    try app.register(collection: RegisterController())
-
+    
+    //    try app.register(collection: GeoController())
+    //    try app.register(collection: EvaluationController())
+    //    try app.register(collection: EnviromentController())
+    //    try app.register(collection: ResidentController())
+    //    try app.register(collection: RegisterController())
+    
 }
 
 func webSockets(_ app: Application) throws{
     print("Creating connection")
     
+    /// Aiming to add to a class
+    /// Active session for Web Socket Connection
     app.webSocket("DataExchange"){ request,ws in
         
-        ws.onText { ws, data in
-            ws.send("Message Received")
-        }
-        
+        // MARK - Variables
         let dataController = DataController()
         
-        let firstData = request.session.data["firstData"] ?? "First Data nil"
-        let secondData = request.session.data["secondData"] ?? "Second Data nil"
+        // User Info to get via connection Request and register automatically
+        let user = request.session.data["username"] ?? "User 001"
+        let team = request.session.data["team"] ?? "Empty Team"
         
-        dataController.addData(data: .init(data: firstData))
-        dataController.addData(data: .init(data: secondData))
+        // Add User to Specific Team Session
+        dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         
-        ws.onText { (ws, data) in            
-            if let receivedData = data.data(using: .utf8),
-                let decodedData = try? JSONDecoder().decode(SpecifiedData.self, from: receivedData){
-                // Receive the Data from the Client and Decode it
-                // Save to DATABASE
-                // Must get Team ID,
+        // Actions for control of User Sessions
+        ws.onText { (ws, data) in
+            if let dataCov = data.data(using: .ascii){
+                guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
+                switch message.operation{
+                case 0:
+                    // INSERT DATA
+                    print()
+                case 1:
+                    // FETCH DATA
+                    dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                        switch response.actionStatus{
+                        case .Completed:
+                            let convertedData = String(data: response.dataReceived!,encoding: .utf8)
+                            dataController.broadcast(data: convertedData!)
+                        case .Error:
+                            ws.send("Error")
+                        default:
+                            ws.send("Error")
+                        }
+                    }
+                case 2:
+                    // UPDATE DATA
+                    print()
+                case 3:
+                    // DELETE DATA
+                    print()
+                default:
+                    print()
+                    
+                    
+                }                
             }
+            // Receive the Data from the Client and Decode it
+            // Save to DATABASE
+            // Must get Team ID,
+        }
+        
+        ws.onBinary { (ws, binary) in
+            print(binary)
         }
         
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
+            // remover usuario
         }
         
     }
-
+    
+    
 }

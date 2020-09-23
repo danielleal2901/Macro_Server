@@ -7,8 +7,9 @@
 
 import Foundation
 
+
+/// Using for identify current data requests (disabled for a while)
 enum DataTypes{
-    case SpecifiedData
-    case String
-    case Int
+    case Terrain
+    case Georeferencing
 }

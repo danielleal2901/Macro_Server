@@ -10,6 +10,7 @@ import Foundation
 
 internal struct TeamConnection{
     // MARK - Variables
-    internal var id: Int
+    internal var name: String
+    internal var teamName: String
     internal var webSocket: WebSocket
 }

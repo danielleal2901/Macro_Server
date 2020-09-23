@@ -10,22 +10,29 @@ import Foundation
 internal struct DataMessage: Codable{
     
     // MARK - Variables
-    internal private(set) var data: SpecifiedData
+    internal private(set) var data: Data
+    internal private(set) var dataID: String
     internal private(set) var destTeamID: Int
-    internal private(set) var respUser: Int
+    internal private(set) var respUserID: Int
+    internal private(set) var operation: Operations.RawValue    
     
     // In doubt if using this type or another encoder
     private enum CodingKeys: String, CodingKey{
         case data
+        case dataID
+        case operation
         case destTeamID = "destination"
-        case respUser = "user"
+        case respUserID = "user"
     }
     
+    // MARK - Initializer
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        data = try values.decode(SpecifiedData.self,forKey: .data)
-        destTeamID = try values.decode(Int.self,forKey: .data)
-        respUser = try values.decode(Int.self,forKey: .data)
+        data = try values.decode(Data.self,forKey:  .data)
+        dataID = try values.decode(String.self,forKey: .dataID)
+        destTeamID = try values.decode(Int.self,forKey: .destTeamID)
+        respUserID = try values.decode(Int.self,forKey: .respUserID)
+        operation = try values.decode(Int.self, forKey: .operation)
     }
     
 }

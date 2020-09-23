@@ -9,36 +9,47 @@ import Vapor
 import Foundation
 
 internal class DataController{
+    typealias Services = ServiceTypes
     
-    var dataSample = SpecifiedData(id: 0)
-    
-    internal func addData(data: ServiceTypes.Dispatch.Request){
-        DataManager.shared.appendData(request: .init(data:"" )) { (response) in
-            
-            
-            
-        }
-    }
-    
-    internal func fetchData(){
-        DataManager.shared.fetchData(request: .init(id: "")) { (response) in
+    /// Add a Data to Database
+    /// - Parameter data: Data to add
+    internal func addData(data: Services.Dispatch.Request){
+        DataManager.shared.appendData(request: data) { (response) in
             
         }
     }
+
+    ///
+    /// - Parameters:
+    ///   - sessionID:
+    ///   - dataMessage:
+    ///   - completion:
+    /// - Returns:
+    internal func fetchData(sessionID: Request,dataMessage: Services.Receive.Request,completion: @escaping (Services.Receive.Response) -> ()){
+        DataManager.shared.fetchData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
+            completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
+        }
+    }
     
-   // Net Code
-//    internal func broadcast(teamID: Int){
-//        guard let connections = DataManager.shared.fetchConnections(teamID: teamID) else {return}
-//
-//        let message = Message(text: message, senderNick: nickname, destinationRoom: roomName, kind: .public)
-//        let encoder = JSONEncoder()
-//
-//
-//        if let data = try? encoder.encode(message), let jsonDocument = String(data: data, encoding: .utf8)
-//        {
-//            connections.forEach({ $0.webSocket.send(jsonDocument) })
-//        }
-//    }
+    internal func updateData(){}
+    internal func deleteData(){}
     
+    /// Call Manager to perform action to add user to a certain team
+    /// - Parameters:
+    ///   - userID: user identification
+    ///   - teamID: team identification
+    ///   - connection: connection identification
+    internal func enteredUser(userID: String,teamID: String,connection: WebSocket){
+        DataManager.shared.addUser(userID: userID, teamID: teamID, socket: connection)
+    }
+    
+    
+    /// Broadcast certain data to all users in the connection (currently using one)
+    /// - Parameter data: Data to send to all users
+    internal func broadcast(data: String){
+        let connections = DataManager.shared.fetchConnections()
+        // Do not send to current id sender
+        connections.forEach({ $0.webSocket.send(data)})
+    }
     
 }
