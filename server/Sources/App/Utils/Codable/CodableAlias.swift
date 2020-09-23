@@ -36,9 +36,27 @@ class  CodableAlias{
     ///   - valueToDecode: Value that needs to be decoded
     ///   - intendedType: Type to decode the passed value
     /// - Returns: Value decoded
-    func decodeData<Datatype>(valueToDecode: Data,intendedType: Datatype.Type) -> [Datatype]? where Datatype: Decodable{
+    func decodeDataArray<Datatype>(valueToDecode: Data,intendedType: Datatype.Type) -> [Datatype]? where Datatype: Decodable{
         do{
             let data = try JSONDecoder().decode([Datatype].self, from: valueToDecode)
+            return data
+        } catch(let error){
+            print(error)
+            return nil
+        }
+    }
+    
+    // @gui
+    // Vou mudar para uma simples função
+    
+    /// Decode the Data Value to a intended Type passed as parameter
+    /// - Parameters:
+    ///   - valueToDecode: Value that needs to be decoded
+    ///   - intendedType: Type to decode the passed value
+    /// - Returns: Value decoded
+    func decodeDataSingle<Datatype>(valueToDecode: Data,intendedType: Datatype.Type) -> Datatype? where Datatype: Decodable{
+        do{
+            let data = try JSONDecoder().decode(Datatype.self, from: valueToDecode)
             return data
         } catch(let error){
             print(error)

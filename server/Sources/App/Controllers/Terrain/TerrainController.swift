@@ -25,20 +25,45 @@ struct TerrainController: RouteCollection {
     
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
         let terrainInput = try req.content.decode(Terrain.Input.self)
+
                 
         let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
-           
         return terrain.create(on: req.db).map({ terrain })
+    }
+    
+    func insertTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            _ = try! sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func updateTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            _ = try! sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func deleteTerrainSQL(id: UUID, req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            _ = try! sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
     }
     
     
     // Use on future, for custom sql requests
     func fetchSome(req: Request){
         if let sql = req.db as? PostgresDatabase{
-            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ (value) in
-                print(value)
+            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ _ in
+                print("Worked")
             })
-            print(some)
         }
     }
     

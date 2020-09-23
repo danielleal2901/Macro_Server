@@ -49,11 +49,13 @@ func webSockets(_ app: Application) throws{
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
-                guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
+                guard let message = try? CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
-                    print()
+                    dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
@@ -70,10 +72,15 @@ func webSockets(_ app: Application) throws{
                     }
                 case 2:
                     // UPDATE DATA
-                    print()
+                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 case 3:
-                    // DELETE DATA
-                    print()
+                    // DELETE DATA                    
+                    let data = CodableAlias().decodeDataSingle(valueToDecode: message.data, intendedType: TerrainModel.self)
+                    dataController.deleteData(sessionRequest: request, dataID: data!.id ) { (response) in
+                        print(response.actionStatus)
+                    }
                 default:
                     print()
                     
