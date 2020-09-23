@@ -29,7 +29,7 @@ final class Terrain: Model, Content {
     
     init() {}
     
-    init(id: UUID? = nil, name: String, stages: [String]) {
+    init(id: UUID = UUID(), name: String, stages: [String]) {
         self.id = id
         self.name = name
         self.stages = stages

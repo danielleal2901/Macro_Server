@@ -25,10 +25,31 @@ struct TerrainController: RouteCollection {
     
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
         let terrainInput = try req.content.decode(Terrain.Input.self)
-                
+    
         let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
-           
-        return terrain.create(on: req.db).map({ terrain })
+        
+        let eventLoop: EventLoop = req.eventLoop
+
+        let promiseStages = eventLoop.makePromise(of: Bool.self)
+        
+        let stages = terrainInput.stages.map{
+            Stage(type: $0.self, terrainID: terrain.id!)
+        }
+        
+        stages.forEach { stage  in
+           let _ = stage.save(on: req.db).map { _ in
+                if (stage.id! == stages.last!.id!){
+                    promiseStages.succeed(true)
+                }
+            }
+        }
+
+        return promiseStages.futureResult.flatMap { result in
+            return terrain.create(on: req.db).map { _ in
+                return terrain
+            }
+        }
+
     }
     
     

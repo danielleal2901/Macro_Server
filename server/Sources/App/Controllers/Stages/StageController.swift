@@ -43,7 +43,7 @@ class StageController: RouteCollection {
     func insertStage(req: Request) throws -> EventLoopFuture<Stage.Output> {
         
         let stageInput = try self.verifyUploadRoutes(req: req)
-        
+                
         return Stage.query(on: req.db)
             .group(.and) { group in
                 group.filter(\.$type == stageInput.type).filter("terrain_id", .equal, stageInput.$terrain.id)
@@ -133,14 +133,13 @@ class StageController: RouteCollection {
         }
         
         return Stage.query(on: req.db)
-            .filter("terrain_id", .equal, terrainId).first()
-            .unwrap(or: Abort(.notFound))
-            .flatMapThrowing {
-                if stageType != $0.type {
-                    throw Abort(.badRequest)
-                }
+            .group(.and) { group in
+                group.filter(\.$type == stageType).filter("terrain_id", .equal, terrainId)
+            }.first().unwrap(or: Abort(.notFound))
+            .map {
                 return Stage.Output(id: $0.id!.uuidString, terrain: $0.$terrain.id.uuidString, stageType: $0.type.rawValue)
-        }
+            }
+
     }
     
     /// Method used to validate and get content from uploads request.
