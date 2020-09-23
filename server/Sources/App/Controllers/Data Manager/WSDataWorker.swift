@@ -1,5 +1,5 @@
 //
-//  DataManager.swift
+//  WSDataWorker.swift
 //  
 //
 //  Created by Guilherme Martins Dalosto de Oliveira on 18/09/20.
@@ -8,12 +8,12 @@
 import Vapor
 import Foundation
 
-internal class DataManager{
+internal class WSDataWorker{
     
     
     // MARK - Variables
     /// Singleton
-    internal static let shared = DataManager()
+    internal static let shared = WSDataWorker()
     /// Datas stored in the database
     /// Change to a "ViewModel"
     internal private(set) var datas: [String]
@@ -30,7 +30,7 @@ internal class DataManager{
     
     // Change Request to Request type of Vip Cycle
      
-     /// Append Some Data on the Storage included on Data Manager
+     /// Append Some Data on the Storage included on WSDataWorker
      /// - Parameters:
      ///   - request: Request action with Data that needs to be included in Database
      ///   - completion: Response of Receive action, including the result of action Status

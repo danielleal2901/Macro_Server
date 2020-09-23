@@ -36,7 +36,7 @@ func webSockets(_ app: Application) throws{
     app.webSocket("DataExchange"){ request,ws in
         
         // MARK - Variables
-        let dataController = DataController()
+        let dataController = WSInteractor()
         
         // User Info to get via connection Request and register automatically
         let user = request.session.data["username"] ?? "User 001"
