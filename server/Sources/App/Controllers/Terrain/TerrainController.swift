@@ -52,14 +52,39 @@ struct TerrainController: RouteCollection {
 
     }
     
+    func insertTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func updateTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func deleteTerrainSQL(id: UUID, req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
     
     // Use on future, for custom sql requests
     func fetchSome(req: Request){
         if let sql = req.db as? PostgresDatabase{
-            let some = try! sql.simpleQuery("select * from terrains where id = 'c3b7dd1a755e42919676092053485061'").whenSuccess({ (value) in
-                print(value)
+            sql.simpleQuery("select * from terrains").whenSuccess({ _ in
+                print("Worked")
             })
-            print(some)
         }
     }
     

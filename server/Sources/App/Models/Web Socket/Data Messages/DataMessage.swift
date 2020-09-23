@@ -11,7 +11,8 @@ internal struct DataMessage: Codable{
     
     // MARK - Variables
     internal private(set) var data: Data
-    internal private(set) var dataID: String
+    internal private(set) var dataID: UUID
+    internal private(set) var dataType: String
     internal private(set) var destTeamID: Int
     internal private(set) var respUserID: Int
     internal private(set) var operation: Operations.RawValue    
@@ -20,6 +21,7 @@ internal struct DataMessage: Codable{
     private enum CodingKeys: String, CodingKey{
         case data
         case dataID
+        case dataType
         case operation
         case destTeamID = "destination"
         case respUserID = "user"
@@ -29,7 +31,8 @@ internal struct DataMessage: Codable{
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         data = try values.decode(Data.self,forKey:  .data)
-        dataID = try values.decode(String.self,forKey: .dataID)
+        dataID = try values.decode(UUID.self,forKey: .dataID)
+        dataType = try values.decode(String.self,forKey: .dataType)
         destTeamID = try values.decode(Int.self,forKey: .destTeamID)
         respUserID = try values.decode(Int.self,forKey: .respUserID)
         operation = try values.decode(Int.self, forKey: .operation)

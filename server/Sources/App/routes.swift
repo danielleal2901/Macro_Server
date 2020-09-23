@@ -36,24 +36,27 @@ func webSockets(_ app: Application) throws{
     app.webSocket("DataExchange"){ request,ws in
         
         // MARK - Variables
-        let dataController = DataController()
+        let dataController = WSInteractor()
         
         // User Info to get via connection Request and register automatically
-        let user = request.session.data["username"] ?? "User 001"
-        let team = request.session.data["team"] ?? "Empty Team"
+        //        let user = request.session.data["username"] ?? "User 001"
+        //        let team = request.session.data["team"] ?? "Empty Team"
         
         // Add User to Specific Team Session
-        dataController.enteredUser(userID: user, teamID: team, connection: ws)
+        //        dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
-                guard let message = try? JSONDecoder().decode(DataMessage.self, from: dataCov) else {return}
+                // Make responsability to another class
+                guard let message = CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
-                    print()
+                    dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
@@ -70,16 +73,22 @@ func webSockets(_ app: Application) throws{
                     }
                 case 2:
                     // UPDATE DATA
-                    print()
+                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 case 3:
-                    // DELETE DATA
-                    print()
+                    // DELETE DATA                    
+                    let data = CodableAlias().decodeDataSingle(valueToDecode: message.data, intendedType: TerrainModel.self)
+                    dataController.deleteData(sessionRequest: request, dataID: data!.id ) { (response) in
+                        print(response.actionStatus)
+                    }
                 default:
                     print()
                     
                     
                 }                
             }
+            
             // Receive the Data from the Client and Decode it
             // Save to DATABASE
             // Must get Team ID,
