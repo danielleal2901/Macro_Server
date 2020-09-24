@@ -52,7 +52,7 @@ struct TerrainController: RouteCollection {
 
     }
     
-    func insertSQL(terrain: TerrainModel,req: Request){
+    func insertTerrainSQL(terrain: TerrainModel,req: Request){
         if let sql = req.db as? PostgresDatabase{
             sql.simpleQuery("INSERT INTO terrains (0,1) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
                 print("Worked")

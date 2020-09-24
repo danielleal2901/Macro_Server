@@ -36,7 +36,7 @@ internal class WSDataWorker{
         
         switch request.data.dataType{
         case "terrain":
-            TerrainInteractor().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -60,7 +60,7 @@ internal class WSDataWorker{
         //var eventData: EventLoopFuture<[DataTypes]>
         switch dataRequest.data.dataType{
         case "terrain":
-            let eventData = try! TerrainInteractor().fetchAllTerrains(req: sessionRequest)
+            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
                 response.dataReceived = encodedValue!
@@ -69,7 +69,7 @@ internal class WSDataWorker{
             }
         case "georeferecing":
             // Change Terrain Interactor
-            let eventData = try! TerrainInteractor().fetchAllTerrains(req: sessionRequest)
+            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
                 response.dataReceived? = encodedValue!
@@ -88,7 +88,7 @@ internal class WSDataWorker{
         
         switch dataRequest.data.dataType{
         case "terrain":
-            TerrainInteractor().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -104,7 +104,7 @@ internal class WSDataWorker{
         
         switch dataType{
         case "terrain":
-            TerrainInteractor().deleteTerrainSQL(id: dataID, req: sessionRequest)
+            TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
