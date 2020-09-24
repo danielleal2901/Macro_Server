@@ -7,13 +7,13 @@
 
 import Foundation
 
-internal struct WSPackageData: Codable{
+internal struct WSDataPackage: Codable{
     
     // MARK - Variables
     internal private(set) var packageID: UUID
     
     internal private(set) var content: Data
-    internal private(set) var dataType: String
+    internal private(set) var dataType: DataTypes.RawValue
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID
     internal private(set) var operation: Operations.RawValue

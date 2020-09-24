@@ -35,25 +35,26 @@ func webSockets(_ app: Application) throws{
         //        let team = request.session.data["team"] ?? "Empty Team"
         
         // Add User to Specific Team Session
-        //        dataController.enteredUser(userID: user, teamID: team, connection: ws)
+//         dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
                 // Make responsability to another class
-                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSPackageData.self) else {return}
+                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
+                dataController.enteredUser(userID: message.respUserID, teamID: message.destTeamID, connection: ws)
                 switch message.operation{
                 case 0:
                     // INSERT DATA
                     dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
                         switch response.actionStatus{
                         case .Completed:
-                            ws.send("Success")
+                            print()
                         case .Error:
-                            ws.send("Error")
+                            print()
                         default:
-                            ws.send("Error")
+                            print()
                         }
                     }
                 case 1:
@@ -64,12 +65,12 @@ func webSockets(_ app: Application) throws{
                             let dataReceived = response.dataReceived
                             let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: dataReceived)
                             ws.send(encoded)
-                            ws.send("Success")
+                            print()
                         //dataController.broadcastData(data: convertedData!)
                         case .Error:
-                            ws.send("Error")
+                            print()
                         default:
-                            ws.send("Error")
+                            print()
                         }
                     }
                 case 2:

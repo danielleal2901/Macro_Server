@@ -32,10 +32,11 @@ internal class WSDataWorker{
          var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         let dataDecoded = CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: TerrainModel.self)
+        guard let decoded = dataDecoded else {return}
         
         switch request.data.dataType{
         case "terrain":
-            TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainInteractor().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -59,7 +60,7 @@ internal class WSDataWorker{
         //var eventData: EventLoopFuture<[DataTypes]>
         switch dataRequest.data.dataType{
         case "terrain":
-            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
+            let eventData = try! TerrainInteractor().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
                 response.dataReceived = encodedValue!
@@ -67,8 +68,8 @@ internal class WSDataWorker{
                 completion(response)
             }
         case "georeferecing":
-            // Change Terrain Controller
-            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
+            // Change Terrain Interactor
+            let eventData = try! TerrainInteractor().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
                 response.dataReceived? = encodedValue!
@@ -87,7 +88,7 @@ internal class WSDataWorker{
         
         switch dataRequest.data.dataType{
         case "terrain":
-            TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            TerrainInteractor().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -103,7 +104,7 @@ internal class WSDataWorker{
         
         switch dataType{
         case "terrain":
-            TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
+            TerrainInteractor().deleteTerrainSQL(id: dataID, req: sessionRequest)
             response.actionStatus = .Completed
             completion(response)
         default:

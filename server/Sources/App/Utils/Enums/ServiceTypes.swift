@@ -26,7 +26,7 @@ enum ServiceTypes{
     struct Dispatch{
          /// Data of Dispatch Request
         struct Request{
-            var data: WSPackageData // Change to DataType
+            var data: WSDataPackage // Change to DataType
         }
         /// Response of Dispatch Request
         struct Response{
@@ -43,7 +43,7 @@ enum ServiceTypes{
         /// Data of Receive Request
         struct Request{
             // Change to proper ID var
-            var data: WSPackageData
+            var data: WSDataPackage
         }
         /// Response of Receive Request
         struct Response{

@@ -9,7 +9,8 @@ import Foundation
 
 
 /// Using for identify current data requests (disabled for a while)
-enum DataTypes{
-    case Terrain
-    case Georeferencing
+enum DataTypes: String{
+    case Terrain = "terrain"
+    case Georeferecing = "georeferecing"
 }
+
