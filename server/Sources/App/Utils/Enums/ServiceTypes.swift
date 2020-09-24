@@ -26,11 +26,15 @@ enum ServiceTypes{
     struct Dispatch{
          /// Data of Dispatch Request
         struct Request{
-            var data: DataMessage // Change to DataType
+            var data: WSDataPackage // Change to DataType
         }
         /// Response of Dispatch Request
         struct Response{
             var actionStatus: StateTypes
+        }
+        
+        struct Broadcast{
+            
         }
     }
     
@@ -39,7 +43,7 @@ enum ServiceTypes{
         /// Data of Receive Request
         struct Request{
             // Change to proper ID var
-            var data: DataMessage
+            var data: WSDataPackage
         }
         /// Response of Receive Request
         struct Response{
