@@ -8,10 +8,13 @@
 
 import Foundation
 
-class  CodableAlias{
+class  CoderHelper{
     
     /// MARK : Shared
-    internal static let shared = CodableAlias()
+    static let shared:CoderHelper = {
+        let coder = CoderHelper()
+        return coder
+    }()
     
     // !! Change to accordingly to Intended Return Type !!
     /// Encode the Parameter Data to String

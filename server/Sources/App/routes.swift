@@ -8,15 +8,7 @@ func routes(_ app: Application) throws {
     app.get { req in
         return "It works!"
     }
-    
-    app.webSocket("echo"){ req,ws in
-        print(ws)
-    }
-    
-    app.get("hello") { req -> String in    
-        return "Hello, world!"
-    }
-    
+
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
     
@@ -50,21 +42,30 @@ func webSockets(_ app: Application) throws{
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
                 // Make responsability to another class
-                guard let message = CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
+                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSPackageData.self) else {return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
                     dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
-                        print(response.actionStatus)
+                        switch response.actionStatus{
+                        case .Completed:
+                            ws.send("Success")
+                        case .Error:
+                            ws.send("Error")
+                        default:
+                            ws.send("Error")
+                        }
                     }
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                        print(response.actionStatus)
                         switch response.actionStatus{
                         case .Completed:
-                            let convertedData = String(data: response.dataReceived!,encoding: .utf8)
-                            dataController.broadcast(data: convertedData!)
+                            let dataReceived = response.dataReceived
+                            let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: dataReceived)
+                            ws.send(encoded)
+                            ws.send("Success")
+                        //dataController.broadcastData(data: convertedData!)
                         case .Error:
                             ws.send("Error")
                         default:
@@ -78,7 +79,7 @@ func webSockets(_ app: Application) throws{
                     }
                 case 3:
                     // DELETE DATA                    
-                    let data = CodableAlias().decodeDataSingle(valueToDecode: message.data, intendedType: TerrainModel.self)
+                    let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: TerrainModel.self)
                     dataController.deleteData(sessionRequest: request, dataID: data!.id ) { (response) in
                         print(response.actionStatus)
                     }
