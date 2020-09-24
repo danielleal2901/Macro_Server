@@ -17,20 +17,25 @@ class StageController: RouteCollection {
     
     func setupRoutesBuilder(routes: RoutesBuilder){
         
+        //stages
         let stages = routes.grouped(PathComponent(stringLiteral: StageRoute.main.rawValue))
         
+        //stages/:stageName
         stages.group(PathComponent(stringLiteral: StageRoute.stageName.rawValue)) { (stage) in
             stage.post(use: insertStage)
             stage.get(use: fetchAllStages)
             
-            //With stageId
+            //stages/:stageName/:stageId
             stage.group(PathComponent(stringLiteral: StageRoute.stageId.rawValue)) { (stage) in
                 stage.get(use: fetchStageById)
                 stage.delete(use: deleteStageById)
                 stage.put(use: updateStageById)
             }
-            //With terrainID
+            
+            //stages/:stageName/terrain
             stage.group(PathComponent(stringLiteral: StageRoute.withTerrain.rawValue)) { (stage) in
+                
+                //stages/:stageName/terrain/:terrainId
                 stage.group(PathComponent(stringLiteral: StageRoute.terrainId.rawValue)) { (stage) in
                     stage.get(use: fetchStageByTerrainID)
                 }

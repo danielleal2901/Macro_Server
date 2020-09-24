@@ -17,12 +17,12 @@ class OverviewController: RouteCollection {
         
         overviewMain.post(use: insertOverview)
         overviewMain.get(use: fetchAllOverviews)
-//
+
         //overviews/overviewId
         overviewMain.group(OverviewRoutes.getPathComponent(.id)) { (overview) in
-//            overview.delete(use: deleteOverviewById)
+            overview.delete(use: deleteOverviewById)
             overview.get(use: fetchOverviewById)
-//            overview.put(use: updateOverviewById)
+            overview.put(use: updateOverviewById)
         }
     
         //overviews/stage
@@ -43,7 +43,7 @@ class OverviewController: RouteCollection {
             throw Abort(.badRequest)
         }
         
-        let overview = Overview(stageID: id, sections: overviewInput.sections)
+        let overview = Overview(stageId: id, sections: overviewInput.sections)
 
         return overview.create(on: req.db).transform(to:Overview.Output(id: overview.id!.uuidString, stageId: overview.$stage.id.uuidString, sections: overview.sections))
     }
@@ -72,5 +72,32 @@ class OverviewController: RouteCollection {
         
     }
     
+    func deleteOverviewById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        guard let id = req.parameters.get(OverviewParameters.overviewId.rawValue, as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        
+        return Overview.find(id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap({$0.delete(on: req.db)})
+            .transform(to: .ok)
+    }
+    
+    func updateOverviewById(req: Request) throws -> EventLoopFuture<Overview.Output> {
+        guard let id = req.parameters.get(OverviewParameters.overviewId.rawValue, as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        
+        let newOverview = try req.content.decode(Overview.Input.self)
+        return Overview.find(id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .map { oldOverview in
+                oldOverview.sections = newOverview.sections
+                let _ = oldOverview.save(on: req.db)
+                
+                return Overview.Output(id: oldOverview.id!.uuidString, stageId: oldOverview.$stage.id.uuidString, sections: oldOverview.sections)
+            }
+        
+    }
 }
 

@@ -34,10 +34,10 @@ final class Overview: Model, Content {
     var sections: [OverviewSection]
     
     init() {}
-    
-    init(stageID: UUID, sections: [OverviewSection]) {
+     
+    init(stageId: UUID, sections: [OverviewSection]) {
         self.id = UUID()
-        self.$stage.id = stageID
+        self.$stage.id = stageId
         self.sections = sections
     }
 }

@@ -19,7 +19,8 @@ struct CreateStage: Migration {
                 .id()
                 .field("type", stageType, .required)
                 .field("terrain_id", .uuid, .required)
-                .foreignKey("terrain_id", references: "terrains", "id", onDelete: .cascade)
+//                .field("terrain_id", .uuid, .required, .references("terrains", "id"))
+                .foreignKey("terrain_id", references: "terrains", "id", onDelete: .cascade, onUpdate: .restrict)
                 .create()
         }
     }

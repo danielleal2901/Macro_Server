@@ -13,9 +13,14 @@ import Vapor
 struct TerrainController: RouteCollection {
     
     func boot(routes: RoutesBuilder) throws {
+        
+        //terrain
         let terrains = routes.grouped(TerrainRoutes.getPathComponent(.main))
+        
         terrains.post(use: insertTerrain)
         terrains.get(use: fetchAllTerrains)
+        
+        //terrain/:terrainId
         terrains.group(TerrainRoutes.getPathComponent(.id)) { (terrain) in
             terrain.delete(use: deleteTerrainById)
             terrain.get(use: fetchTerrainById)
@@ -27,65 +32,52 @@ struct TerrainController: RouteCollection {
         let terrainInput = try req.content.decode(Terrain.Input.self)
     
         let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
-        
-        let eventLoop: EventLoop = req.eventLoop
-
-        let promiseStages = eventLoop.makePromise(of: Bool.self)
+//
+//        let eventLoop: EventLoop = req.eventLoop
+//        let promiseStages = eventLoop.makePromise(of: Bool.self)
         
         let stages = terrainInput.stages.map{
             Stage(type: $0.self, terrainID: terrain.id!)
         }
-        
-        stages.forEach { stage  in
-           let _ = stage.save(on: req.db).map { _ in
-                if (stage.id! == stages.last!.id!){
-                    promiseStages.succeed(true)
+                                
+    
+        return terrain.create(on: req.db).map { _ in
+            stages.map { stage in
+                stage.create(on: req.db).map { _ in
+                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel",
+                                                                                items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                 }
             }
-        }
+        }.transform(to: terrain)
+             
+//        stages.map { stage in
+//            stage.create(on: req.db).flatMap { _ in
+//                overviewPreSet.$stage.$id = stage.id!
+//
+//
+//                overviewPreSet.create(on: req.db).flatMap { _ in
+//                    return terrain
+//                }
+//            }
+//        }
+//        stages.forEach { stage  in
+//
+//
+//            let _ = overviewPreSet.create(on: req.db).map { _ in
+//                let _ = stage.create(on: req.db).map { _ in
+//                   if (stage.id! == stages.last!.id!){
+//                       promiseStages.succeed(true)
+//                   }
+//                }
+//            }
+//        }
+//
+//        return promiseStages.futureResult.flatMap { result in
+//            return terrain.create(on: req.db).map { _ in
+//                return terrain
+//            }
+//        }
 
-        return promiseStages.futureResult.flatMap { result in
-            return terrain.create(on: req.db).map { _ in
-                return terrain
-            }
-        }
-
-    }
-    
-    func insertTerrainSQL(terrain: TerrainModel,req: Request){
-        if let sql = req.db as? PostgresDatabase{
-            sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
-                print("Worked")
-            })
-        }
-    }
-    
-    func updateTerrainSQL(terrain: TerrainModel,req: Request){
-        if let sql = req.db as? PostgresDatabase{
-            // Check which data changed?
-            sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
-                print("Worked")
-            })
-        }
-    }
-    
-    func deleteTerrainSQL(id: UUID, req: Request){
-        if let sql = req.db as? PostgresDatabase{
-            // Check which data changed?
-            sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
-                print("Worked")
-            })
-        }
-    }
-    
-    
-    // Use on future, for custom sql requests
-    func fetchSome(req: Request){
-        if let sql = req.db as? PostgresDatabase{
-            sql.simpleQuery("select * from terrains").whenSuccess({ _ in
-                print("Worked")
-            })
-        }
     }
     
     func fetchAllTerrains(req: Request) throws -> EventLoopFuture<[Terrain]>  {
@@ -127,6 +119,47 @@ struct TerrainController: RouteCollection {
                 return oldTerrain
         }
     }
+    
+    
+    
+    //MARK: Sql Methods
+    func insertTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            sql.simpleQuery("INSERT INTO terrains (id,name) VALUES ('\(terrain.id)','\(terrain.name)')").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func updateTerrainSQL(terrain: TerrainModel,req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            sql.simpleQuery("UPDATE terrains SET name = '\(terrain.name)' WHERE name = 'guidelas'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    func deleteTerrainSQL(id: UUID, req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            // Check which data changed?
+            sql.simpleQuery("DELETE FROM terrains WHERE id = '\(id)'").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    
+    // Use on future, for custom sql requests
+    func fetchSome(req: Request){
+        if let sql = req.db as? PostgresDatabase{
+            sql.simpleQuery("select * from terrains").whenSuccess({ _ in
+                print("Worked")
+            })
+        }
+    }
+    
+    
         
 }
 
