@@ -32,9 +32,6 @@ struct TerrainController: RouteCollection {
         let terrainInput = try req.content.decode(Terrain.Input.self)
     
         let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
-//
-//        let eventLoop: EventLoop = req.eventLoop
-//        let promiseStages = eventLoop.makePromise(of: Bool.self)
         
         let stages = terrainInput.stages.map{
             Stage(type: $0.self, terrainID: terrain.id!)
@@ -51,35 +48,7 @@ struct TerrainController: RouteCollection {
                 }
             }
         }.transform(to: terrain)
-             
-//        stages.map { stage in
-//            stage.create(on: req.db).flatMap { _ in
-//                overviewPreSet.$stage.$id = stage.id!
-//
-//
-//                overviewPreSet.create(on: req.db).flatMap { _ in
-//                    return terrain
-//                }
-//            }
-//        }
-//        stages.forEach { stage  in
-//
-//
-//            let _ = overviewPreSet.create(on: req.db).map { _ in
-//                let _ = stage.create(on: req.db).map { _ in
-//                   if (stage.id! == stages.last!.id!){
-//                       promiseStages.succeed(true)
-//                   }
-//                }
-//            }
-//        }
-//
-//        return promiseStages.futureResult.flatMap { result in
-//            return terrain.create(on: req.db).map { _ in
-//                return terrain
-//            }
-//        }
-
+    
     }
     
     func fetchAllTerrains(req: Request) throws -> EventLoopFuture<[Terrain]>  {
