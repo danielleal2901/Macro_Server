@@ -44,8 +44,10 @@ struct TerrainController: RouteCollection {
         return terrain.create(on: req.db).map { _ in
             stages.map { stage in
                 stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel",
-                                                                                items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                        .map { _ in
+                            return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
+                    }
                 }
             }
         }.transform(to: terrain)

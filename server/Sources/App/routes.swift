@@ -20,13 +20,8 @@ func routes(_ app: Application) throws {
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
     try app.register(collection: OverviewController())
+    try app.register(collection: StatusController())
 
-    
-    //    try app.register(collection: GeoController())
-    //    try app.register(collection: EvaluationController())
-    //    try app.register(collection: EnviromentController())
-    //    try app.register(collection: ResidentController())
-    //    try app.register(collection: RegisterController())
     
 }
 
