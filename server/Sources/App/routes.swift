@@ -8,15 +8,7 @@ func routes(_ app: Application) throws {
     app.get { req in
         return "It works!"
     }
-    
-    app.webSocket("echo"){ req,ws in
-        print(ws)
-    }
-    
-    app.get("hello") { req -> String in    
-        return "Hello, world!"
-    }
-    
+
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
     try app.register(collection: OverviewController())
@@ -40,32 +32,42 @@ func webSockets(_ app: Application) throws{
         //        let team = request.session.data["team"] ?? "Empty Team"
         
         // Add User to Specific Team Session
-        //        dataController.enteredUser(userID: user, teamID: team, connection: ws)
+//         dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .ascii){
                 // Make responsability to another class
-                guard let message = CodableAlias().decodeDataSingle(valueToDecode: dataCov, intendedType: DataMessage.self) else {return}
+                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
+                dataController.enteredUser(userID: message.respUserID, teamID: message.destTeamID, connection: ws)
                 switch message.operation{
                 case 0:
                     // INSERT DATA
                     dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
-                        print(response.actionStatus)
+                        switch response.actionStatus{
+                        case .Completed:
+                            print()
+                        case .Error:
+                            print()
+                        default:
+                            print()
+                        }
                     }
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                        print(response.actionStatus)
                         switch response.actionStatus{
                         case .Completed:
-                            let convertedData = String(data: response.dataReceived!,encoding: .utf8)
-                            dataController.broadcast(data: convertedData!)
+                            let dataReceived = response.dataReceived
+                            let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: dataReceived)
+                            ws.send(encoded)
+                            print()
+                        //dataController.broadcastData(data: convertedData!)
                         case .Error:
-                            ws.send("Error")
+                            print()
                         default:
-                            ws.send("Error")
+                            print()
                         }
                     }
                 case 2:
@@ -75,7 +77,7 @@ func webSockets(_ app: Application) throws{
                     }
                 case 3:
                     // DELETE DATA                    
-                    let data = CodableAlias().decodeDataSingle(valueToDecode: message.data, intendedType: TerrainModel.self)
+                    let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: TerrainModel.self)
                     dataController.deleteData(sessionRequest: request, dataID: data!.id ) { (response) in
                         print(response.actionStatus)
                     }

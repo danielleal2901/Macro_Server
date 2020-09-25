@@ -28,10 +28,11 @@ internal class WSDataWorker{
      /// - Parameters:
      ///   - request: Request action with Data that needs to be included in Database
      ///   - completion: Response of Receive action, including the result of action Status
-    internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Dispatch.Response?) -> ()){
+    internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: (ServiceTypes.Dispatch.Response) -> ()){
          var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
-        let dataDecoded = CodableAlias().decodeDataSingle(valueToDecode: request.data.data, intendedType: TerrainModel.self)
+        let dataDecoded = CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: TerrainModel.self)
+        guard let decoded = dataDecoded else {return}
         
         switch request.data.dataType{
         case "terrain":
@@ -67,7 +68,7 @@ internal class WSDataWorker{
                 completion(response)
             }
         case "georeferecing":
-            // Change Terrain Controller
+            // Change Terrain Interactor
             let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
             eventData.whenSuccess { (terrains) in
                 let encodedValue = try? JSONEncoder().encode(terrains)
@@ -83,7 +84,7 @@ internal class WSDataWorker{
     internal func updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
-        let dataDecoded = CodableAlias().decodeDataSingle(valueToDecode: dataRequest.data.data, intendedType: TerrainModel.self)
+        let dataDecoded = CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: TerrainModel.self)
         
         switch dataRequest.data.dataType{
         case "terrain":
@@ -121,8 +122,8 @@ internal class WSDataWorker{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - socket: websocket
-    func addUser(userID: String,teamID: String,socket: WebSocket){
-        let connection = TeamConnection(name: userID, teamName: teamID, webSocket: socket)
+    func addUser(userID: UUID,teamID: UUID,socket: WebSocket){
+        let connection = TeamConnection(userID: userID, teamID: teamID, webSocket: socket)
         self.connections.append(connection)
     }
     
