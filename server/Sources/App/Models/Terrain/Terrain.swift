@@ -11,11 +11,12 @@ import Fluent
 
 final class Terrain: Model, Content {
     
-    struct Input: Content {
+    struct Inoutput: Content {
         let name: String
         let stages: [StageTypes]
+        let id: String?
     }
-    
+
     static let schema = "terrains"
     
     @ID(key: .id)

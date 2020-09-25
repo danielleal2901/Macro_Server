@@ -31,21 +31,28 @@ internal class WSDataWorker{
     internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
-        //let dataDecoded = CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: TerrainModel.self)
-        //guard let decoded = dataDecoded else {return}
-        
         switch request.data.dataType{
         case "terrain":            
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
-            response.actionStatus = .Completed
-            completion(response)
+            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
+            do{
+                let akaresponse = try createTerrain(terrainInput: terrainInput!, req: sessionRequest)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
         case "stage":
             let stageInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Input.self)
             guard let id = UUID(uuidString: stageInput!.terrain) else {return}
             let stage = Stage(type: stageInput!.stageType, terrainID: id)
             
             let akaresponse = stage.save(on: sessionRequest.db)
-            stage.update(on: sessionRequest.db)
             
             akaresponse.whenSuccess { _ in
                 response.actionStatus = .Completed
@@ -60,7 +67,7 @@ internal class WSDataWorker{
         case "overview":
             let overviewInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Input.self)
             guard let id = UUID(uuidString: overviewInput!.stageId) else {return}
-            let overview = Overview(stageID: id, sections: (overviewInput?.sections)!)
+            let overview = Overview(stageId: id, sections: overviewInput!.sections)
             
             let akaresponse = overview.save(on: sessionRequest.db)
             
@@ -75,11 +82,12 @@ internal class WSDataWorker{
             }
             
         case "status":
-            let overviewInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Input.self)
-            guard let id = UUID(uuidString: overviewInput!.stageId) else {return}
-            let overview = Overview(stageID: id, sections: (overviewInput?.sections)!)
+            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Input.self)
+            guard let id = UUID(uuidString: statusInput!.stageId) else {return}
+            let status = Status(stageId: id, sections: statusInput!.sections)
             
-            let akaresponse = overview.save(on: sessionRequest.db)
+            
+            let akaresponse = status.save(on: sessionRequest.db)
             
             akaresponse.whenSuccess { _ in
                 response.actionStatus = .Completed
@@ -90,6 +98,9 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
+        case "":
+            print()
+            
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -110,13 +121,8 @@ internal class WSDataWorker{
         
         switch dataRequest.data.dataType{
         case "terrain":
-            let eventData = try! TerrainController().fetchAllTerrains(req: sessionRequest)
-            eventData.whenSuccess { (terrains) in
-                let encodedValue = try? JSONEncoder().encode(terrains)
-                response.dataReceived = encodedValue!
-                response.actionStatus = .Completed
-                completion(response)
-            }
+            print()
+            
         case "stage":
             print()
         default:
@@ -129,15 +135,77 @@ internal class WSDataWorker{
     internal func updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
-        let dataDecoded = CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: TerrainModel.self)
-        
         switch dataRequest.data.dataType{
         case "terrain":
-            TerrainController().updateTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
-            response.actionStatus = .Completed
-            completion(response)
+            //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
+            guard let id = terrainInput?.id else {return}
+            do{
+                let akaresponse = try updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
         case "stage":
+            let stageInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Input.self)
+            guard let id = UUID(uuidString: stageInput!.terrain) else {return}
+            let stage = Stage(type: stageInput!.stageType, terrainID: id)
+            
+            let akaresponse = stage.save(on: sessionRequest.db)
+            
+            akaresponse.whenSuccess { _ in
+                response.actionStatus = .Completed
+                completion(response)
+            }
+            
+            akaresponse.whenFailure { _ in
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
+        case "overview":
+            let overviewInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Input.self)
+            guard let id = UUID(uuidString: overviewInput!.stageId) else {return}
+            let overview = Overview(stageId: id, sections: overviewInput!.sections)
+            
+            let akaresponse = overview.save(on: sessionRequest.db)
+            
+            akaresponse.whenSuccess { _ in
+                response.actionStatus = .Completed
+                completion(response)
+            }
+            
+            akaresponse.whenFailure { _ in
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
+        case "status":
+            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Input.self)
+            guard let id = UUID(uuidString: statusInput!.stageId) else {return}
+            let status = Status(stageId: id, sections: statusInput!.sections)
+            
+            
+            let akaresponse = status.save(on: sessionRequest.db)
+            
+            akaresponse.whenSuccess { _ in
+                response.actionStatus = .Completed
+                completion(response)
+            }
+            
+            akaresponse.whenFailure { _ in
+                response.actionStatus = .Error
+                completion(response)
+            }
+        case "":
             print()
+            
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -146,12 +214,26 @@ internal class WSDataWorker{
         
     }
     
-    internal func deleteData(sessionRequest: Request,dataID: UUID,dataType: String,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
+    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataID: UUID,dataType: String,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataType{
         case "terrain":
-            TerrainController().deleteTerrainSQL(id: dataID, req: sessionRequest)
+            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
+            
+            do{
+                let akaresponse = try deleteTerrain(req: sessionRequest, newTerrain: terrainInput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
+            
+            
             response.actionStatus = .Completed
             completion(response)
         default:
@@ -162,7 +244,48 @@ internal class WSDataWorker{
         
     }
     
+    internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<Terrain>{
+        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
+        
+        let stages = terrainInput.stages.map{
+            Stage(type: $0.self, terrainID: terrain.id!)
+        }
+        
+        return terrain.create(on: req.db).map { _ in
+            stages.map { stage in
+                stage.create(on: req.db).map { _ in
+                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                        .map { _ in
+                            return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
+                    }
+                }
+            }
+        }.transform(to: terrain)
+    }
     
+    internal func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<Terrain>{
+        guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
+        
+        return Terrain.find(uuid, on: req.db).flatMap { (terrain) in
+            terrain?.name = newTerrain.name
+            return terrain!.update(on: req.db).transform(to: terrain!)
+        }
+        
+        
+        
+    }
+    
+    // Change newTerrain ->>> ID
+    internal func deleteTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
+        guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
+        
+        return Terrain.find(uuid, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+            $0.delete(on: req.db).transform(to: .ok)
+        }
+        
+        
+        
+    }
     
     /// Add a user to a group (currently using one instance)
     /// - Parameters:

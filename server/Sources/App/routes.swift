@@ -12,13 +12,8 @@ func routes(_ app: Application) throws {
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
     try app.register(collection: OverviewController())
+    try app.register(collection: StatusController())
 
-    
-    //    try app.register(collection: GeoController())
-    //    try app.register(collection: EvaluationController())
-    //    try app.register(collection: EnviromentController())
-    //    try app.register(collection: ResidentController())
-    //    try app.register(collection: RegisterController())
     
 }
 
@@ -82,8 +77,8 @@ func webSockets(_ app: Application) throws{
                     }
                 case 3:
                     // DELETE DATA                    
-                    let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: TerrainModel.self)
-                    dataController.deleteData(sessionRequest: request, dataID: data!.id ) { (response) in
+                    let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: Terrain.self)
+                    dataController.deleteData(sessionRequest: request, package: message, dataID: data!.id! ) { (response) in
                         print(response.actionStatus)
                     }
                 default:

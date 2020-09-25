@@ -39,8 +39,8 @@ internal class WSInteractor{
     }
     
     
-    internal func deleteData(sessionRequest: Request,dataID: UUID,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest,dataID: dataID,dataType: "terrain") { (response) in
+    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataID: UUID,completion: @escaping (Services.Dispatch.Response) -> ()){
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataID: dataID,dataType: "terrain") { (response) in
             completion(response)
         }
     }
