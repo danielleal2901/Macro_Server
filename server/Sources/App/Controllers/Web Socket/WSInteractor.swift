@@ -17,7 +17,7 @@ internal class WSInteractor{
             completion(response)
             switch response.actionStatus{
             case .Completed:
-                broadcastData(data: data.data,idUser: data.data.respUserID)
+                self.broadcastData(data: data.data,idUser: data.data.respUserID)
             case .Error:
                 print()
             default:

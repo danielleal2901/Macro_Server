@@ -50,7 +50,7 @@ func webSockets(_ app: Application) throws{
                 case 0:
                     // INSERT DATA
                     dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
-                        switch response.actionStatus{
+                        switch response.actionStatus{                            
                         case .Completed:
                             print()
                         case .Error:
@@ -68,7 +68,7 @@ func webSockets(_ app: Application) throws{
                             let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: dataReceived)
                             ws.send(encoded)
                             print()
-                        //dataController.broadcastData(data: convertedData!)
+//                            dataController.broadcastData(data: convertedData!)
                         case .Error:
                             print()
                         default:

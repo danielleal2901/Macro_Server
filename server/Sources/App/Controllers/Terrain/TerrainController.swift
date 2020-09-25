@@ -60,6 +60,7 @@ struct TerrainController: RouteCollection {
         }
     }
     
+    
     func updateTerrainSQL(terrain: TerrainModel,req: Request){
         if let sql = req.db as? PostgresDatabase{
             // Check which data changed?
