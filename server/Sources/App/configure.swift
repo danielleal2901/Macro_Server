@@ -24,9 +24,10 @@ public func configure(_ app: Application) throws {
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
     
-//    app.migrations.add(CreateStage())
-//    app.migrations.add(CreateDocument())
+    app.migrations.add(CreateStage())
+    app.migrations.add(CreateDocument())
     app.migrations.add(CreateOverview())
+    app.migrations.add(CreateStatus())
 //    app.migrations.add(CreateEnum())
 
     // register routes

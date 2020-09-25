@@ -1,27 +1,27 @@
 //
 //  File.swift
+//  
 //
-//
-//  Created by Daniel Leal on 20/09/20.
+//  Created by Daniel Leal on 24/09/20.
 //
 
 import Foundation
 import Vapor
 import Fluent
 
-final class Overview: Model, Content {
+final class Status: Model, Content {
     
-    static let schema = "overviews"
+    static let schema = "status"
     
     struct Input: Content {
         let stageId: String
-        let sections: [OverviewSection]
+        let sections: [StatusSection]
     }
     
     struct Output: Content {
         let id: String
         let stageId: String
-        let sections: [OverviewSection]
+        let sections: [StatusSection]
     }
     
     @ID(key: .id)
@@ -31,11 +31,11 @@ final class Overview: Model, Content {
     var stage: Stage
     
     @Field(key: "sections")
-    var sections: [OverviewSection]
+    var sections: [StatusSection]
     
     init() {}
      
-    init(stageId: UUID, sections: [OverviewSection]) {
+    init(stageId: UUID, sections: [StatusSection]) {
         self.id = UUID()
         self.$stage.id = stageId
         self.sections = sections

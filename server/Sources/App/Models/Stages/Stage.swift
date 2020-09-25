@@ -35,8 +35,9 @@ final class Stage: Model, Content {
     
     init() {}
     
-    init(id: UUID? = nil, type: StageTypes, terrainID: UUID) {
+    init(type: StageTypes, terrainID: UUID) {
         self.type = type
         self.$terrain.id = terrainID
+        self.id = UUID()
     }
 }
