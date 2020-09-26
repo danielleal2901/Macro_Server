@@ -29,6 +29,14 @@ internal class WSInteractor{
     internal func fetchData(sessionID: Request,dataMessage: Services.Receive.Request,completion: @escaping (Services.Receive.Response) -> ()){
         WSDataWorker.shared.fetchData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
+            switch response!.actionStatus{
+            case .Completed:
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+            case .Error:
+                print()
+            default:
+                print()
+            }
         }
     }
     
@@ -63,6 +71,7 @@ internal class WSInteractor{
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
             if $0.userID != idUser{
+//                $0.webSocket.send([UInt8(data)])
                 $0.webSocket.send(encoded)
             }
             

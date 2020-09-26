@@ -10,7 +10,10 @@ import Foundation
 
 /// Using for identify current data requests (disabled for a while)
 enum DataTypes: String{
-    case Terrain = "terrain"
-    case Georeferecing = "georeferecing"
+    case terrain = "terrain"
+    case status = "status"
+    case document = "document"
+    case overview = "overview"
+    case stage = "stage"
 }
 

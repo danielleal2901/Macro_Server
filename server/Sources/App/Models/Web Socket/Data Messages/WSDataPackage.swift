@@ -28,7 +28,7 @@ internal struct WSDataPackage: Codable{
         case respUserID = "user"
     }
     
-    // MARK - Initializer
+    
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         packageID = try values.decode(UUID.self,forKey: .packageID)
