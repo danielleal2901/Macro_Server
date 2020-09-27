@@ -16,6 +16,7 @@ struct CreateOverview: Migration {
         return database.schema("overviews")
             .id()
             .field("stage_id", .uuid, .required)
+            .unique(on: "stage_id")
             .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade, onUpdate: .restrict)
             .field("sections", .array(of: .array(of: .custom(OverviewSection.self)) ), .required)
             .create()

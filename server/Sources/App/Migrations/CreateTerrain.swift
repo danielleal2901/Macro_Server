@@ -16,9 +16,9 @@ struct CreateTerrain: Migration {
         return database.schema("terrains")
             .id()
             .field("name", .string)
+            .unique(on: "name")
             .field("stages_names", .array(of: .string), .required)
             .create()
-        
     }
     
     func revert(on database: Database) -> EventLoopFuture<Void> {

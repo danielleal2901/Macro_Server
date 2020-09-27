@@ -16,6 +16,7 @@ struct CreateDocument: Migration {
             .id()
             .field("format", .string, .required)
             .field("stage_id", .uuid, .required)
+            .unique(on: "stage_id")
             .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade)
             .create()
     }

@@ -16,10 +16,10 @@ struct CreateStatus: Migration {
         return database.schema("status")
             .id()
             .field("stage_id", .uuid, .required)
+            .unique(on: "stage_id")
             .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade, onUpdate: .restrict)
             .field("sections", .array(of: .array(of: .custom(StatusSection.self)) ), .required)
             .create()
-            
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {
