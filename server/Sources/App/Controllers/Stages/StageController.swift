@@ -45,24 +45,24 @@ class StageController: RouteCollection {
         
     }
     
-    func insertStage(req: Request) throws -> EventLoopFuture<Stage.Output> {
+    func insertStage(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
-        let stageInput = try self.verifyUploadRoutes(req: req)
+        let stageInoutput = try self.verifyUploadRoutes(req: req)
                 
         return Stage.query(on: req.db)
             .group(.and) { group in
-                group.filter(\.$type == stageInput.type).filter("terrain_id", .equal, stageInput.$terrain.id)
+                group.filter(\.$type == stageInoutput.type).filter("terrain_id", .equal, stageInoutput.$terrain.id)
         }.count().flatMapThrowing { count in
             if (count > 0) {
                 throw Abort(.badRequest)
             }
         }.flatMap { _ in
-            return stageInput.save(on: req.db).transform(to:Stage.Output(id: stageInput.id!.uuidString, terrain: stageInput.$terrain.id.uuidString, stageType: stageInput.type.rawValue))
+            return stageInoutput.save(on: req.db).transform(to:Stage.Inoutput(id: stageInoutput.id!.uuidString, terrain: stageInoutput.$terrain.id.uuidString, stageType: StageTypes(rawValue: stageInoutput.type.rawValue)!))
         }
         
     }
     
-    func fetchAllStages(req: Request) throws -> EventLoopFuture<[Stage.Output]> {
+    func fetchAllStages(req: Request) throws -> EventLoopFuture<[Stage.Inoutput]> {
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -70,13 +70,13 @@ class StageController: RouteCollection {
             .filter(\.$type == stageType)
             .all().map { stages in
                 let outputs = stages.map { stage in
-                    Stage.Output(id: stage.id!.uuidString, terrain: stage.$terrain.id.uuidString, stageType: stage.type.rawValue)
+                    Stage.Inoutput(id: stage.id!.uuidString, terrain: stage.$terrain.id.uuidString, stageType: StageTypes(rawValue: stage.type.rawValue)!)
                 }
                 return outputs
         }
     }
     
-    func fetchStageById(req: Request) throws -> EventLoopFuture<Stage.Output> {
+    func fetchStageById(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -88,7 +88,7 @@ class StageController: RouteCollection {
                     throw Abort(.badRequest)
                 }
                 
-                return Stage.Output(id: $0.id!.uuidString, terrain: $0.$terrain.id.uuidString , stageType: $0.type.rawValue)
+                return Stage.Inoutput(id: $0.id!.uuidString, terrain: $0.$terrain.id.uuidString , stageType: StageTypes(rawValue: $0.type.rawValue)!)
         }
     }
     
@@ -109,7 +109,7 @@ class StageController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateStageById(req: Request) throws -> EventLoopFuture<Stage.Output> {
+    func updateStageById(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
         let stageInput = try self.verifyUploadRoutes(req: req)
         
@@ -124,12 +124,12 @@ class StageController: RouteCollection {
                 
                 //Colocar aqui o que quiser mudar
                 let _ = stage.save(on: req.db)
-                return Stage.Output(id: stage.id!.uuidString, terrain: stage.$terrain.id.uuidString , stageType: stage.type.rawValue)
+                return Stage.Inoutput(id: stage.id!.uuidString, terrain: stage.$terrain.id.uuidString , stageType: StageTypes(rawValue: stage.type.rawValue)!)
                 
         }
     }
     
-    func fetchStageByTerrainID(req: Request) throws -> EventLoopFuture<Stage.Output> {
+    func fetchStageByTerrainID(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -142,7 +142,7 @@ class StageController: RouteCollection {
                 group.filter(\.$type == stageType).filter("terrain_id", .equal, terrainId)
             }.first().unwrap(or: Abort(.notFound))
             .map {
-                return Stage.Output(id: $0.id!.uuidString, terrain: $0.$terrain.id.uuidString, stageType: $0.type.rawValue)
+                return Stage.Inoutput(id: $0.id!.uuidString, terrain: $0.$terrain.id.uuidString, stageType: StageTypes(rawValue: $0.type.rawValue)!)
             }
 
     }
@@ -158,7 +158,7 @@ class StageController: RouteCollection {
         }
         
         //Verifica se consegue dar decode no input
-        let input = try req.content.decode(Stage.Input.self)
+        let input = try req.content.decode(Stage.Inoutput.self)
         
         //Verifica se o id no input eh um uuid
         guard let id = UUID(uuidString: input.terrain) else {

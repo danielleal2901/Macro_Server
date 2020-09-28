@@ -35,9 +35,9 @@ class OverviewController: RouteCollection {
         }
     }
 
-    func insertOverview(req: Request) throws -> EventLoopFuture<Overview.Output> {
+    func insertOverview(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
         
-        let overviewInput = try req.content.decode(Overview.Input.self)
+        let overviewInput = try req.content.decode(Overview.Inoutput.self)
         
         guard let id = UUID(uuidString: overviewInput.stageId) else {
             throw Abort(.badRequest)
@@ -45,7 +45,7 @@ class OverviewController: RouteCollection {
         
         let overview = Overview(stageId: id, sections: overviewInput.sections)
 
-        return overview.create(on: req.db).transform(to:Overview.Output(id: overview.id!.uuidString, stageId: overview.$stage.id.uuidString, sections: overview.sections))
+        return overview.create(on: req.db).transform(to:Overview.Inoutput(id: overview.id!.uuidString, stageId: overview.$stage.id.uuidString, sections: overview.sections))
     }
     
     func fetchAllOverviews(req: Request) throws -> EventLoopFuture<[Overview]> {
@@ -57,7 +57,7 @@ class OverviewController: RouteCollection {
             .unwrap(or: Abort(.notFound))
     }
     
-    func fetchOverviewByStageId (req: Request) throws -> EventLoopFuture<Overview.Output> {
+    func fetchOverviewByStageId (req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
         
         guard let stageId = req.parameters.get((OverviewParameters.stageId.rawValue), as: UUID.self) else {
             throw Abort(.badRequest)
@@ -67,7 +67,7 @@ class OverviewController: RouteCollection {
             .filter("stage_id", .equal, stageId)
             .first().unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalOverview in
-                Overview.Output(id: try optionalOverview.requireID().uuidString, stageId: optionalOverview.$stage.id.uuidString, sections: optionalOverview.sections)
+                Overview.Inoutput(id: try optionalOverview.requireID().uuidString, stageId: optionalOverview.$stage.id.uuidString, sections: optionalOverview.sections)
             }
         
     }
@@ -83,19 +83,19 @@ class OverviewController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateOverviewById(req: Request) throws -> EventLoopFuture<Overview.Output> {
+    func updateOverviewById(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
         guard let id = req.parameters.get(OverviewParameters.overviewId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        let newOverview = try req.content.decode(Overview.Input.self)
+        let newOverview = try req.content.decode(Overview.Inoutput.self)
         return Overview.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .map { oldOverview in
                 oldOverview.sections = newOverview.sections
                 let _ = oldOverview.save(on: req.db)
                 
-                return Overview.Output(id: oldOverview.id!.uuidString, stageId: oldOverview.$stage.id.uuidString, sections: oldOverview.sections)
+                return Overview.Inoutput(id: oldOverview.id!.uuidString, stageId: oldOverview.$stage.id.uuidString, sections: oldOverview.sections)
             }
         
     }

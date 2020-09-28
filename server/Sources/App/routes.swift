@@ -26,10 +26,7 @@ func webSockets(_ app: Application) throws{
         
         // MARK - Variables
         let dataController = WSInteractor()
-        
-        // User Info to get via connection Request and register automatically
-        //        let user = request.session.data["username"] ?? "User 001"
-        //        let team = request.session.data["team"] ?? "Empty Team"
+
         
         dataController.enteredUser(userID: UUID(), teamID: UUID(), connection: ws)
 //         dataController.enteredUser(userID: user, teamID: team, connection: ws)
@@ -76,8 +73,7 @@ func webSockets(_ app: Application) throws{
                             }
                         case 3:
                             // DELETE DATA
-                            let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: Terrain.self)
-                            dataController.deleteData(sessionRequest: request, package: message, dataID: data!.id! ) { (response) in
+                            dataController.deleteData(sessionRequest: request, package: message) { (response) in
                                 print(response.actionStatus)
                             }
                         default:

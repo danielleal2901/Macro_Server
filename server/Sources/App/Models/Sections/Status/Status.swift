@@ -13,17 +13,12 @@ final class Status: Model, Content {
     
     static let schema = "status"
     
-    struct Input: Content {
-        let stageId: String
-        let sections: [StatusSection]
-    }
-    
-    struct Output: Content {
+    struct Inoutput: Content {
         let id: String
         let stageId: String
         let sections: [StatusSection]
     }
-    
+            
     @ID(key: .id)
     var id: UUID?
     
