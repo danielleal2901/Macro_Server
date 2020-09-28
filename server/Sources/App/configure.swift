@@ -29,6 +29,7 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateOverview())
     app.migrations.add(CreateStatus())
     app.migrations.add(CreateUser())
+    app.migrations.add(CreateUserToken())
 //    app.migrations.add(CreateEnum())
 
     // register routes

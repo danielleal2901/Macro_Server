@@ -9,7 +9,7 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
-    app.post("users") { (req) -> EventLoopFuture<User> in
+    app.post("registerUsers") { (req) -> EventLoopFuture<User> in
         try UserModel.validate(content: req)
         let create = try req.content.decode(UserModel.self)
         guard create.password == create.confirmPassword else {
@@ -23,6 +23,22 @@ func routes(_ app: Application) throws {
         return user.save(on: req.db)
             .map { user }
     }
+    
+    let passwordProtected = app.grouped(User.authenticator())
+        
+    passwordProtected.post("login") { req -> EventLoopFuture<UserToken> in
+        let user = try req.auth.require(User.self)
+        let token = try user.generateToken()
+        return token.save(on: req.db)
+            .map { token }
+    }
+    
+    let tokenProtected = app.grouped(UserToken.authenticator())
+    
+    tokenProtected.get("me") { req -> User in
+        try req.auth.require(User.self)
+    }
+    
     
     try app.register(collection: TerrainController())
     try app.register(collection: StageController())
