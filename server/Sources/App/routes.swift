@@ -13,7 +13,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: StageController())
     try app.register(collection: OverviewController())
     try app.register(collection: StatusController())
-
+    
     
 }
 
