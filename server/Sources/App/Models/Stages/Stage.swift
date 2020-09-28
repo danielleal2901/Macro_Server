@@ -13,15 +13,10 @@ final class Stage: Model, Content {
     
     static let schema = "stages"
     
-    struct Input: Content {
-        let terrain: String
-        let stageType: StageTypes
-    }
-    
-    struct Output: Content {
+    struct Inoutput: Content {
         let id: String
         let terrain: String
-        let stageType: String
+        let stageType: StageTypes
     }
     
     @ID(key: .id)

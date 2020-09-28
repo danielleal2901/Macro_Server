@@ -36,9 +36,9 @@ class StatusController: RouteCollection {
         }
     }
 
-    func insertStatus(req: Request) throws -> EventLoopFuture<Status.Output> {
+    func insertStatus(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
         
-        let StatusInput = try req.content.decode(Status.Input.self)
+        let StatusInput = try req.content.decode(Status.Inoutput.self)
         
         guard let id = UUID(uuidString: StatusInput.stageId) else {
             throw Abort(.badRequest)
@@ -46,7 +46,7 @@ class StatusController: RouteCollection {
         
         let status = Status(stageId: id, sections: StatusInput.sections)
 
-        return status.create(on: req.db).transform(to:Status.Output(id: status.id!.uuidString, stageId: status.$stage.id.uuidString, sections: status.sections))
+        return status.create(on: req.db).transform(to:Status.Inoutput(id: status.id!.uuidString, stageId: status.$stage.id.uuidString, sections: status.sections))
     }
     
     func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status]> {
@@ -58,7 +58,7 @@ class StatusController: RouteCollection {
             .unwrap(or: Abort(.notFound))
     }
     
-    func fetchStatusByStageId (req: Request) throws -> EventLoopFuture<Status.Output> {
+    func fetchStatusByStageId (req: Request) throws -> EventLoopFuture<Status.Inoutput> {
         
         guard let stageId = req.parameters.get((StatusParameters.stageId.rawValue), as: UUID.self) else {
             throw Abort(.badRequest)
@@ -68,7 +68,7 @@ class StatusController: RouteCollection {
             .filter("stage_id", .equal, stageId)
             .first().unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalStatus in
-                Status.Output(id: try optionalStatus.requireID().uuidString, stageId: optionalStatus.$stage.id.uuidString, sections: optionalStatus.sections)
+                Status.Inoutput(id: try optionalStatus.requireID().uuidString, stageId: optionalStatus.$stage.id.uuidString, sections: optionalStatus.sections)
             }
         
     }
@@ -84,19 +84,19 @@ class StatusController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateStatusById(req: Request) throws -> EventLoopFuture<Status.Output> {
+    func updateStatusById(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
         guard let id = req.parameters.get(StatusParameters.statusId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        let newStatus = try req.content.decode(Status.Input.self)
+        let newStatus = try req.content.decode(Status.Inoutput.self)
         return Status.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .map { oldStatus in
                 oldStatus.sections = newStatus.sections
                 let _ = oldStatus.save(on: req.db)
                 
-                return Status.Output(id: oldStatus.id!.uuidString, stageId: oldStatus.$stage.id.uuidString, sections: oldStatus.sections)
+                return Status.Inoutput(id: oldStatus.id!.uuidString, stageId: oldStatus.$stage.id.uuidString, sections: oldStatus.sections)
             }
         
     }

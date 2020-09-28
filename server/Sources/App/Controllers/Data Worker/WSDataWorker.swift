@@ -14,6 +14,7 @@ internal class WSDataWorker{
     // MARK - Variables
     /// Singleton
     internal static let shared = WSDataWorker()
+    internal let dataManager = DataManager()
     /// Connection for future use
     internal private(set) var connections: [TeamConnection] // To Change
     
@@ -36,7 +37,7 @@ internal class WSDataWorker{
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
             do{
-                let akaresponse = try createTerrain(terrainInput: terrainInput!, req: sessionRequest)
+                let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -48,9 +49,9 @@ internal class WSDataWorker{
             }
             
         case "stage":
-            let stageInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Input.self)
-            guard let id = UUID(uuidString: stageInput!.terrain) else {return}
-            let stage = Stage(type: stageInput!.stageType, terrainID: id)
+            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
+            guard let id = UUID(uuidString: stageInoutput!.terrain) else {return}
+            let stage = Stage(type: stageInoutput!.stageType, terrainID: id)
             
             let akaresponse = stage.save(on: sessionRequest.db)
             
@@ -65,9 +66,9 @@ internal class WSDataWorker{
             }
             
         case "overview":
-            let overviewInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Input.self)
-            guard let id = UUID(uuidString: overviewInput!.stageId) else {return}
-            let overview = Overview(stageId: id, sections: overviewInput!.sections)
+            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
+            guard let id = UUID(uuidString: overviewInoutput!.stageId) else {return}
+            let overview = Overview(stageId: id, sections: overviewInoutput!.sections)
             
             let akaresponse = overview.save(on: sessionRequest.db)
             
@@ -82,7 +83,7 @@ internal class WSDataWorker{
             }
             
         case "status":
-            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Input.self)
+            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
             guard let id = UUID(uuidString: statusInput!.stageId) else {return}
             let status = Status(stageId: id, sections: statusInput!.sections)
             
@@ -122,7 +123,6 @@ internal class WSDataWorker{
         switch dataRequest.data.dataType{
         case "terrain":
             print()
-            
         case "stage":
             print()
         default:
@@ -139,9 +139,8 @@ internal class WSDataWorker{
         case "terrain":
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
-            guard let id = terrainInput?.id else {return}
             do{
-                let akaresponse = try updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
+                let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -153,43 +152,39 @@ internal class WSDataWorker{
             }
             
         case "stage":
-            let stageInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Input.self)
-            guard let id = UUID(uuidString: stageInput!.terrain) else {return}
-            let stage = Stage(type: stageInput!.stageType, terrainID: id)
+            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Inoutput.self)
             
-            let akaresponse = stage.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            do{
+                let akaresponse = try dataManager.updateStage(req: sessionRequest, newStage: stageInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
+            
         case "overview":
-            let overviewInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Input.self)
-            guard let id = UUID(uuidString: overviewInput!.stageId) else {return}
-            let overview = Overview(stageId: id, sections: overviewInput!.sections)
-            
-            let akaresponse = overview.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Inoutput.self)
+            do{
+                let akaresponse = try dataManager.updateOverview(req: sessionRequest, newOverview: overviewInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
         case "status":
-            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Input.self)
-            guard let id = UUID(uuidString: statusInput!.stageId) else {return}
-            let status = Status(stageId: id, sections: statusInput!.sections)
+            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
+            guard let id = UUID(uuidString: statusInoutput!.stageId) else {return}
+            let status = Status(stageId: id, sections: statusInoutput!.sections)
             
             
             let akaresponse = status.save(on: sessionRequest.db)
@@ -219,23 +214,66 @@ internal class WSDataWorker{
         
         switch dataType{
         case "terrain":
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
+            let terrainInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
             
             do{
-                let akaresponse = try deleteTerrain(req: sessionRequest, newTerrain: terrainInput!)
+                let akaresponse = try dataManager.deleteTerrain(req: sessionRequest, terrain: terrainInoutput!)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
                 }
             } catch (let error){
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
                 
             }
             
+        case "stage":
+            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Stage.Inoutput.self)
             
-            response.actionStatus = .Completed
-            completion(response)
+            do{
+                let akaresponse = try dataManager.deleteStage(req: sessionRequest, stage: stageInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
+        case "overview":
+            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Overview.Inoutput.self)
+            
+            do{
+                let akaresponse = try dataManager.deleteOverview(req: sessionRequest, overview: overviewInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
+        case "status":
+            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Status.Inoutput.self)
+            
+            do{
+                let akaresponse = try dataManager.deleteStatus(req: sessionRequest, status: statusInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -244,48 +282,7 @@ internal class WSDataWorker{
         
     }
     
-    internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<Terrain>{
-        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
-        
-        let stages = terrainInput.stages.map{
-            Stage(type: $0.self, terrainID: terrain.id!)
-        }
-        
-        return terrain.create(on: req.db).map { _ in
-            stages.map { stage in
-                stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
-                        .map { _ in
-                            return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
-                    }
-                }
-            }
-        }.transform(to: terrain)
-    }
     
-    internal func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<Terrain>{
-        guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
-        
-        return Terrain.find(uuid, on: req.db).flatMap { (terrain) in
-            terrain?.name = newTerrain.name
-            return terrain!.update(on: req.db).transform(to: terrain!)
-        }
-        
-        
-        
-    }
-    
-    // Change newTerrain ->>> ID
-    internal func deleteTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
-        guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
-        
-        return Terrain.find(uuid, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
-            $0.delete(on: req.db).transform(to: .ok)
-        }
-        
-        
-        
-    }
     
     /// Add a user to a group (currently using one instance)
     /// - Parameters:
