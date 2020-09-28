@@ -136,8 +136,7 @@ internal class WSDataWorker{
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
-        case "terrain":
-            //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+        case "terrain":            
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
             do{
                 let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
@@ -209,7 +208,7 @@ internal class WSDataWorker{
         
     }
     
-    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataID: UUID,dataType: String,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
+    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataType: String,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataType{

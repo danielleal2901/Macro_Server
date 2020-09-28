@@ -76,8 +76,7 @@ func webSockets(_ app: Application) throws{
                             }
                         case 3:
                             // DELETE DATA
-                            let data = CoderHelper.shared.decodeDataSingle(valueToDecode: message.content, intendedType: Terrain.self)
-                            dataController.deleteData(sessionRequest: request, package: message, dataID: data!.id! ) { (response) in
+                            dataController.deleteData(sessionRequest: request, package: message) { (response) in
                                 print(response.actionStatus)
                             }
                         default:
