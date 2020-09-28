@@ -19,7 +19,6 @@ struct CreateStage: Migration {
                 .id()
                 .field("type", stageType, .required)
                 .field("terrain_id", .uuid, .required)
-                .unique(on: "terrain_id")
                 .foreignKey("terrain_id", references: "terrains", "id", onDelete: .cascade, onUpdate: .restrict)
                 .create()
         }
