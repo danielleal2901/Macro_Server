@@ -68,7 +68,7 @@ func webSockets(_ app: Application) throws{
                             }
                         case 2:
                             // UPDATE DATA
-                            dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                             dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
                                 print(response.actionStatus)
                             }
                         case 3:
