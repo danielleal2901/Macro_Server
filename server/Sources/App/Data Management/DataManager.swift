@@ -8,7 +8,7 @@
 import Vapor
 import Foundation
 
-class DataManager{
+class DataManager: DataManagerLogic{
     // Terrain
     internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<Terrain>{
         let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map{$0.rawValue})
@@ -52,7 +52,6 @@ class DataManager{
             return stage!.update(on: req.db).transform(to: stage!)
         }
     }
-    
     internal func deleteStage(req: Request,stage: Stage.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         guard let uuid = UUID(uuidString: stage.id) else {throw Abort(.notFound)}
         
@@ -70,7 +69,6 @@ class DataManager{
             return overview!.update(on: req.db).transform(to: overview!)
         }
     }
-    
     internal func deleteOverview(req: Request,overview: Overview.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         guard let uuid = UUID(uuidString: overview.id) else {throw Abort(.notFound)}
         
@@ -88,7 +86,6 @@ class DataManager{
             return status!.update(on: req.db).transform(to: status!)
         }
     }
-    
     internal func deleteStatus(req: Request,status: Status.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         guard let uuid = UUID(uuidString: status.id) else {throw Abort(.notFound)}
         
