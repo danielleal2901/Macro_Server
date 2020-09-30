@@ -31,7 +31,7 @@ internal class WSInteractor{
             completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
             switch response!.actionStatus{
             case .Completed:
-                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+                print()
             case .Error:
                 print()
             default:
@@ -43,13 +43,29 @@ internal class WSInteractor{
     internal func updateData(sessionID: Request,dataMessage: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
         WSDataWorker.shared.updateData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
+            switch response!.actionStatus{
+            case .Completed:
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+            case .Error:
+                print()
+            default:
+                print()
+            }
         }
     }
     
     
     internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: "terrain") { (response) in
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
             completion(response)
+            switch response.actionStatus{
+            case .Completed:
+                self.broadcastData(data: package,idUser: package.respUserID)
+            case .Error:
+                print()
+            default:
+                print()
+            }
         }
     }
     

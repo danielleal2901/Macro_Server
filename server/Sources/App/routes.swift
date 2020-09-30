@@ -9,9 +9,9 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
-    app.post("registerUsers") { (req) -> EventLoopFuture<User> in
-        try UserModel.validate(content: req)
-        let create = try req.content.decode(UserModel.self)
+    // @gui -> Going to Change Path, using for testing
+    app.post("userregister") { (req) -> EventLoopFuture<User> in
+        let create = try req.content.decode(AuthEntity.self)        
         guard create.password == create.confirmPassword else {
             throw Abort(.badRequest, reason: "Passwords did not match")
         }
@@ -25,10 +25,11 @@ func routes(_ app: Application) throws {
     }
     
     let passwordProtected = app.grouped(User.authenticator())
-        
-    passwordProtected.post("login") { req -> EventLoopFuture<UserToken> in
+    // @gui -> Going to Change Path, using for testing
+    passwordProtected.post("userlogin") { req -> EventLoopFuture<UserToken> in
         let user = try req.auth.require(User.self)
         let token = try user.generateToken()
+        
         return token.save(on: req.db)
             .map { token }
     }
@@ -74,7 +75,7 @@ func webSockets(_ app: Application) throws{
                     dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
                         switch response.actionStatus{
                         case .Completed:
-                            print()
+                            print("Adicionou")
                         case .Error:
                             print()
                         default:
