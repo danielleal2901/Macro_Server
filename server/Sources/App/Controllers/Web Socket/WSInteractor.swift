@@ -14,7 +14,6 @@ internal class WSInteractor{
     
     internal func addData(sessionRequest: Request, data: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
         WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
-            completion(response)
             switch response.actionStatus{
             case .Completed:
                 self.broadcastData(data: data.data,idUser: data.data.respUserID)

@@ -14,11 +14,11 @@ final class Status: Model, Content {
     static let schema = "status"
     
     struct Inoutput: Content {
-        let id: String
+        var id: String
         let stageId: String
         let sections: [StatusSection]
     }
-            
+
     @ID(key: .id)
     var id: UUID?
     
@@ -30,8 +30,8 @@ final class Status: Model, Content {
     
     init() {}
      
-    init(stageId: UUID, sections: [StatusSection]) {
-        self.id = UUID()
+    init(id: UUID = UUID(), stageId: UUID, sections: [StatusSection]) {
+        self.id = id
         self.$stage.id = stageId
         self.sections = sections
     }

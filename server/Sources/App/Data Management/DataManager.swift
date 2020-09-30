@@ -12,7 +12,9 @@ import Fluent
 class DataManager: DataManagerLogic{
     // Terrain
     internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<Terrain>{
-        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map({$0.rawValue}))
+        guard let uuid = UUID(uuidString: terrainInput.id) else {throw Abort(.notFound)}
+        
+        let terrain = Terrain(id: uuid, name: terrainInput.name, stages: terrainInput.stages.map({$0.rawValue}))
         //
         let stages = terrainInput.stages.map{
             Stage(type: $0.self, terrainID: terrain.id!)
@@ -27,10 +29,10 @@ class DataManager: DataManagerLogic{
                     }
                 }
             }
-        }.transform(to: terrain)
+            }.transform(to: terrain)
     }
     internal func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<Terrain>{
-        guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
+        guard let uuid = UUID(uuidString: newTerrain.id) else {throw Abort(.notFound)}
         
         return Terrain.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -41,7 +43,7 @@ class DataManager: DataManagerLogic{
         }
     }
     internal func deleteTerrain(req: Request,terrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
-        guard let uuid = UUID(uuidString: terrain.id!) else {throw Abort(.notFound)}
+        guard let uuid = UUID(uuidString: terrain.id) else {throw Abort(.notFound)}
         
         return Terrain.find(uuid, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
@@ -50,9 +52,9 @@ class DataManager: DataManagerLogic{
     
     // Stage
     internal func createStage(req: Request, stage: Stage.Inoutput) throws -> EventLoopFuture<Stage.Inoutput> {
-        guard let terrainId = UUID(uuidString: stage.terrain) else {throw Abort(.notFound)}
+        guard let uuid = UUID(uuidString: stage.id), let terrainId = UUID(uuidString: stage.terrain) else {throw Abort(.notFound)}
         
-        let originalStage = Stage(type: stage.stageType, terrainID: terrainId)
+        let originalStage = Stage(id: uuid, type: stage.stageType, terrainID: terrainId)
         
         return Stage.query(on: req.db)
             .group(.and) { group in
@@ -97,11 +99,11 @@ class DataManager: DataManagerLogic{
     // Overview
     internal func createOverview(req: Request, overviewInput: Overview.Inoutput) throws -> EventLoopFuture<Overview.Inoutput> {
         
-        guard let id = UUID(uuidString: overviewInput.stageId) else {
+        guard let uuid = UUID(uuidString: overviewInput.id), let stageId = UUID(uuidString: overviewInput.stageId) else {
             throw Abort(.badRequest)
         }
         
-        let overview = Overview(stageId: id, sections: overviewInput.sections)
+        let overview = Overview(id: uuid, stageId: stageId, sections: overviewInput.sections)
 
         return overview.create(on: req.db).transform(to:Overview.Inoutput(id: overview.id!.uuidString, stageId: overview.$stage.id.uuidString, sections: overview.sections))
     }
@@ -127,11 +129,11 @@ class DataManager: DataManagerLogic{
     // Status
    internal func createStatus(req: Request, statusInoutput: Status.Inoutput) throws -> EventLoopFuture<Status.Inoutput> {
         
-         guard let id = UUID(uuidString: statusInoutput.stageId) else {
+         guard let uuid = UUID(uuidString: statusInoutput.id), let statusId = UUID(uuidString: statusInoutput.stageId) else {
              throw Abort(.badRequest)
          }
  
-         let status = Status(stageId: id, sections: statusInoutput.sections)
+        let status = Status(id: uuid, stageId: statusId, sections: statusInoutput.sections)
  
          return status.create(on: req.db).transform(to:Status.Inoutput(id: status.id!.uuidString, stageId: status.$stage.id.uuidString, sections: status.sections))
     

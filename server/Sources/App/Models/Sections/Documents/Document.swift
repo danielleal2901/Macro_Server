@@ -24,8 +24,8 @@ final class Document: Model, Content {
     
     init() {}
     
-    init(stageId: UUID, format: String) {
-        self.id = UUID()
+    init(id: UUID = UUID(), stageId: UUID, format: String) {
+        self.id = id
         self.$stage.id = stageId
         self.format = format
     }

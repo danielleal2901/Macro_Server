@@ -35,11 +35,11 @@ internal class WSDataWorker{
         switch request.data.dataType{
         case "terrain":            
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
-            
+            var terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
+            terrainInput?.id = UUID().uuidString
             do{
                 let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
-                akaresponse.whenSuccess { _ in
+                akaresponse.whenSuccess { terrain in
                     response.actionStatus = .Completed
                     completion(response)
                 }
@@ -50,7 +50,8 @@ internal class WSDataWorker{
             }
             
         case "stage":
-            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
+            var stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
+            stageInoutput?.id = UUID().uuidString
             
             do{
                 let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput!)
@@ -69,8 +70,9 @@ internal class WSDataWorker{
             }
             
         case "overview":
-            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
-                    
+            var overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
+            overviewInoutput?.id = UUID().uuidString
+            
             do{
                 let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput!)
                 akaresponse.whenSuccess { _ in
@@ -88,8 +90,9 @@ internal class WSDataWorker{
             }
             
         case "status":
-            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
-
+            var statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
+            statusInoutput?.id = UUID().uuidString
+            
             do{
                 let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInoutput!)
                 akaresponse.whenSuccess { _ in

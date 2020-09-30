@@ -14,7 +14,7 @@ final class Stage: Model, Content {
     static let schema = "stages"
     
     struct Inoutput: Content {
-        let id: String
+        var id: String
         let terrain: String
         let stageType: StageTypes
     }
@@ -30,9 +30,9 @@ final class Stage: Model, Content {
     
     init() {}
     
-    init(type: StageTypes, terrainID: UUID) {
+    init(id: UUID = UUID(), type: StageTypes, terrainID: UUID) {
         self.type = type
         self.$terrain.id = terrainID
-        self.id = UUID()
+        self.id = id
     }
 }

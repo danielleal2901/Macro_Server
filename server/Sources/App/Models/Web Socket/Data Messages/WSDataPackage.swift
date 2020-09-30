@@ -12,7 +12,7 @@ internal struct WSDataPackage: Codable{
     // MARK - Variables
     internal private(set) var packageID: UUID
     
-    internal private(set) var content: Data
+    internal var content: Data
     internal private(set) var dataType: DataTypes.RawValue
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID

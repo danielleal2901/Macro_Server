@@ -32,6 +32,17 @@ class  CoderHelper{
         }
     }
     
+    
+    func encodeGenericToData<ValueType>(valueToEncode: ValueType) -> Data? where ValueType: Codable{
+        do{
+            let data = try JSONEncoder().encode(valueToEncode)
+            return data
+        } catch(let error){
+            print(error)
+            return nil
+        }
+    }
+    
     // !! Change Datatype to Enum DataTypes and ValueToDecode to a generic relative !!
     
     /// Decode the Data Value to a intended Type passed as parameter
