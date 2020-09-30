@@ -22,14 +22,11 @@ class StageController: RouteCollection {
         
         //stages/:stageName
         stages.group(PathComponent(stringLiteral: StageRoute.stageName.rawValue)) { (stage) in
-            stage.post(use: insertStage)
             stage.get(use: fetchAllStages)
             
             //stages/:stageName/:stageId
             stage.group(PathComponent(stringLiteral: StageRoute.stageId.rawValue)) { (stage) in
                 stage.get(use: fetchStageById)
-                stage.delete(use: deleteStageById)
-                stage.put(use: updateStageById)
             }
             
             //stages/:stageName/terrain
@@ -41,23 +38,6 @@ class StageController: RouteCollection {
                 }
             }
             
-        }
-        
-    }
-    
-    func insertStage(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
-        
-        let stageInoutput = try self.verifyUploadRoutes(req: req)
-                
-        return Stage.query(on: req.db)
-            .group(.and) { group in
-                group.filter(\.$type == stageInoutput.type).filter("terrain_id", .equal, stageInoutput.$terrain.id)
-        }.count().flatMapThrowing { count in
-            if (count > 0) {
-                throw Abort(.badRequest)
-            }
-        }.flatMap { _ in
-            return stageInoutput.save(on: req.db).transform(to:Stage.Inoutput(id: stageInoutput.id!.uuidString, terrain: stageInoutput.$terrain.id.uuidString, stageType: StageTypes(rawValue: stageInoutput.type.rawValue)!))
         }
         
     }
@@ -92,43 +72,6 @@ class StageController: RouteCollection {
         }
     }
     
-    func deleteStageById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        
-        let stageType = try self.verifyDataRoutes(req: req)
-        
-        return Stage.find(req.parameters.get(StageParameters.stageId.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMapThrowing({
-                
-                //Valida se o a etapa informada na url eh a mesma que ira ser deletada.
-                if stageType != $0.type {
-                    throw Abort(.badRequest)
-                }
-                let _ = $0.delete(on: req.db)
-            })
-            .transform(to: .ok)
-    }
-    
-    func updateStageById(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
-        
-        let stageInput = try self.verifyUploadRoutes(req: req)
-        
-        return Stage.find(req.parameters.get(StageParameters.stageId.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMapThrowing { stage in
-                
-                //Valida se o a etapa informada na url eh a mesma que ira ser deletada.
-                if stageInput.type != stage.type {
-                    throw Abort(.badRequest)
-                }
-                
-                //Colocar aqui o que quiser mudar
-                let _ = stage.save(on: req.db)
-                return Stage.Inoutput(id: stage.id!.uuidString, terrain: stage.$terrain.id.uuidString , stageType: StageTypes(rawValue: stage.type.rawValue)!)
-                
-        }
-    }
-    
     func fetchStageByTerrainID(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
         let stageType = try self.verifyDataRoutes(req: req)
@@ -147,33 +90,6 @@ class StageController: RouteCollection {
 
     }
     
-    /// Method used to validate and get content from uploads request.
-    /// - Parameter req: upload request
-    /// - Throws: a possible error in validation
-    /// - Returns: a stage get from request content
-    func verifyUploadRoutes(req: Request) throws -> Stage{
-        
-        guard let parameter = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        //Verifica se consegue dar decode no input
-        let input = try req.content.decode(Stage.Inoutput.self)
-        
-        //Verifica se o id no input eh um uuid
-        guard let id = UUID(uuidString: input.terrain) else {
-            throw Abort(.badRequest)
-        }
-        
-        //Verifica se o tipo da url eh igual ao tipo do content
-        if input.stageType.rawValue != parameter {
-            throw Abort(.badRequest)
-        }
-        
-        let stage = Stage(type: input.stageType, terrainID: id)
-        
-        return stage
-    }
     
     /// Method used to validate and get a stage type from data request
     /// - Parameter req: data request

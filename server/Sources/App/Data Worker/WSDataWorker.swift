@@ -36,6 +36,7 @@ internal class WSDataWorker{
         case "terrain":            
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
+            
             do{
                 let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
                 akaresponse.whenSuccess { _ in
@@ -50,55 +51,61 @@ internal class WSDataWorker{
             
         case "stage":
             let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
-            guard let id = UUID(uuidString: stageInoutput!.terrain) else {return}
-            let stage = Stage(type: stageInoutput!.stageType, terrainID: id)
             
-            let akaresponse = stage.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            do{
+                let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+                akaresponse.whenFailure { _ in
+                    response.actionStatus = .Error
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
         case "overview":
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
-            guard let id = UUID(uuidString: overviewInoutput!.stageId) else {return}
-            let overview = Overview(stageId: id, sections: overviewInoutput!.sections)
-            
-            let akaresponse = overview.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+                    
+            do{
+                let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+                akaresponse.whenFailure { _ in
+                    response.actionStatus = .Error
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
         case "status":
-            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
-            guard let id = UUID(uuidString: statusInput!.stageId) else {return}
-            let status = Status(stageId: id, sections: statusInput!.sections)
-            
-            
-            let akaresponse = status.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
+
+            do{
+                let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+                akaresponse.whenFailure { _ in
+                    response.actionStatus = .Error
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
+            
         case "":
             print()
             
@@ -118,17 +125,7 @@ internal class WSDataWorker{
     ///   - request: Request of Receive action, having id for search in database
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
     internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
-        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
-        
-        switch dataRequest.data.dataType{
-        case "terrain":
-            print()
-        case "stage":
-            print()
-        default:
-            print()
-            
-        }
+        //MARK: HTTP Request
     }
     
     
@@ -243,6 +240,7 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
+            
         case "overview":
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Overview.Inoutput.self)
             
@@ -258,6 +256,7 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
+            
         case "status":
             let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Status.Inoutput.self)
             

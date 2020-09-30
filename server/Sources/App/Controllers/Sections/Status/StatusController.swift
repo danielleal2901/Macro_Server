@@ -16,14 +16,11 @@ class StatusController: RouteCollection {
         //Status
         let statusMain = routes.grouped(StatusRoutes.getPathComponent(.main))
         
-        statusMain.post(use: insertStatus)
         statusMain.get(use: fetchAllStatuss)
 
         //Status/StatusId
         statusMain.group(StatusRoutes.getPathComponent(.id)) { (status) in
-            status.delete(use: deleteStatusById)
             status.get(use: fetchStatusById)
-            status.put(use: updateStatusById)
         }
     
         //Status/stage
@@ -36,19 +33,6 @@ class StatusController: RouteCollection {
         }
     }
 
-    func insertStatus(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
-        
-        let StatusInput = try req.content.decode(Status.Inoutput.self)
-        
-        guard let id = UUID(uuidString: StatusInput.stageId) else {
-            throw Abort(.badRequest)
-        }
-        
-        let status = Status(stageId: id, sections: StatusInput.sections)
-
-        return status.create(on: req.db).transform(to:Status.Inoutput(id: status.id!.uuidString, stageId: status.$stage.id.uuidString, sections: status.sections))
-    }
-    
     func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status]> {
         return Status.query(on: req.db).all()
     }
@@ -72,38 +56,5 @@ class StatusController: RouteCollection {
             }
         
     }
-    
-    func deleteStatusById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(StatusParameters.statusId.rawValue, as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        return Status.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap({$0.delete(on: req.db)})
-            .transform(to: .ok)
-    }
-    
-    func updateStatusById(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
-        guard let id = req.parameters.get(StatusParameters.statusId.rawValue, as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        let newStatus = try req.content.decode(Status.Inoutput.self)
-        return Status.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .map { oldStatus in
-                oldStatus.sections = newStatus.sections
-                let _ = oldStatus.save(on: req.db)
-                
-                return Status.Inoutput(id: oldStatus.id!.uuidString, stageId: oldStatus.$stage.id.uuidString, sections: oldStatus.sections)
-            }
-        
-    }
-
-
-
-
-
 
 }

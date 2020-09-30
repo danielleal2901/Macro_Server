@@ -15,14 +15,11 @@ class OverviewController: RouteCollection {
         //overviews
         let overviewMain = routes.grouped(OverviewRoutes.getPathComponent(.main))
         
-        overviewMain.post(use: insertOverview)
         overviewMain.get(use: fetchAllOverviews)
 
         //overviews/overviewId
         overviewMain.group(OverviewRoutes.getPathComponent(.id)) { (overview) in
-            overview.delete(use: deleteOverviewById)
             overview.get(use: fetchOverviewById)
-            overview.put(use: updateOverviewById)
         }
     
         //overviews/stage
@@ -33,19 +30,6 @@ class OverviewController: RouteCollection {
                 overview.get(use: fetchOverviewByStageId)
             }
         }
-    }
-
-    func insertOverview(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
-        
-        let overviewInput = try req.content.decode(Overview.Inoutput.self)
-        
-        guard let id = UUID(uuidString: overviewInput.stageId) else {
-            throw Abort(.badRequest)
-        }
-        
-        let overview = Overview(stageId: id, sections: overviewInput.sections)
-
-        return overview.create(on: req.db).transform(to:Overview.Inoutput(id: overview.id!.uuidString, stageId: overview.$stage.id.uuidString, sections: overview.sections))
     }
     
     func fetchAllOverviews(req: Request) throws -> EventLoopFuture<[Overview]> {
@@ -71,33 +55,6 @@ class OverviewController: RouteCollection {
             }
         
     }
-    
-    func deleteOverviewById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(OverviewParameters.overviewId.rawValue, as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        return Overview.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap({$0.delete(on: req.db)})
-            .transform(to: .ok)
-    }
-    
-    func updateOverviewById(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
-        guard let id = req.parameters.get(OverviewParameters.overviewId.rawValue, as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        let newOverview = try req.content.decode(Overview.Inoutput.self)
-        return Overview.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .map { oldOverview in
-                oldOverview.sections = newOverview.sections
-                let _ = oldOverview.save(on: req.db)
-                
-                return Overview.Inoutput(id: oldOverview.id!.uuidString, stageId: oldOverview.$stage.id.uuidString, sections: oldOverview.sections)
-            }
-        
-    }
+
 }
 
