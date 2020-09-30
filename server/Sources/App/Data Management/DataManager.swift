@@ -54,8 +54,7 @@ class DataManager: DataManagerLogic{
     }
     internal func deleteStage(req: Request,stage: Stage.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         guard let uuid = UUID(uuidString: stage.id) else {throw Abort(.notFound)}
-        
-        
+    
         Terrain.query(on: req.db)
         
         return Stage.find(uuid, on: req.db).unwrap(or: Abort(.notFound)).flatMap {

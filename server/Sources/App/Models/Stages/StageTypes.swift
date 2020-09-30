@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Vapor
 
-enum StageTypes : String, Codable{
+enum StageTypes : String, Content{
     case georeferencing = "georeferencing"
     case car = "car"
     case evaluation = "evaluation"
