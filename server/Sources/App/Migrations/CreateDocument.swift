@@ -14,10 +14,10 @@ struct CreateDocument: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         database.schema("documents")
             .id()
-            .field("format", .string, .required)
             .field("stage_id", .uuid, .required)
             .unique(on: "stage_id")
             .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade)
+            .field("format", .string, .required)
             .create()
     }
     
