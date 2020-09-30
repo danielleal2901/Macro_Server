@@ -31,7 +31,7 @@ internal class WSInteractor{
             completion(response ?? Services.Receive.Response.init(dataReceived: nil, actionStatus: .Error))
             switch response!.actionStatus{
             case .Completed:
-                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+                print()
             case .Error:
                 print()
             default:
@@ -56,7 +56,7 @@ internal class WSInteractor{
     
     
     internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType.rawValue) { (response) in
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
             completion(response)
             switch response.actionStatus{
             case .Completed:

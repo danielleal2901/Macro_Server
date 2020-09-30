@@ -203,11 +203,11 @@ internal class WSDataWorker{
         
     }
     
-    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataType: String,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
+    internal func deleteData(sessionRequest: Request,package: WSDataPackage,dataType: DataTypes,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataType{
-        case "terrain":
+        case .terrain:
             let terrainInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
             
             do{
@@ -223,7 +223,7 @@ internal class WSDataWorker{
                 
             }
             
-        case "stage":
+        case .stage:
             let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Stage.Inoutput.self)
             
             do{
@@ -238,7 +238,7 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
-        case "overview":
+        case .overview:
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Overview.Inoutput.self)
             
             do{
@@ -253,7 +253,7 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
-        case "status":
+        case .status:
             let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Status.Inoutput.self)
             
             do{

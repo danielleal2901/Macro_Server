@@ -28,6 +28,14 @@ internal struct WSDataPackage: Codable{
         case respUserID = "user"
     }
     
+    init(packageID: UUID,content: Data,dataType: DataTypes,destTeamID: UUID,respUserID: UUID,operation: Int){
+        self.packageID = packageID
+        self.content = content
+        self.dataType = dataType
+        self.destTeamID = destTeamID
+        self.respUserID = respUserID
+        self.operation = operation
+    }
     
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
