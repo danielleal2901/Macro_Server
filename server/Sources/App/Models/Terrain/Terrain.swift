@@ -26,11 +26,11 @@ final class Terrain: Model, Content {
     var name: String
     
     @Field(key: "stages_names")
-    var stages: [StageTypes]
+    var stages: [String]
     
     init() {}
     
-    init(id: UUID = UUID(), name: String, stages: [StageTypes]) {
+    init(id: UUID = UUID(), name: String, stages: [String]) {
         self.id = id
         self.name = name
         self.stages = stages

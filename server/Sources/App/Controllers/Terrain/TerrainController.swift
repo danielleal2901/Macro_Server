@@ -31,7 +31,7 @@ struct TerrainController: RouteCollection {
     func insertTerrain(req: Request) throws -> EventLoopFuture<Terrain> {
         let terrainInput = try req.content.decode(Terrain.Inoutput.self)
         
-        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages)
+        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map({$0.rawValue}))
         
         let stages = terrainInput.stages.map{
             Stage(type: $0.self, terrainID: terrain.id!)
@@ -82,7 +82,7 @@ struct TerrainController: RouteCollection {
             .unwrap(or: Abort(.notFound))
             .flatMapThrowing { oldTerrain in
                 oldTerrain.name = newTerrain.name
-                oldTerrain.stages = newTerrain.stages
+                oldTerrain.stages = newTerrain.stages.map({$0.rawValue})
                 
                 let _ = oldTerrain.save(on: req.db).map { (_) -> (Terrain) in
                     Terrain(name: oldTerrain.name, stages: oldTerrain.stages)

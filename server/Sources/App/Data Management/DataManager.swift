@@ -11,8 +11,8 @@ import Foundation
 class DataManager: DataManagerLogic{
     // Terrain
     internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<Terrain>{
-        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages)
-        
+        let terrain = Terrain(name: terrainInput.name, stages: terrainInput.stages.map({$0.rawValue}))
+//
         let stages = terrainInput.stages.map{
             Stage(type: $0.self, terrainID: terrain.id!)
         }
@@ -31,9 +31,12 @@ class DataManager: DataManagerLogic{
     internal func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<Terrain>{
         guard let uuid = UUID(uuidString: newTerrain.id!) else {throw Abort(.notFound)}
         
-        return Terrain.find(uuid, on: req.db).flatMap { (terrain) in
-            terrain?.name = newTerrain.name
-            return terrain!.update(on: req.db).transform(to: terrain!)
+        return Terrain.find(uuid, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (terrain) in
+                terrain.name = newTerrain.name
+                terrain.stages = newTerrain.stages.map({$0.rawValue})
+                return terrain.update(on: req.db).transform(to: terrain)
         }
     }
     internal func deleteTerrain(req: Request,terrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
@@ -53,14 +56,27 @@ class DataManager: DataManagerLogic{
         }
     }
     internal func deleteStage(req: Request,stage: Stage.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
-        guard let uuid = UUID(uuidString: stage.id) else {throw Abort(.notFound)}
-    
-        Terrain.query(on: req.db)
+        guard let uuid = UUID(uuidString: stage.id) else {throw Abort(.badRequest)}
+        guard let terrainId = UUID(uuidString: stage.terrain) else {throw Abort(.badRequest)}
         
-        return Stage.find(uuid, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
-            $0.delete(on: req.db).transform(to: .ok)
+        
+        return Terrain.find(terrainId, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { terrain in
+                terrain.stages.removeAll {$0 == stage.stageType.rawValue}
+                return terrain.update(on: req.db)
+                    .flatMap({ _ in
+                        Stage.find(uuid, on: req.db)
+                            .unwrap(or: Abort(.notFound))
+                            .flatMap { deleteStage  in
+                                return deleteStage.delete(on: req.db).transform(to: HTTPStatus.ok)
+                        }
+                    })
         }
+ 
     }
+    
+    
     
     // Overview
     internal func updateOverview(req: Request,newOverview: Overview.Inoutput) throws -> EventLoopFuture<Overview>{
