@@ -13,7 +13,7 @@ internal struct WSDataPackage: Codable{
     internal private(set) var packageID: UUID
     
     internal private(set) var content: Data
-    internal private(set) var dataType: DataTypes.RawValue
+    internal private(set) var dataType: DataTypes
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID
     internal private(set) var operation: Operations.RawValue
@@ -33,7 +33,7 @@ internal struct WSDataPackage: Codable{
         let values = try decoder.container(keyedBy: CodingKeys.self)
         packageID = try values.decode(UUID.self,forKey: .packageID)
         content = try values.decode(Data.self,forKey:  .content)
-        dataType = try values.decode(String.self,forKey: .dataType)
+        dataType = try values.decode(DataTypes.self,forKey: .dataType)
         destTeamID = try values.decode(UUID.self,forKey: .destTeamID)
         respUserID = try values.decode(UUID.self,forKey: .respUserID)
         operation = try values.decode(Int.self, forKey: .operation)

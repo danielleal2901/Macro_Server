@@ -31,9 +31,10 @@ internal class WSDataWorker{
     ///   - completion: Response of Receive action, including the result of action Status
     internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
+        guard let dataType = request.data.dataType as? DataTypes else {return}
         
-        switch request.data.dataType{
-        case "terrain":            
+        switch dataType{
+        case .terrain:
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
             do{
@@ -48,7 +49,7 @@ internal class WSDataWorker{
                 completion(response)
             }
             
-        case "stage":
+        case .stage:
             let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
             guard let id = UUID(uuidString: stageInoutput!.terrain) else {return}
             let stage = Stage(type: stageInoutput!.stageType, terrainID: id)
@@ -65,7 +66,7 @@ internal class WSDataWorker{
                 completion(response)
             }
             
-        case "overview":
+        case .overview:
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
             guard let id = UUID(uuidString: overviewInoutput!.stageId) else {return}
             let overview = Overview(stageId: id, sections: overviewInoutput!.sections)
@@ -82,7 +83,7 @@ internal class WSDataWorker{
                 completion(response)
             }
             
-        case "status":
+        case .status:
             let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
             guard let id = UUID(uuidString: statusInput!.stageId) else {return}
             let status = Status(stageId: id, sections: statusInput!.sections)
@@ -99,9 +100,6 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
-        case "":
-            print()
-            
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -121,9 +119,9 @@ internal class WSDataWorker{
         var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
-        case "terrain":
+        case .terrain:
             print()
-        case "stage":
+        case .stage:
             print()
         default:
             print()
@@ -136,7 +134,7 @@ internal class WSDataWorker{
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
-        case "terrain":            
+        case .terrain:
             let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
             do{
                 let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
@@ -150,7 +148,7 @@ internal class WSDataWorker{
                 completion(response)
             }
             
-        case "stage":
+        case .stage:
             let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Inoutput.self)
             
             do{
@@ -166,7 +164,7 @@ internal class WSDataWorker{
             }
             
             
-        case "overview":
+        case .overview:
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Inoutput.self)
             do{
                 let akaresponse = try dataManager.updateOverview(req: sessionRequest, newOverview: overviewInoutput!)
@@ -180,7 +178,7 @@ internal class WSDataWorker{
                 completion(response)
             }
             
-        case "status":
+        case .status:
             let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
             guard let id = UUID(uuidString: statusInoutput!.stageId) else {return}
             let status = Status(stageId: id, sections: statusInoutput!.sections)
@@ -197,9 +195,6 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
-        case "":
-            print()
-            
         default:
             print("Not working")
             response.actionStatus = .Error

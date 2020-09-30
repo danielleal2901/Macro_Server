@@ -56,7 +56,7 @@ internal class WSInteractor{
     
     
     internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType.rawValue) { (response) in
             completion(response)
             switch response.actionStatus{
             case .Completed:
@@ -90,7 +90,6 @@ internal class WSInteractor{
 //                $0.webSocket.send([UInt8(data)])
                 $0.webSocket.send(encoded)
 //            }
-            
         })
     }
     

@@ -9,7 +9,7 @@ import Foundation
 
 
 /// Using for identify current data requests (disabled for a while)
-enum DataTypes: String{
+enum DataTypes: String, Codable{
     case terrain = "terrain"
     case status = "status"
     case document = "document"
