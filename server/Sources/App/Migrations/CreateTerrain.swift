@@ -17,7 +17,7 @@ struct CreateTerrain: Migration {
             .id()
             .field("name", .string)
             .unique(on: "name")
-            .field("stages_names", .array(of: .string), .required)
+            .field("stages_names", .array(of: .array(of: .custom(StageTypes.self))), .required)
             .create()
     }
     

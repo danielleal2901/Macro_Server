@@ -43,13 +43,29 @@ internal class WSInteractor{
     internal func updateData(sessionID: Request,dataMessage: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
         WSDataWorker.shared.updateData(sessionRequest: sessionID,dataRequest: dataMessage) { (response) in
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
+            switch response!.actionStatus{
+            case .Completed:
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+            case .Error:
+                print()
+            default:
+                print()
+            }
         }
     }
     
     
     internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: "terrain") { (response) in
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
             completion(response)
+            switch response.actionStatus{
+            case .Completed:
+                self.broadcastData(data: package,idUser: package.respUserID)
+            case .Error:
+                print()
+            default:
+                print()
+            }
         }
     }
     
@@ -70,10 +86,10 @@ internal class WSInteractor{
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userID != idUser{
+//            if $0.userID != idUser{
 //                $0.webSocket.send([UInt8(data)])
                 $0.webSocket.send(encoded)
-            }
+//            }
             
         })
     }
