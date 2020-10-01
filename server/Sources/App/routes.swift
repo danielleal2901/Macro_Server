@@ -3,20 +3,29 @@ import Vapor
 
 func routes(_ app: Application) throws {
     
-    //let wss = NIOWebSocketServer.default()
-    
     app.get { req in
         return "It works!"
     }
     
     //@gui -> Going to Change Path, using for testing
-    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in                
+    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
         let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
-        return state.save(on: req.db)
-            .map { state }
+        
+        let user = User.query(on: req.db).filter("id", .equal, state.respUserID).first()
+        user.whenSuccess { (findedUser) in
+            state.name = findedUser?.name
+            state.photo = findedUser?.name
+        }
+        
+        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
+            state.name = user?.name
+            state.photo = user?.name
+            state.save(on: req.db)
+            return state
+        }
     }
-    
+        
     //@gui - > Change to Post for specified with Team
     app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
         return WSUserState.query(on: req.db).all()
@@ -24,7 +33,7 @@ func routes(_ app: Application) throws {
     
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(AuthEntity.self)        
+        let create = try req.content.decode(AuthEntity.self)
         guard create.password == create.confirmPassword else {
             throw Abort(.badRequest, reason: "Passwords did not match")
         }
