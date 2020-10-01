@@ -288,6 +288,11 @@ internal class WSDataWorker{
         self.connections.append(connection)
     }
     
+    func removeUser(userID: UUID,socket: WebSocket){
+        connections = self.connections.filter {
+            return $0.userID != userID
+        }
+    }
     
     /// Fetch all connections active (current using one instance)
     /// - Returns: intended connection

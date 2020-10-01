@@ -58,9 +58,11 @@ func webSockets(_ app: Application) throws{
         
         // MARK - Variables
         let dataController = WSInteractor()
+        var userID = UUID()
+        var teamID = UUID()
         
         
-        dataController.enteredUser(userID: UUID(), teamID: UUID(), connection: ws)
+        dataController.enteredUser(userID: userID, teamID: teamID, connection: ws)
         //         dataController.enteredUser(userID: user, teamID: team, connection: ws)
         
         // Actions for control of User Sessions
@@ -126,6 +128,7 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onClose.whenComplete { result in
+            dataController.signOutUser(userID: userID,connection: ws)        
             print("Ended Connection")
             // remover usuario
         }

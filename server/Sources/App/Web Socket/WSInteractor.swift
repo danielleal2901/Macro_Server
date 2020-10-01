@@ -78,6 +78,9 @@ internal class WSInteractor{
         WSDataWorker.shared.addUser(userID: userID, teamID: teamID, socket: connection)
     }
     
+    internal func signOutUser(userID: UUID,connection: WebSocket){
+        WSDataWorker.shared.removeUser(userID: userID, socket: connection)
+    }
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
@@ -86,10 +89,10 @@ internal class WSInteractor{
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-//            if $0.userID != idUser{
-//                $0.webSocket.send([UInt8(data)])
-                $0.webSocket.send(encoded)
-//            }
+            //            if $0.userID != idUser{
+            //                $0.webSocket.send([UInt8(data)])
+            $0.webSocket.send(encoded)
+            //            }
         })
     }
     
