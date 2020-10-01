@@ -109,15 +109,17 @@ func webSockets(_ app: Application) throws{
     
     app.webSocket("DataExchange"){ request,ws in
         
+        let id = UUID()
+        dataController.enteredUser(userState: WSUserState(id, UUID(), UUID()),connection: ws)
+        
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
-            
-            dataController.enteredUser(userState: WSUserState(UUID(), UUID(), UUID()),connection: ws)
-            
+                        
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
+                dataController.updateUserId(id: message.respUserID, previousId: id)
                 
                 switch message.operation{
                 case 0:

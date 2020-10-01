@@ -75,9 +75,21 @@ internal class WSInteractor{
     ///   - connection: connection identification
     internal func enteredUser(userState: WSUserState,connection: WebSocket){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
+            user.name = "User"
+            user.photo = "Photo"
             let data = try! JSONEncoder().encode(user)
             self.broadcastData(data: data, idUser: user.respUserID)
         })
+    }
+    
+    func updateUserId(id: UUID, previousId: UUID){
+        
+        for i in 0 ..< WSDataWorker.shared.connections.count {
+            if (WSDataWorker.shared.connections[i].userState.id == previousId){
+                WSDataWorker.shared.connections[i].userState.id = id
+            }
+        }
+
     }
     
     internal func changeStage(userState: WSUserState,connection: WebSocket){
@@ -99,10 +111,9 @@ internal class WSInteractor{
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            //            if $0.userID != idUser{
-            //                $0.webSocket.send([UInt8(data)])
-            $0.webSocket.send(encoded)
-            //            }
+            if $0.userState.respUserID != idUser{
+                $0.webSocket.send(encoded)
+            }
         })
     }
     

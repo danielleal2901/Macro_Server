@@ -16,7 +16,7 @@ internal class WSDataWorker{
     internal static let shared = WSDataWorker()
     internal let dataManager = DataManager()
     /// Connection for future use
-    internal private(set) var connections: [TeamConnection] // To Change
+    var connections: [TeamConnection] // To Change
     
     // MARK - Initializer
     private init(){
