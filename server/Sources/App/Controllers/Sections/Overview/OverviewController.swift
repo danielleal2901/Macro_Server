@@ -51,7 +51,7 @@ class OverviewController: RouteCollection {
             .filter("stage_id", .equal, stageId)
             .first().unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalOverview in
-                Overview.Inoutput(id: try optionalOverview.requireID().uuidString, stageId: optionalOverview.$stage.id.uuidString, sections: optionalOverview.sections)
+                Overview.Inoutput(id: try optionalOverview.requireID(), stageId: optionalOverview.$stage.id, sections: optionalOverview.sections)
             }
         
     }

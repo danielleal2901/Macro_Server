@@ -52,7 +52,7 @@ class StatusController: RouteCollection {
             .filter("stage_id", .equal, stageId)
             .first().unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalStatus in
-                Status.Inoutput(id: try optionalStatus.requireID().uuidString, stageId: optionalStatus.$stage.id.uuidString, sections: optionalStatus.sections)
+                Status.Inoutput(id: try optionalStatus.requireID(), stageId: optionalStatus.$stage.id, sections: optionalStatus.sections)
             }
         
     }

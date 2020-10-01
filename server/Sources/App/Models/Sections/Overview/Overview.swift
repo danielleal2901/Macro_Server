@@ -14,8 +14,8 @@ final class Overview: Model, Content {
     static let schema = "overviews"
     
     struct Inoutput: Content {
-        var id: String
-        let stageId: String
+        let id: UUID
+        let stageId: UUID
         let sections: [OverviewSection]
     }
             

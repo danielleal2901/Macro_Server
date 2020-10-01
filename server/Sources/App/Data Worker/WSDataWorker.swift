@@ -36,7 +36,7 @@ internal class WSDataWorker{
         case "terrain":            
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
             var terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
-            terrainInput?.id = UUID().uuidString
+
             do{
                 let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
                 akaresponse.whenSuccess { terrain in
@@ -51,7 +51,6 @@ internal class WSDataWorker{
             
         case "stage":
             var stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
-            stageInoutput?.id = UUID().uuidString
             
             do{
                 let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput!)
@@ -71,7 +70,6 @@ internal class WSDataWorker{
             
         case "overview":
             var overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
-            overviewInoutput?.id = UUID().uuidString
             
             do{
                 let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput!)
@@ -91,7 +89,6 @@ internal class WSDataWorker{
             
         case "status":
             var statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
-            statusInoutput?.id = UUID().uuidString
             
             do{
                 let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInoutput!)
@@ -182,18 +179,15 @@ internal class WSDataWorker{
             
         case "status":
             let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
-            guard let id = UUID(uuidString: statusInoutput!.stageId) else {return}
-            let status = Status(stageId: id, sections: statusInoutput!.sections)
             
-            
-            let akaresponse = status.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            do{
+                let akaresponse = try dataManager.updateStatus(req: sessionRequest, newStatus: statusInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
