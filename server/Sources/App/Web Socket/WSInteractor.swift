@@ -74,12 +74,12 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-    internal func enteredUser(userID: UUID,teamID: UUID,stageID: UUID,connection: WebSocket){
-        WSDataWorker.shared.addUser(userID: userID, teamID: teamID, stageID: stageID, socket: connection)
+    internal func enteredUser(userState: WSUserState,connection: WebSocket){
+        WSDataWorker.shared.addUser(userState: userState,socket: connection)
     }
     
-    internal func connectToStage(userID: UUID,teamID: UUID, stageID: UUID,connection: WebSocket){
-        WSDataWorker.shared.connectUserStage(userID: userID, teamID: teamID,stageID: stageID, socket: connection)
+    internal func changeStage(userState: WSUserState,connection: WebSocket){
+        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection)
     }
     
     

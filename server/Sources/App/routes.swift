@@ -66,9 +66,9 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.connectToStage(userID: user.userState.respUserID,teamID: user.userState.destTeamID, stageID:user.userState.stageID,connection: ws)
+                    dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.stageID) ,connection: ws)
                 } else{
-                    dataController.enteredUser(userID: message.newUserState.respUserID, teamID: message.newUserState.destTeamID, stageID: message.newUserState.stageID, connection: ws)
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws)
                     currentUserID = message.newUserState.respUserID
                 }
             }
