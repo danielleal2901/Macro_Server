@@ -283,14 +283,19 @@ internal class WSDataWorker{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - socket: websocket
-    func addUser(userID: UUID,teamID: UUID,socket: WebSocket){
-        let connection = TeamConnection(userID: userID, teamID: teamID, webSocket: socket)
+    func addUser(userID: UUID,teamID: UUID,stageID: UUID,socket: WebSocket){
+        let connection = TeamConnection(userState: .init(userID, teamID, stageID), webSocket: socket)
         self.connections.append(connection)
     }
     
+    func changeUserStage(userID: UUID,teamID: UUID,stageID: UUID,socket: WebSocket){
+        let connection = TeamConnection(userState: .init(userID, teamID, stageID), webSocket: socket)
+           self.connections.append(connection)
+       }
+    
     func removeUser(userID: UUID,socket: WebSocket){
         connections = self.connections.filter {
-            return $0.userID != userID
+            return $0.userState.respUserID != userID
         }
     }
     

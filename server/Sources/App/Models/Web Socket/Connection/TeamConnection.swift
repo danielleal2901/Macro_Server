@@ -10,7 +10,6 @@ import Foundation
 
 internal struct TeamConnection{
     // MARK - Variables
-    internal var userID: UUID
-    internal var teamID: UUID
+    internal var userState: WSUserState
     internal var webSocket: WebSocket
 }

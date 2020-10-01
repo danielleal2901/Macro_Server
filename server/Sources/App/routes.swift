@@ -52,19 +52,51 @@ func routes(_ app: Application) throws {
 func webSockets(_ app: Application) throws{
     print("Creating connection")
     
+    let dataController = WSInteractor()
     /// Aiming to add to a class
     /// Active session for Web Socket Connection
+    
+    app.webSocket("UserConnection"){ request,ws in
+        var currentUserID: UUID?
+        
+        ws.onText{ (ws,data) in
+            if let dataCov = data.data(using: .utf8){
+                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
+                if let user = WSDataWorker.shared.connections.first(where: {
+                    for userState in message.userStates{
+                        return $0.userState.respUserID == userState.respUserID
+                    }
+                    return false
+                }) {
+                    currentUserID = user.userState.respUserID
+                    dataController.connectToStage(userID: user.userState.respUserID,teamID: user.userState.destTeamID, stageID:user.userState.stageID,connection: ws)
+                } else{
+                    dataController.enteredUser(userID: message.newUserState.respUserID, teamID: message.newUserState.destTeamID, stageID: message.newUserState.stageID, connection: ws)
+                    currentUserID = message.newUserState.respUserID
+                }
+                
+                
+                
+                
+                
+                
+                
+            }
+        }
+        
+        
+        ws.onClose.whenComplete { result in
+            dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws)
+            print("Ended Connection")
+            // remover usuario
+        }
+        
+    }
+    
+    
     app.webSocket("DataExchange"){ request,ws in
         
         // MARK - Variables
-        let dataController = WSInteractor()
-        var userID = UUID()
-        var teamID = UUID()
-        
-        
-        dataController.enteredUser(userID: userID, teamID: teamID, connection: ws)
-        //         dataController.enteredUser(userID: user, teamID: team, connection: ws)
-        
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .utf8){
@@ -128,10 +160,9 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onClose.whenComplete { result in
-            dataController.signOutUser(userID: userID,connection: ws)        
             print("Ended Connection")
-            // remover usuario
         }
+        
         
     }
     
