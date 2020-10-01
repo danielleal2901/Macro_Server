@@ -10,11 +10,15 @@ func routes(_ app: Application) throws {
     }
     
     //@gui -> Going to Change Path, using for testing
-    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
+    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in                
         let create = try req.content.decode(WSUserState.self)
         let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
         return state.save(on: req.db)
-            .map { state }        
+            .map { state }
+    }
+    
+    app.post("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in        
+        return WSUserState.query(on: req.db).all()
     }
     
     // @gui -> Going to Change Path, using for testing

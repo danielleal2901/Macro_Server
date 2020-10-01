@@ -8,9 +8,15 @@
 import Fluent
 import Vapor
 
+struct WSUserEntity: Codable{
+    var respUserID: String
+    var destTeamID: String
+    var stageID: String
+}
+
 final class WSUserState: Model, Content {
    
-    static let schema = "user_states"
+    static let schema = "users_states"
     
     @ID(key: .id)
     var id: UUID?
@@ -31,4 +37,5 @@ final class WSUserState: Model, Content {
         self.destTeamID = dest
         self.stageID = stage
     }
+        
 }
