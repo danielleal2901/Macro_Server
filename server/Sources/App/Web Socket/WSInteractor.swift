@@ -78,15 +78,15 @@ internal class WSInteractor{
             user.name = "User"
             user.photo = "Photo"
             let data = try! JSONEncoder().encode(user)
-            self.broadcastData(data: data, idUser: user.respUserID)
+//            self.broadcastData(data: data, idUser: user.respUserID)
         })
     }
     
     func updateUserId(id: UUID, previousId: UUID){
         
         for i in 0 ..< WSDataWorker.shared.connections.count {
-            if (WSDataWorker.shared.connections[i].userState.id == previousId){
-                WSDataWorker.shared.connections[i].userState.id = id
+            if (WSDataWorker.shared.connections[i].userState.respUserID == previousId){
+                WSDataWorker.shared.connections[i].userState.respUserID = id
             }
         }
 

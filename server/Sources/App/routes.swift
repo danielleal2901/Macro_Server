@@ -119,7 +119,7 @@ func webSockets(_ app: Application) throws{
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
-                dataController.updateUserId(id: message.respUserID, previousId: id)
+                    dataController.updateUserId(id: message.respUserID, previousId: id)
                 
                 switch message.operation{
                 case 0:
