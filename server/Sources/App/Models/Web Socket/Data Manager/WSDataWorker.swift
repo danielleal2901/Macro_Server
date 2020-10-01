@@ -51,52 +51,45 @@ internal class WSDataWorker{
             
         case .stage:
             let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
-            guard let id = UUID(uuidString: stageInoutput!.terrain) else {return}
-            let stage = Stage(type: stageInoutput!.stageType, terrainID: id)
-            
-            let akaresponse = stage.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+                
+            do{
+                let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
         case .overview:
             let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
-            guard let id = UUID(uuidString: overviewInoutput!.stageId) else {return}
-            let overview = Overview(stageId: id, sections: overviewInoutput!.sections)
             
-            let akaresponse = overview.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            do{
+                let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
             
         case .status:
             let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
-            guard let id = UUID(uuidString: statusInput!.stageId) else {return}
-            let status = Status(stageId: id, sections: statusInput!.sections)
             
-            
-            let akaresponse = status.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+            do{
+                let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
@@ -180,18 +173,15 @@ internal class WSDataWorker{
             
         case .status:
             let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
-            guard let id = UUID(uuidString: statusInoutput!.stageId) else {return}
-            let status = Status(stageId: id, sections: statusInoutput!.sections)
-            
-            
-            let akaresponse = status.save(on: sessionRequest.db)
-            
-            akaresponse.whenSuccess { _ in
-                response.actionStatus = .Completed
-                completion(response)
-            }
-            
-            akaresponse.whenFailure { _ in
+
+            do{
+                let akaresponse = try dataManager.updateStatus(req: sessionRequest, newStatus: statusInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
                 response.actionStatus = .Error
                 completion(response)
             }
