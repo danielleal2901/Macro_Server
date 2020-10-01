@@ -9,12 +9,13 @@ import Foundation
 import Vapor
 import Fluent
 
+
 final class Terrain: Model, Content {
     
     struct Inoutput: Content {
         let name: String
         let stages: [StageTypes]
-        let id: String?
+        var id: String
     }
 
     static let schema = "terrains"

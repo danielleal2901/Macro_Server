@@ -14,8 +14,8 @@ final class Overview: Model, Content {
     static let schema = "overviews"
     
     struct Inoutput: Content {
-        let id: String
-        let stageId: String
+        let id: UUID
+        let stageId: UUID
         let sections: [OverviewSection]
     }
             
@@ -30,8 +30,8 @@ final class Overview: Model, Content {
     
     init() {}
      
-    init(stageId: UUID, sections: [OverviewSection]) {
-        self.id = UUID()
+    init(id: UUID = UUID (), stageId: UUID, sections: [OverviewSection]) {
+        self.id = id
         self.$stage.id = stageId
         self.sections = sections
     }

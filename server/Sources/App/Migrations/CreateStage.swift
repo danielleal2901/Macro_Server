@@ -17,9 +17,9 @@ struct CreateStage: Migration {
         return database.enum("stages_types").read().flatMap { stageType in
             database.schema("stages")
                 .id()
-                .field("type", stageType, .required)
                 .field("terrain_id", .uuid, .required)
                 .foreignKey("terrain_id", references: "terrains", "id", onDelete: .cascade, onUpdate: .restrict)
+                .field("type", stageType, .required)
                 .create()
         }
     }
