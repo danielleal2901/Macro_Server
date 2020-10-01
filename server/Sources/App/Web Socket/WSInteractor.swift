@@ -75,11 +75,17 @@ internal class WSInteractor{
     ///   - teamID: team identification
     ///   - connection: connection identification
     internal func enteredUser(userState: WSUserState,connection: WebSocket){
-        WSDataWorker.shared.addUser(userState: userState,socket: connection)
+        WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
+            let data = try! JSONEncoder().encode(user)
+            self.broadcastData(data: data, idUser: user.respUserID)
+        })
     }
     
     internal func changeStage(userState: WSUserState,connection: WebSocket){
-        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection)
+        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
+            let data = try! JSONEncoder().encode(user)
+            self.broadcastData(data: data, idUser: user.respUserID)
+        })
     }
     
     
