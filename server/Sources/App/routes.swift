@@ -75,6 +75,7 @@ func webSockets(_ app: Application) throws{
     print("Creating connection")
     
     let dataController = WSInteractor()
+    
     /// Aiming to add to a class
     /// Active session for Web Socket Connection
     
@@ -111,6 +112,9 @@ func webSockets(_ app: Application) throws{
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
+            
+            dataController.enteredUser(userState: WSUserState(UUID(), UUID(), UUID()),connection: ws)
+            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
@@ -173,6 +177,7 @@ func webSockets(_ app: Application) throws{
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
+            dataController.signOutUser(userID: UUID(),connection: ws)
         }
         
         
