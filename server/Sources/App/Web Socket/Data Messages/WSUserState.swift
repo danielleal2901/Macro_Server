@@ -5,24 +5,30 @@
 //  Created by Guilherme Martins Dalosto de Oliveira on 01/10/20.
 //
 
-import Foundation
+import Fluent
+import Vapor
 
-struct WSUserState: Codable{
-    internal private(set) var respUserID: UUID
-    internal private(set) var destTeamID: UUID
-    internal private(set) var stageID: UUID
+final class WSUserState: Model, Content {
+   
+    static let schema = "user_states"
     
+    @ID(key: .id)
+    var id: UUID?
+    
+    @Field(key: "respUserID")
+    var respUserID: UUID
+    
+    @Field(key: "destTeamID")
+    var destTeamID: UUID
+    
+    @Field(key: "stageID")
+    var stageID: UUID
+    
+    init() {}
+       
     init(_ resp: UUID,_ dest: UUID,_ stage: UUID){
         self.respUserID = resp
         self.destTeamID = dest
-        self.stageID = stage        
+        self.stageID = stage
     }
-    
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        respUserID = try values.decode(UUID.self,forKey: .respUserID)
-        destTeamID = try values.decode(UUID.self,forKey: .destTeamID)
-        stageID = try values.decode(UUID.self, forKey: .stageID)
-    }
-    
 }

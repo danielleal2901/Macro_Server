@@ -9,6 +9,14 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
+    //@gui -> Going to Change Path, using for testing
+    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
+        let create = try req.content.decode(WSUserState.self)
+        let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
+        return state.save(on: req.db)
+            .map { state }        
+    }
+    
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
         let create = try req.content.decode(AuthEntity.self)        
