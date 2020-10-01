@@ -17,7 +17,8 @@ func routes(_ app: Application) throws {
             .map { state }
     }
     
-    app.post("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in        
+    //@gui - > Change to Post for specified with Team
+    app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
         return WSUserState.query(on: req.db).all()
     }
     
