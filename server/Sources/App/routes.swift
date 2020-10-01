@@ -63,10 +63,7 @@ func webSockets(_ app: Application) throws{
             if let dataCov = data.data(using: .utf8){
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
                 if let user = WSDataWorker.shared.connections.first(where: {
-                    for userState in message.userStates{
-                        return $0.userState.respUserID == userState.respUserID
-                    }
-                    return false
+                    return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
                     dataController.connectToStage(userID: user.userState.respUserID,teamID: user.userState.destTeamID, stageID:user.userState.stageID,connection: ws)
@@ -74,13 +71,6 @@ func webSockets(_ app: Application) throws{
                     dataController.enteredUser(userID: message.newUserState.respUserID, teamID: message.newUserState.destTeamID, stageID: message.newUserState.stageID, connection: ws)
                     currentUserID = message.newUserState.respUserID
                 }
-                
-                
-                
-                
-                
-                
-                
             }
         }
         

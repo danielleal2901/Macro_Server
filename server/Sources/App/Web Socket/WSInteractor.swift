@@ -79,7 +79,7 @@ internal class WSInteractor{
     }
     
     internal func connectToStage(userID: UUID,teamID: UUID, stageID: UUID,connection: WebSocket){
-        WSDataWorker.shared.changeUserStage(userID: userID, teamID: teamID,stageID: stageID, socket: connection)
+        WSDataWorker.shared.connectUserStage(userID: userID, teamID: teamID,stageID: stageID, socket: connection)
     }
     
     

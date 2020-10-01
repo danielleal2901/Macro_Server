@@ -288,7 +288,7 @@ internal class WSDataWorker{
         self.connections.append(connection)
     }
     
-    func changeUserStage(userID: UUID,teamID: UUID,stageID: UUID,socket: WebSocket){
+    func connectUserStage(userID: UUID,teamID: UUID,stageID: UUID,socket: WebSocket){
         let connection = TeamConnection(userState: .init(userID, teamID, stageID), webSocket: socket)
            self.connections.append(connection)
        }
