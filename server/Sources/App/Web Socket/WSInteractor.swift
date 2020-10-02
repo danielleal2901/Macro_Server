@@ -103,12 +103,9 @@ internal class WSInteractor{
     
     internal func changeStage(userState: WSUserState,connection: WebSocket,req: Request) {
         WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
-            let data = try! JSONEncoder().encode(user)
             do{
-                try! updateUserState(req: req, newState: userState)
-                self.broadcastData(data: data, idUser: user.respUserID)
-            } catch(let error)  {print(error.localizedDescription)}
-            
+                try updateUserState(req: req, newState: userState)
+            } catch(let error){print(error.localizedDescription)}
         })
     }
     
@@ -124,7 +121,8 @@ internal class WSInteractor{
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
                 state.stageID = newState.stageID
-                
+                let codedState = CoderHelper.shared.encodeGenericToData(valueToEncode: state)
+                self.broadcastData(data: codedState, idUser: state.respUserID)
                 return state.update(on: req.db).transform(to: state)
         }
     }

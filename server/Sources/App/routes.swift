@@ -7,25 +7,6 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
-    //@gui -> Going to Change Path, using for testing
-    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
-        let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(create.name!,create.photo!,create.respUserID, create.destTeamID, create.stageID)
-        
-        let user = User.query(on: req.db).filter("id", .equal, state.respUserID).first()
-        user.whenSuccess { (findedUser) in
-            state.name = findedUser?.name
-            state.photo = findedUser?.name
-        }
-        
-        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
-            state.name = user?.name
-            state.photo = user?.name
-            state.save(on: req.db)
-            return state
-        }
-    }
-    
     //@gui - > Change to Post for specified with Team
     app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
         return WSUserState.query(on: req.db).all()
@@ -89,9 +70,9 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.name!,user.userState.photo!,user.userState.respUserID, user.userState.destTeamID, user.userState.stageID) ,connection: ws, req: request)
+                    dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name!,user.userState.photo!,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageID) ,connection: ws, req: request)
                 } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.name!,message.newUserState.photo!,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws,req:request)
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name!,message.newUserState.photo!,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws,req:request)
                     currentUserID = message.newUserState.respUserID
                 }
             }
@@ -99,9 +80,8 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onClose.whenComplete { result in
-            do{
+            
             try! dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws,req: request)
-            } catch(let error){print(error)}
             print("Ended Connection")
             // remover usuario
         }

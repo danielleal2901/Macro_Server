@@ -32,7 +32,8 @@ final class WSUserState: Model, Content {
     
     init() {}
        
-    init(_ name: String, _ photo: String,_ resp: UUID,_ dest: UUID,_ stage: UUID){
+    init(_ id: UUID,_ name: String, _ photo: String,_ resp: UUID,_ dest: UUID,_ stage: UUID){
+        self.id = id
         self.name = name
         self.photo = photo
         self.respUserID = resp
