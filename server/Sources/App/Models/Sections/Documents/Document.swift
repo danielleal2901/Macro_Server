@@ -13,20 +13,25 @@ final class Document: Model, Content {
     
     static let schema = "documents"
     
+    struct Inoutput: Content {
+        let id: UUID
+        let stageId: UUID
+        let sections: [DocumentSection]
+    }
+    
     @ID(key: .id)
     var id: UUID?
     
     @Parent(key: "stage_id")
     var stage: Stage
     
-    @Field(key: "format")
-    var format: String
+    @Field(key: "sections")
+    var sections: [DocumentSection]
     
     init() {}
     
-    init(id: UUID = UUID(), stageId: UUID, format: String) {
+    init(id: UUID = UUID(), stageId: UUID, sections: [DocumentSection]) {
         self.id = id
         self.$stage.id = stageId
-        self.format = format
     }
 }

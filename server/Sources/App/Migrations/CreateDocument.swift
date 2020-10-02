@@ -16,8 +16,8 @@ struct CreateDocument: Migration {
             .id()
             .field("stage_id", .uuid, .required)
             .unique(on: "stage_id")
-            .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade)
-            .field("format", .string, .required)
+            .foreignKey("stage_id", references: "stages", "id", onDelete: .cascade, onUpdate: .restrict)
+            .field("sections", .array(of: .array(of: .custom(DocumentSection.self)) ), .required)
             .create()
     }
     
