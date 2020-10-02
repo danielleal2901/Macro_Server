@@ -85,7 +85,7 @@ internal class WSInteractor{
     func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
         return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
             state.name = user?.name
-            state.photo = user?.name            
+            state.photo = user?.name
             state.save(on: req.db)
             return state
         }
@@ -130,8 +130,18 @@ internal class WSInteractor{
     }
     
     
-    internal func signOutUser(userID: UUID,connection: WebSocket){
+    internal func signOutUser(userID: UUID,connection: WebSocket,req: Request) throws -> EventLoopFuture<Void>{
         WSDataWorker.shared.removeUser(userID: userID, socket: connection)
+        return WSUserState.query(on: req.db).all().map {  value in
+            value.forEach { (user) in
+                if user.respUserID == userID{
+                    WSUserState.find(user.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+                        $0.delete(on: req.db)
+                    }
+                }
+            }
+        }
+        
     }
     
     /// Broadcast certain data to all users in the connection (currently using one)

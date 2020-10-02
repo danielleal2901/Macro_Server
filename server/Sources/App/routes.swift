@@ -81,8 +81,7 @@ func webSockets(_ app: Application) throws{
     
     app.webSocket("UserConnection"){ request,ws in
         var currentUserID: UUID?
-        
-        
+                
         ws.onText{ (ws,data) in
             if let dataCov = data.data(using: .utf8){
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
@@ -100,7 +99,9 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onClose.whenComplete { result in
-            dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws)
+            do{
+            try! dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws,req: request)
+            } catch(let error){print(error)}
             print("Ended Connection")
             // remover usuario
         }
@@ -177,7 +178,6 @@ func webSockets(_ app: Application) throws{
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
-            dataController.signOutUser(userID: UUID(),connection: ws)
         }
         
         
