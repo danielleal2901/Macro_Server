@@ -33,5 +33,6 @@ final class Document: Model, Content {
     init(id: UUID = UUID(), stageId: UUID, sections: [DocumentSection]) {
         self.id = id
         self.$stage.id = stageId
+        self.sections = sections
     }
 }

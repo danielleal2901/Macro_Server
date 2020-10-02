@@ -26,10 +26,14 @@ class DataManager: DataManagerLogic{
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
                             return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
+                                .map { _ in
+                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
+                                    
+                            }
                     }
                 }
             }
-            }.transform(to: terrain)
+        }.transform(to: terrain)
     }
     internal func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<Terrain>{
         guard let uuid = UUID(uuidString: newTerrain.id) else {throw Abort(.notFound)}
@@ -88,10 +92,10 @@ class DataManager: DataManagerLogic{
                         optionalTerrain.stages.removeAll(where: {$0 == stage.stageType.rawValue})
                         return optionalTerrain.update(on: req.db)
                             .flatMap { _  in
-                             optionalStage.delete(on: req.db).transform(to: HTTPStatus.ok)
+                                optionalStage.delete(on: req.db).transform(to: HTTPStatus.ok)
                         }
                 }
-
+                
         }
         
     }
@@ -100,7 +104,7 @@ class DataManager: DataManagerLogic{
     internal func createOverview(req: Request, overviewInput: Overview.Inoutput) throws -> EventLoopFuture<Overview.Inoutput> {
         
         let overview = Overview(id: overviewInput.id, stageId: overviewInput.stageId, sections: overviewInput.sections)
-
+        
         return overview.create(on: req.db).transform(to:Overview.Inoutput(id: overview.id!, stageId: overview.$stage.id, sections: overview.sections))
     }
     
@@ -112,7 +116,7 @@ class DataManager: DataManagerLogic{
                 overview.sections = newOverview.sections
                 return overview.update(on: req.db).transform(to: overview)
         }
-
+        
     }
     
     internal func deleteOverview(req: Request,overview: Overview.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
@@ -124,16 +128,16 @@ class DataManager: DataManagerLogic{
     
     
     // Status
-   internal func createStatus(req: Request, statusInoutput: Status.Inoutput) throws -> EventLoopFuture<Status.Inoutput> {
- 
-    let status = Status(id: statusInoutput.id, stageId: statusInoutput.stageId, sections: statusInoutput.sections)
- 
+    internal func createStatus(req: Request, statusInoutput: Status.Inoutput) throws -> EventLoopFuture<Status.Inoutput> {
+        
+        let status = Status(id: statusInoutput.id, stageId: statusInoutput.stageId, sections: statusInoutput.sections)
+        
         return status.create(on: req.db).transform(to:Status.Inoutput(id: status.id!, stageId: status.$stage.id, sections: status.sections))
-    
-   }
+        
+    }
     
     internal func updateStatus(req: Request,newStatus: Status.Inoutput) throws -> EventLoopFuture<Status>{
-
+        
         return Status.find(newStatus.id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (status) in
@@ -147,5 +151,5 @@ class DataManager: DataManagerLogic{
             $0.delete(on: req.db).transform(to: .ok)
         }
     }
-
+    
 }

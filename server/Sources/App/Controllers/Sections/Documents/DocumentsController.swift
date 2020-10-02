@@ -16,22 +16,28 @@ class DocumentController: RouteCollection {
         let documentsMain = routes.grouped(DocumentRoutes.getPathComponent(.main))
         
         documentsMain.get(use: fetchAllDocuments(req:))
-
+        
         //document/documentId
         documentsMain.group(DocumentRoutes.getPathComponent(.id)) { (document) in
             document.get(use: fetchDocById(req:))
-            document.put(use: updateItemDoc(req:))
-        }
-    
-        //document/stage
-        documentsMain.group(DocumentRoutes.getPathComponent(.withStage)) { (document) in
-        
-            //document/stage/stageId
-            document.group(DocumentRoutes.getPathComponent(.stageId)) { (document) in
+            
+            //document/documentId/section
+            document.group(DocumentRoutes.getPathComponent(.sectionName)) { (document) in
+                document.put(use: updateItemDoc(req:))
             }
         }
         
-    
+        //document/stage
+        documentsMain.group(DocumentRoutes.getPathComponent(.withStage)) { (document) in
+            
+            //document/stage/stageId
+            document.group(DocumentRoutes.getPathComponent(.stageId)) { (document) in
+                
+                document.get(use: fetchDocByStageId(req:))
+            }
+        }
+        
+        
     }
     
     func insertDocument(req: Request) throws -> EventLoopFuture<Document> {
@@ -48,6 +54,21 @@ class DocumentController: RouteCollection {
             .unwrap(or: Abort(.notFound))
     }
     
+    func fetchDocByStageId (req: Request) throws -> EventLoopFuture<Document.Inoutput> {
+        
+        guard let stageId = req.parameters.get((DocumentParameters.stageId.rawValue), as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        
+        return Document.query(on: req.db)
+            .filter("stage_id", .equal, stageId)
+            .first().unwrap(or: Abort(.notFound))
+            .flatMapThrowing { optionalDoc in
+                Document.Inoutput(id: try optionalDoc.requireID(), stageId: optionalDoc.$stage.id, sections: optionalDoc.sections)
+        }
+        
+    }
+    
     func deleteDocById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
@@ -60,53 +81,82 @@ class DocumentController: RouteCollection {
     }
     
     func updateItemDoc(req: Request) throws -> EventLoopFuture<Document> {
-        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self) else {
+        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self), let sectionName = req.parameters.get(DocumentParameters.sectionName.rawValue) else {
             throw Abort(.badRequest)
         }
-        
-        let decodeQuery = try req.query.decode(DocumentItemQuery.self)
-        let sectionName = decodeQuery.sectionName
-        let itemName = decodeQuery.itemName
         
         let newItem = try req.content.decode(DocumentItem.self)
         
         return Document.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMapThrowing { (oldDocument) in
+            .flatMapThrowing { (oldDocument) -> Document in
+  
                 var flagItem = false
                 var flagSection = false
 
                 for i in 0..<oldDocument.sections.count {
-                    var section = oldDocument.sections[i]
-                    
-                    if section.name == sectionName{
+                    if oldDocument.sections[i].name == sectionName{
                         flagSection = true
-                        for y in 0..<section.items.count{
-                            var item = section.items[y]
-                            if item.name == newItem.name, item.format == newItem.format{
-                                item.content = newItem.content
+                        for y in 0..<oldDocument.sections[i].items.count{
+                            if oldDocument.sections[i].items[y].name == newItem.name, oldDocument.sections[i].items[y].format == newItem.format{
+                                oldDocument.sections[i].items[y].content = newItem.content
                                 flagItem = true
                             }
                         }
                         if (!flagItem){
-                            section.items.append(newItem)
+                            oldDocument.sections[i].items.append(newItem)
                             flagItem = true
                         }
                     }
-                    
+
                 }
-                
+
                 if (!flagSection){
                     throw (Abort(.notFound))
                 }
-            
-                return Document(id: try oldDocument.requireID(), stageId: oldDocument.$stage.id, sections: oldDocument.sections)
                 
+                return oldDocument
+        }.flatMap { (document) -> EventLoopFuture<Document> in
+            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
         }
-                
-//        }.flatMap { (document) -> EventLoopFuture<Document> in
-//            return document.save(on: req.db).map({ document })
-//        }
+        
     }
     
+    //    func getSection (document: Document, sectionName: String, req: Request) -> EventLoopFuture<DocumentSection>{
+    //
+    //        let eventloop = req.eventLoop
+    //        let promisse = eventloop.makePromise(of: DocumentSection.self)
+    //
+    //        guard let selectedSection = document.sections.first(where: { (section) -> Bool in
+    //            return section.name == sectionName
+    //        })else {
+    //            promisse.fail(Abort(.notFound))
+    //        }
+    //
+    //        promisse.succeed(selectedSection)
+    //    }
+    //
+    //    func getItem (section: DocumentSection, itemName: String, req: Request) -> EventLoopFuture<DocumentSection>{
+    //
+    //        let eventloop = req.eventLoop
+    //        let promisse = eventloop.makePromise(of: DocumentItem.self)
+    //
+    //        guard let selectedItem = section.items.first(where: { (item) -> Bool in
+    //            return item.name == itemName
+    //        })else {
+    //            promisse.fail(Abort(.notFound))
+    //        }
+    //
+    //        promisse.succeed(selectedItem)
+    //    }
+    
+    //                map({Document(id: oldDocument.id!, stageId: oldDocument.$stage.id, sections: oldDocument.sections)})
+    
+
+    
+    
+    
+    
 }
+
+

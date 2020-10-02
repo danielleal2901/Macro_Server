@@ -10,7 +10,6 @@ import Vapor
 
 struct DocumentItem: Content, Equatable {
     let name: String
-    var content: String
+    var content: Data
     let format: String
-    
 }

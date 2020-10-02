@@ -12,7 +12,7 @@ enum DocumentRoutes: String {
     case id = ":documentId"
     case withStage = "stage"
     case stageId = ":stageId"
-    
+    case sectionName = ":sectionName"
     
     static func getPathComponent(_ route: DocumentRoutes) -> PathComponent {
         return PathComponent(stringLiteral: route.rawValue)
@@ -23,6 +23,5 @@ enum DocumentParameters : String {
     case stageName = "stageName"
     case documentId = "documentId"
     case stageId = "stageId"
-    case documentSection = "sectionName"
-    case documentItem = "itemName"
+    case sectionName = "sectionName"
 }
