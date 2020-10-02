@@ -73,30 +73,60 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-    internal func enteredUser(userState: WSUserState,connection: WebSocket){
+    internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-            user.name = "User"
-            user.photo = "Photo"
             let data = try! JSONEncoder().encode(user)
+            self.insertUserState(state: user, req: req)
             self.broadcastData(data: data, idUser: user.respUserID)
         })
+    }
+    
+    @discardableResult
+    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
+        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
+            state.name = user?.name
+            state.photo = user?.name            
+            state.save(on: req.db)
+            return state
+        }
     }
     
     func updateUserId(id: UUID, previousId: UUID){
         
         for i in 0 ..< WSDataWorker.shared.connections.count {
-            if (WSDataWorker.shared.connections[i].userState.id == previousId){
-                WSDataWorker.shared.connections[i].userState.id = id
+            if (WSDataWorker.shared.connections[i].userState.respUserID == previousId){
+                WSDataWorker.shared.connections[i].userState.respUserID = id
             }
         }
-
+        
     }
     
-    internal func changeStage(userState: WSUserState,connection: WebSocket){
+    internal func changeStage(userState: WSUserState,connection: WebSocket,req: Request) {
         WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
             let data = try! JSONEncoder().encode(user)
-            self.broadcastData(data: data, idUser: user.respUserID)
+            do{
+                try! updateUserState(req: req, newState: userState)
+                self.broadcastData(data: data, idUser: user.respUserID)
+            } catch(let error)  {print(error.localizedDescription)}
+            
         })
+    }
+    
+    @discardableResult
+    internal func updateUserState(req: Request,newState: WSUserState) throws -> EventLoopFuture<WSUserState>{
+        guard let uuid = newState.id else {throw Abort(.notFound)}
+        
+        return WSUserState.find(uuid, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (state) in
+                state.name = newState.name
+                state.photo = newState.photo
+                state.respUserID = newState.respUserID
+                state.destTeamID = newState.destTeamID
+                state.stageID = newState.stageID
+                
+                return state.update(on: req.db).transform(to: state)
+        }
     }
     
     
