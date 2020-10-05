@@ -9,6 +9,7 @@ import Foundation
 import Vapor
 
 struct DocumentSection: Content {
+    let id: UUID
     let name: String
     var items: [DocumentItem]
 }

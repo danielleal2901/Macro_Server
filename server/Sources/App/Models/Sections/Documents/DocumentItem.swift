@@ -9,7 +9,7 @@ import Foundation
 import Vapor
 
 struct DocumentItem: Content, Equatable {
+    let id: UUID
     let name: String
-    var content: Data
     let format: String
 }

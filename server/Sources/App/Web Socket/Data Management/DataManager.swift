@@ -27,7 +27,7 @@ class DataManager: DataManagerLogic{
                         .map { _ in
                             return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
                                 .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
+                                    return Document(stageId: stage.id!, sections: [DocumentSection(id: UUID(), name: "Importantes", items: [])]).create(on: req.db)
                                     
                             }
                     }

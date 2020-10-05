@@ -21,9 +21,10 @@ class DocumentController: RouteCollection {
         documentsMain.group(DocumentRoutes.getPathComponent(.id)) { (document) in
             document.get(use: fetchDocById(req:))
             
-            //document/documentId/section
-            document.group(DocumentRoutes.getPathComponent(.sectionName)) { (document) in
-                document.put(use: updateItemDoc(req:))
+            //document/documentId/section/sectionId
+            document.group(DocumentRoutes.getPathComponent(.sectionId)) { (document) in
+                document.put(use: uploadItem(req:))
+                
             }
         }
         
@@ -41,7 +42,7 @@ class DocumentController: RouteCollection {
     }
     
     func insertDocument(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        let doc = try req.content.decode(Document.self)
+        let doc = try req.content.decode(Document.Inoutput.self)
         return doc.create(on: req.db).map({ doc }).transform(to: .ok)
     }
     
@@ -86,8 +87,9 @@ class DocumentController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateItemDoc(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self), let sectionName = req.parameters.get(DocumentParameters.sectionName.rawValue) else {
+    func uploadItem(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self),
+            let sectionId = req.parameters.get(DocumentParameters.sectionId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
@@ -96,15 +98,15 @@ class DocumentController: RouteCollection {
         return Document.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMapThrowing { (oldDocument) -> Document in
-  
+                
                 var flagItem = false
                 var flagSection = false
-
+                
                 for i in 0..<oldDocument.sections.count {
-                    if oldDocument.sections[i].name == sectionName{
+                    if oldDocument.sections[i].id == sectionId{
                         flagSection = true
                         for y in 0..<oldDocument.sections[i].items.count{
-                            if oldDocument.sections[i].items[y].name == newItem.name, oldDocument.sections[i].items[y].format == newItem.format{
+                            if oldDocument.sections[i].items[y].id == newItem.id {
                                 oldDocument.sections[i].items[y].content = newItem.content
                                 flagItem = true
                             }
@@ -114,20 +116,64 @@ class DocumentController: RouteCollection {
                             flagItem = true
                         }
                     }
-
+                    
                 }
-
+                
                 if (!flagSection){
                     throw (Abort(.notFound))
                 }
                 
                 return oldDocument
         }.flatMap { (document) -> EventLoopFuture<HTTPStatus> in
-//            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
+            //            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
             return document.update(on: req.db).transform(to: .ok)
         }
         
     }
+    
+//    func deleteItemDoc(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+//        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self),
+//            let itemId = req.parameters.get(DocumentParameters.itemId.rawValue, as: UUID.self),
+//            let sectionId = req.parameters.get(DocumentParameters.sectionId.rawValue, as: UUID.self) else {
+//                throw Abort(.badRequest)
+//        }
+//
+//        return Document.find(id, on: req.db)
+//            .unwrap(or: Abort(.notFound))
+//            .flatMapThrowing { (document) -> Document in
+//
+//                var flagItem = false
+//                var flagSection = false
+//
+//                for i in 0..<document.sections.count {
+//                    if document.sections[i].id == sectionId{
+//                        flagSection = true
+//                        for y in 0..<document.sections[i].items.count{
+//                            if document.sections[i].items[y].id == itemId{
+//                                document.sections[i].items.remove(at: y)
+//                                flagItem = true
+//                            }
+//                        }
+//                    }
+//
+//                }
+//
+//                if (!flagItem){
+//                    throw (Abort(.notFound))
+//                }
+//                if (!flagSection){
+//                    throw (Abort(.notFound))
+//                }
+//
+//
+//                return document
+//        }.flatMap { (document) -> EventLoopFuture<HTTPStatus> in
+//            //            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
+//            return document.update(on: req.db).transform(to: .ok)
+//        }
+//
+//
+//    }
     
     
 }
