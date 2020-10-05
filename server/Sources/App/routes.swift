@@ -66,6 +66,7 @@ func webSockets(_ app: Application) throws{
         ws.onText{ (ws,data) in
             if let dataCov = data.data(using: .utf8){
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
+                if message.newUserState.name == nil {message.newUserState.name = "";message.newUserState.photo = ""}
                 if let user = WSDataWorker.shared.connections.first(where: {
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
