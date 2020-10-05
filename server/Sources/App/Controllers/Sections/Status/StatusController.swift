@@ -33,13 +33,19 @@ class StatusController: RouteCollection {
         }
     }
 
-    func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status]> {
-        return Status.query(on: req.db).all()
+    func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status.Inoutput]> {
+        return Status.query(on: req.db).all().map { allStatus in
+            return allStatus.map { status in
+                return Status.Inoutput(id: status.id!, stageId: status.stage.id!, sections: status.sections)
+            }
+        }
     }
     
-    func fetchStatusById(req: Request) throws -> EventLoopFuture<Status> {
+    func fetchStatusById(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
         return Status.find(req.parameters.get(StatusRoutes.id.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
+            .unwrap(or: Abort(.notFound)).map { optionalStatus in
+                return Status.Inoutput(id: optionalStatus.id!, stageId: optionalStatus.stage.id!, sections: optionalStatus.sections)
+        }
     }
     
     func fetchStatusByStageId (req: Request) throws -> EventLoopFuture<Status.Inoutput> {

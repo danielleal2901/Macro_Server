@@ -32,13 +32,19 @@ class OverviewController: RouteCollection {
         }
     }
     
-    func fetchAllOverviews(req: Request) throws -> EventLoopFuture<[Overview]> {
-        return Overview.query(on: req.db).all()
+    func fetchAllOverviews(req: Request) throws -> EventLoopFuture<[Overview.Inoutput]> {
+        return Overview.query(on: req.db).all().map { allOverviews in
+            return allOverviews.map { overview in
+                Overview.Inoutput(id: overview.id!, stageId: overview.stage.id!, sections: overview.sections)
+            }
+        }
     }
     
-    func fetchOverviewById(req: Request) throws -> EventLoopFuture<Overview> {
+    func fetchOverviewById(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
         return Overview.find(req.parameters.get(OverviewRoutes.id.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
+            .unwrap(or: Abort(.notFound)).map { optionalOverview in
+                return Overview.Inoutput(id: optionalOverview.id!, stageId: optionalOverview.stage.id!, sections: optionalOverview.sections)
+        }
     }
     
     func fetchOverviewByStageId (req: Request) throws -> EventLoopFuture<Overview.Inoutput> {

@@ -40,18 +40,24 @@ class DocumentController: RouteCollection {
         
     }
     
-    func insertDocument(req: Request) throws -> EventLoopFuture<Document> {
+    func insertDocument(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let doc = try req.content.decode(Document.self)
-        return doc.create(on: req.db).map({ doc })
+        return doc.create(on: req.db).map({ doc }).transform(to: .ok)
     }
     
-    func fetchAllDocuments(req: Request) throws -> EventLoopFuture<[Document]> {
-        return Document.query(on: req.db).all()
+    func fetchAllDocuments(req: Request) throws -> EventLoopFuture<[Document.Inoutput]> {
+        return Document.query(on: req.db).all().map { allDocs in
+            allDocs.map { doc in
+                Document.Inoutput(id: doc.id!, stageId: doc.stage.id!, sections: doc.sections)
+            }
+        }
     }
     
-    func fetchDocById(req: Request) throws -> EventLoopFuture<Document> {
+    func fetchDocById(req: Request) throws -> EventLoopFuture<Document.Inoutput> {
         return Document.find(req.parameters.get(DocumentParameters.documentId.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound))
+            .unwrap(or: Abort(.notFound)).map { optionalDoc in
+                return Document.Inoutput(id: optionalDoc.id!, stageId: optionalDoc.stage.id!, sections: optionalDoc.sections)
+        }
     }
     
     func fetchDocByStageId (req: Request) throws -> EventLoopFuture<Document.Inoutput> {
@@ -80,7 +86,7 @@ class DocumentController: RouteCollection {
             .transform(to: .ok)
     }
     
-    func updateItemDoc(req: Request) throws -> EventLoopFuture<Document> {
+    func updateItemDoc(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self), let sectionName = req.parameters.get(DocumentParameters.sectionName.rawValue) else {
             throw Abort(.badRequest)
         }
@@ -116,45 +122,12 @@ class DocumentController: RouteCollection {
                 }
                 
                 return oldDocument
-        }.flatMap { (document) -> EventLoopFuture<Document> in
-            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
+        }.flatMap { (document) -> EventLoopFuture<HTTPStatus> in
+//            return document.update(on: req.db).transform(to: Document(id: document.id!, stageId: document.$stage.id, sections: document.sections))
+            return document.update(on: req.db).transform(to: .ok)
         }
         
     }
-    
-    //    func getSection (document: Document, sectionName: String, req: Request) -> EventLoopFuture<DocumentSection>{
-    //
-    //        let eventloop = req.eventLoop
-    //        let promisse = eventloop.makePromise(of: DocumentSection.self)
-    //
-    //        guard let selectedSection = document.sections.first(where: { (section) -> Bool in
-    //            return section.name == sectionName
-    //        })else {
-    //            promisse.fail(Abort(.notFound))
-    //        }
-    //
-    //        promisse.succeed(selectedSection)
-    //    }
-    //
-    //    func getItem (section: DocumentSection, itemName: String, req: Request) -> EventLoopFuture<DocumentSection>{
-    //
-    //        let eventloop = req.eventLoop
-    //        let promisse = eventloop.makePromise(of: DocumentItem.self)
-    //
-    //        guard let selectedItem = section.items.first(where: { (item) -> Bool in
-    //            return item.name == itemName
-    //        })else {
-    //            promisse.fail(Abort(.notFound))
-    //        }
-    //
-    //        promisse.succeed(selectedItem)
-    //    }
-    
-    //                map({Document(id: oldDocument.id!, stageId: oldDocument.$stage.id, sections: oldDocument.sections)})
-    
-
-    
-    
     
     
 }
