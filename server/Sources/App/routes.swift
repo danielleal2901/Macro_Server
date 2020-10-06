@@ -71,9 +71,9 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name!,user.userState.photo!,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageID) ,connection: ws, req: request)
+                    dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name!,user.userState.photo!,message.newUserState.terrainID,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageID) ,connection: ws, req: request)
                 } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name!,message.newUserState.photo!,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws,req:request)
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name!,message.newUserState.photo!,message.newUserState.terrainID,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws,req:request)
                     currentUserID = message.newUserState.respUserID
                 }
             }

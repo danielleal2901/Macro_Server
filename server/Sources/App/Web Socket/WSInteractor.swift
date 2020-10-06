@@ -115,9 +115,7 @@ internal class WSInteractor{
         
         return WSUserState.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (state) in
-                state.name = newState.name
-                state.photo = newState.photo
+            .flatMap { (state) in                
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
                 state.stageID = newState.stageID

@@ -21,6 +21,9 @@ final class WSUserState: Model, Content {
     @Field(key: "photo")
     var photo: String?
     
+    @Field(key: "terrainID")
+    var terrainID: UUID
+    
     @Field(key: "respUserID")
     var respUserID: UUID
     
@@ -32,10 +35,11 @@ final class WSUserState: Model, Content {
     
     init() {}
        
-    init(_ id: UUID,_ name: String, _ photo: String,_ resp: UUID,_ dest: UUID,_ stage: UUID){
+    init(_ id: UUID,_ name: String, _ photo: String,_ terrain: UUID,_ resp: UUID,_ dest: UUID,_ stage: UUID){
         self.id = id
         self.name = name
         self.photo = photo
+        self.terrainID = terrain
         self.respUserID = resp
         self.destTeamID = dest
         self.stageID = stage
