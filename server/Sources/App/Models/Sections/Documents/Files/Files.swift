@@ -13,10 +13,11 @@ final class Files: Model, Content {
 
     static let schema = "files"
     
-    struct Inoutput {
+    struct Inoutput : Content {
         let id: UUID
         let data: Data
         let itemId: UUID
+        let documentId: UUID
     }
     
     @ID(key: .id)
@@ -33,9 +34,10 @@ final class Files: Model, Content {
     
     init(){}
     
-    init(id: UUID = UUID(), itemId: UUID, data: Data) {
+    init(id: UUID = UUID(), itemId: UUID, documentId: UUID, data: Data) {
         self.id = id
         self.itemId = itemId
+        self.$document.id = documentId
         self.data = data
     }
 

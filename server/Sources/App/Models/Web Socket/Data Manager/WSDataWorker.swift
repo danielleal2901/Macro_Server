@@ -93,6 +93,22 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
+            
+        case .document :
+            let documentInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Document.Inoutput.self)
+            
+            do{
+                let akaresponse = try dataManager.createDocument(req: sessionRequest, documentInoutput: documentInput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -109,7 +125,7 @@ internal class WSDataWorker{
     ///   - request: Request of Receive action, having id for search in database
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
     internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
-        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
+//        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
         case .terrain:
@@ -185,6 +201,21 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
+        
+        case .document:
+            let documentInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Document.Inoutput.self)
+            do{
+                let akaresponse = try dataManager.updateDocument(req: sessionRequest, newDocument: documentInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
+            
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -248,6 +279,21 @@ internal class WSDataWorker{
             
             do{
                 let akaresponse = try dataManager.deleteStatus(req: sessionRequest, status: statusInoutput!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
+        case .document:
+            let documentInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Document.Inoutput.self)
+            
+            do{
+                let akaresponse = try dataManager.deleteDocument(req: sessionRequest, document: documentInoutput!)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)

@@ -15,7 +15,7 @@ final class Terrain: Model, Content {
     struct Inoutput: Content {
         let name: String
         let stages: [StageTypes]
-        var id: String
+        let id: UUID
     }
 
     static let schema = "terrains"
