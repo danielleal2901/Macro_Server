@@ -35,7 +35,7 @@ class FilesController: RouteCollection {
                     //files/document/documentId/item/itemId
                     files.group(FilesRoutes.getPathComponent(.itemId)) { (files) in
                         
-                        files.get(use: fetchFilesByDocumentId(req: ))
+                        files.get(use: downloadFile(req: ))
                         
                         files.on(.POST, body: .stream) { req in
                              try self.insertFile(req: req)
@@ -86,7 +86,7 @@ class FilesController: RouteCollection {
         
     }
     
-    func fetchByDocumentAndItemId(req: Request) throws -> EventLoopFuture<Files.Inoutput> {
+    func downloadFile(req: Request) throws -> EventLoopFuture<Files.Inoutput> {
         
         guard let documentId = req.parameters.get(FilesParameters.documentId.rawValue, as: UUID.self),
             let itemId = req.parameters.get(FilesParameters.itemId.rawValue, as: UUID.self)
@@ -107,7 +107,6 @@ class FilesController: RouteCollection {
     
     func insertFile(req: Request) throws -> EventLoopFuture<HTTPStatus> {
 
-        
         guard let contentType = req.content.contentType, let boundary = contentType.parameters["boundary"] else {throw Abort(.badRequest)}
 
         let parser = MultipartParser(boundary: boundary)
@@ -119,7 +118,8 @@ class FilesController: RouteCollection {
             headers.replaceOrAdd(name: field, value: value)
         }
         parser.onBody = { new in
-            body += new.description
+            let string = String(buffer: new)
+            body += string
         }
         parser.onPartComplete = {
             let part = MultipartPart(headers: headers, body: body)
@@ -128,7 +128,7 @@ class FilesController: RouteCollection {
             parts.append(part)
         }
 
-        let promise = req.eventLoop.makePromise(of: Data?.self)
+        let promise = req.eventLoop.makePromise(of: Bool.self)
         
         req.body.drain { part in
             switch part {
@@ -136,48 +136,44 @@ class FilesController: RouteCollection {
                 do {
                     try parser.execute(buffer)
                 }catch (let error){
-                    promise.completeWith(.success(nil))
+                    promise.completeWith(.failure(error))
                 }
                 return req.eventLoop.makeSucceededFuture(())
                 
             case .error(let error):
-                promise.completeWith(.success(nil))
+                promise.completeWith(.failure(error))
                 return req.eventLoop.makeSucceededFuture(())
                 
             case .end:
-                
-                if let fileBuffer = parts.firstPart(named: "data")?.body {
-                    promise.completeWith(.success(Data(buffer: fileBuffer)))
-                }else {
-                    promise.completeWith(.success(nil))
-                }
-                    
+                promise.completeWith(.success(true))
                 return req.eventLoop.makeSucceededFuture(())
             }
         }
             
-        return promise.futureResult.unwrap(or: Abort(.badRequest)).flatMapThrowing { data -> Files in
-            guard var idBuffer = parts.firstPart(named: "id")?.body else {throw Abort(.badRequest)}
-            guard var documentIdBuffer = parts.firstPart(named: "documentId")?.body else {throw Abort(.badRequest)}
-            guard var itemIdBuffer = parts.firstPart(named: "itemId")?.body else {throw Abort(.badRequest)}
+        return promise.futureResult.flatMapThrowing { result -> Files in
+            if (!result){
+                throw Abort(.badRequest)
+            }
             
-            let id = idBuffer.readString(length: idBuffer.readerIndex)
-        
+            guard let fileData = parts.firstPart(named: "data")?.body else {throw Abort(.badRequest)}
+            guard let idBuffer = parts.firstPart(named: "id")?.body else {throw Abort(.badRequest)}
+            guard let documentIdBuffer = parts.firstPart(named: "documentId")?.body else {throw Abort(.badRequest)}
+            guard let itemIdBuffer = parts.firstPart(named: "itemId")?.body else {throw Abort(.badRequest)}
             
             //MARK: TODO -> Ler buffer e salvar o arquivo
+            let id = String(buffer: idBuffer)
             let documentId = String(buffer: documentIdBuffer)
             let itemId = String(buffer: itemIdBuffer)
+            let data = Data(buffer: fileData)
             
-
-
-            let file = Files(id: UUID(uuidString: id!)!, itemId: UUID(uuidString: itemId)!, documentId: UUID(uuidString: documentId)!, data: data)
+            let file = Files(id: UUID(uuidString: id)!, itemId: UUID(uuidString: itemId)!, documentId: UUID(uuidString: documentId)!, data: data)
             return file
         }.flatMap { (file)  in
             file.create(on: req.db).transform(to: .ok)
         }
         
     }
-        
+
         
 
 //        let newFile = try req.content.decode(Files.Inoutput.self)
