@@ -11,5 +11,4 @@ import Vapor
 struct DocumentItem: Content, Equatable {
     let id: UUID
     let name: String
-    let format: String
 }

@@ -15,6 +15,7 @@ enum FilesRoutes: String {
     case documentId = ":documentId"
     case withItem = "item"
     case itemId = ":itemId"
+    case uploadFile = "/files/document/:documentId/item/:itemId"
     
     static func getPathComponent(_ route: FilesRoutes) -> PathComponent {
         return PathComponent(stringLiteral: route.rawValue)
