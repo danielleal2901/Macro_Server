@@ -74,8 +74,8 @@ internal class WSInteractor{
     ///   - teamID: team identification
     ///   - connection: connection identification
     internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
-        WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-            let data = try! JSONEncoder().encode(user)
+        WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in            
+            let data = CoderHelper.shared.encodeGenericToData(valueToEncode: user)
             self.insertUserState(state: user, req: req)
             self.broadcastData(data: data, idUser: user.respUserID)
         })
@@ -84,8 +84,9 @@ internal class WSInteractor{
     @discardableResult
     func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
         return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
-            state.name = user?.name
-            state.photo = user?.name
+            state.name = user!.name
+            state.photo = user!.name
+            print(state.name)
             state.save(on: req.db)
             return state
         }
@@ -118,8 +119,10 @@ internal class WSInteractor{
             .flatMap { (state) in                
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
-                state.stageID = newState.stageID
+                state.stageType = newState.stageType
                 let codedState = CoderHelper.shared.encodeGenericToData(valueToEncode: state)
+                print(state.name)
+                print(state.photo)
                 self.broadcastData(data: codedState, idUser: state.respUserID)
                 return state.update(on: req.db).transform(to: state)
         }
@@ -144,12 +147,12 @@ internal class WSInteractor{
     /// - Parameter data: Data to send to all users
     internal func broadcastData<T>(data: T,idUser: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
-        // Do not send to current id sender
+        // Do not send to current id sender        
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser{
+//            if $0.userState.respUserID != idUser{
                 $0.webSocket.send(encoded)
-            }
+//            }
         })
     }
     

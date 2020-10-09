@@ -16,10 +16,10 @@ final class WSUserState: Model, Content {
     var id: UUID?
     
     @Field(key: "name")
-    var name: String?
+    var name: String
     
     @Field(key: "photo")
-    var photo: String?
+    var photo: String
     
     @Field(key: "terrainID")
     var terrainID: UUID
@@ -30,19 +30,19 @@ final class WSUserState: Model, Content {
     @Field(key: "destTeamID")
     var destTeamID: UUID
     
-    @Field(key: "stageID")
-    var stageID: UUID
+    @Enum (key: "stageType")
+    var stageType: StageTypes
     
     init() {}
        
-    init(_ id: UUID,_ name: String, _ photo: String,_ terrain: UUID,_ resp: UUID,_ dest: UUID,_ stage: UUID){
+    init(_ id: UUID,_ name: String, _ photo: String,_ terrain: UUID,_ resp: UUID,_ dest: UUID,_ stage: StageTypes){
         self.id = id
         self.name = name
         self.photo = photo
         self.terrainID = terrain
         self.respUserID = resp
         self.destTeamID = dest
-        self.stageID = stage
+        self.stageType = stage
     }
         
 }

@@ -8,7 +8,10 @@ func routes(_ app: Application) throws {
     }
     
     //@gui - > Change to Post for specified with Team
-    app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
+    app.get("userStates",":teamid") { (req) -> EventLoopFuture<[WSUserState]> in
+        if let teamID = req.parameters.get("teamid"){
+            return WSUserState.query(on: req.db).filter("destTeamID", .equal, UUID(uuidString: teamID)).all()
+        }
         return WSUserState.query(on: req.db).all()
     }
     
@@ -71,9 +74,12 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name!,user.userState.photo!,message.newUserState.terrainID,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageID) ,connection: ws, req: request)
+                    dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name,user.userState.photo,message.newUserState.terrainID,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageType) ,connection: ws, req: request)
                 } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name!,message.newUserState.photo!,message.newUserState.terrainID,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws,req:request)
+                    if message.newUserState.photo == nil {
+                       message.newUserState.photo = message.newUserState.name
+                    }
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name,message.newUserState.photo,message.newUserState.terrainID,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageType),connection: ws,req:request)
                     currentUserID = message.newUserState.respUserID
                 }
             }
@@ -96,7 +102,6 @@ func webSockets(_ app: Application) throws{
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
-            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
