@@ -304,10 +304,23 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
-        default:
-            print("Not working")
-            response.actionStatus = .Error
-            completion(response)
+            
+        case .file:
+            let fileId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
+            
+            do{
+                let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileId: fileId!)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+                
+            }
+
         }
         
     }

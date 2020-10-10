@@ -23,7 +23,6 @@ class DocumentController: RouteCollection {
             
             //document/documentId/section/sectionId
             document.group(DocumentRoutes.getPathComponent(.sectionId)) { (document) in
-//                document.put(use: uploadItem(req:))
             }
         }
         
@@ -32,7 +31,6 @@ class DocumentController: RouteCollection {
             
             //document/stage/stageId
             document.group(DocumentRoutes.getPathComponent(.stageId)) { (document) in
-                
                 document.get(use: fetchDocByStageId(req:))
             }
         }
@@ -75,18 +73,18 @@ class DocumentController: RouteCollection {
         }
         
     }
-    
-    func deleteDocById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        
-        return Document.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap({$0.delete(on: req.db)})
-            .transform(to: .ok)
-    }
-    
+//
+//    func deleteDocById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+//        guard let id = req.parameters.get(DocumentParameters.documentId.rawValue, as: UUID.self) else {
+//            throw Abort(.badRequest)
+//        }
+//
+//        return Document.find(id, on: req.db)
+//            .unwrap(or: Abort(.notFound))
+//            .flatMap({$0.delete(on: req.db)})
+//            .transform(to: .ok)
+//    }
+//
     
 }
 

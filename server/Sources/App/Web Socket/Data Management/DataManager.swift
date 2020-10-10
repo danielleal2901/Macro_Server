@@ -172,5 +172,12 @@ class DataManager: DataManagerLogic{
             $0.delete(on: req.db).transform(to: .ok)
         }
     }
-
+    
+    //Files
+    internal func deleteFile(req: Request, fileId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+        return Files.find(fileId, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+            $0.delete(on: req.db).transform(to: .ok)
+        }
+    }
+    
 }
