@@ -74,10 +74,8 @@ internal class WSInteractor{
     ///   - teamID: team identification
     ///   - connection: connection identification
     internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
-        WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in            
-            let data = CoderHelper.shared.encodeGenericToData(valueToEncode: user)
+        WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
             self.insertUserState(state: user, req: req)
-            self.broadcastData(data: data, idUser: user.respUserID)
         })
     }
     
@@ -85,8 +83,9 @@ internal class WSInteractor{
     func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
         return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
             state.name = user!.name
-            state.photo = user!.name
             print(state.name)
+            print(state.photo)
+            self.broadcastData(data: state, idUser: (user?.id)!)
             state.save(on: req.db)
             return state
         }
@@ -113,17 +112,15 @@ internal class WSInteractor{
     @discardableResult
     internal func updateUserState(req: Request,newState: WSUserState) throws -> EventLoopFuture<WSUserState>{
         guard let uuid = newState.id else {throw Abort(.notFound)}
-        
+            
         return WSUserState.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (state) in                
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
                 state.stageType = newState.stageType
-                let codedState = CoderHelper.shared.encodeGenericToData(valueToEncode: state)
-                print(state.name)
-                print(state.photo)
-                self.broadcastData(data: codedState, idUser: state.respUserID)
+                state.terrainID = newState.terrainID
+                self.broadcastData(data: state, idUser: state.respUserID)
                 return state.update(on: req.db).transform(to: state)
         }
     }
