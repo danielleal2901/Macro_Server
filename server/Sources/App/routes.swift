@@ -54,8 +54,8 @@ func routes(_ app: Application) throws {
     //    }
     let passwordProtected = app.grouped(User.authenticator())
     
-    app.post("userlogin") { req -> EventLoopFuture<User> in
-        let user: AuthEntity = try req.auth.require(AuthEntity.self)
+    passwordProtected.post("userlogin") { req -> EventLoopFuture<User> in
+        let user = try req.auth.require(User.self)
         
         return User.query(on: req.db).filter("id", .equal, user.id).first().map { (user) in
             return (user ?? User(name: "", email: "", passwordHash: ""))
