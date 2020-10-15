@@ -36,3 +36,8 @@ protocol DocumentManagement {
     func updateDocument(req: Request,newStatus: Document.Inoutput) throws -> EventLoopFuture<HTTPStatus>
     func deleteDocument(req: Request,status: Document.Inoutput) throws -> EventLoopFuture<HTTPStatus>
 }
+
+protocol UserManagement {
+    func updateUser(req: Request, newUser: User) throws -> EventLoopFuture<HTTPStatus>
+    func deleteUser(req: Request, user: User) throws -> EventLoopFuture<HTTPStatus>
+}
