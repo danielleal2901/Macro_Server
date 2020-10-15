@@ -34,13 +34,11 @@ func routes(_ app: Application) throws {
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
         let create = try req.content.decode(AuthEntity.self)
-        guard create.password == create.confirmPassword else {
-            throw Abort(.badRequest, reason: "Passwords did not match")
-        }
         let user = try User(
             name: create.name,
             email: create.email,
-            passwordHash: Bcrypt.hash(create.password)
+            passwordHash: Bcrypt.hash(create.password),
+            userType: create.userType
         )
         return user.save(on: req.db)
             .map { user }

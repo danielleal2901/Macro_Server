@@ -12,13 +12,13 @@ struct AuthEntity: Codable {
     var name: String
     var email: String
     var password: String
-    var confirmPassword: String
+    var userType: Int
     
-    init(name: String,email: String,password: String,confirmPassword: String) {
+    init(name: String,email: String,password: String, userType: Int) {
         self.name = name
         self.email = email
         self.password = password
-        self.confirmPassword = confirmPassword
+        self.userType = userType
     }
     
     init(from decoder: Decoder) throws {
@@ -26,7 +26,7 @@ struct AuthEntity: Codable {
         name = try values.decode(String.self,forKey: .name)
         email = try values.decode(String.self,forKey: .email)
         password = try values.decode(String.self,forKey: .password)
-        confirmPassword = try values.decode(String.self,forKey: .confirmPassword)        
+        userType = try values.decode(Int.self, forKey: .userType)
     }
     
 }
@@ -37,6 +37,4 @@ extension AuthEntity: Validatable{
         validations.add("email", as: String.self,is: .email)
         validations.add("password", as: String.self,is: .count(8...))
     }
-
-
 }

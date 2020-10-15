@@ -22,14 +22,18 @@ final class User: Model, Content {
 
     @Field(key: "password_hash")
     var passwordHash: String
+    
+    @Field(key: "user_type")
+    var userType: Int
 
     init() { }
 
-    init(id: UUID? = nil, name: String, email: String, passwordHash: String) {
+    init(id: UUID? = nil, name: String, email: String, passwordHash: String, userType: Int) {
         self.id = id
         self.name = name
         self.email = email
         self.passwordHash = passwordHash
+        self.userType = userType
     }
 }
 
