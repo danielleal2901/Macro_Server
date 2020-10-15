@@ -180,4 +180,22 @@ class DataManager: DataManagerLogic{
         }
     }
     
+    internal func updateUser(req: Request, newUser: User) throws -> EventLoopFuture<HTTPStatus>{
+        
+        return User.find(newUser.id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (user) in
+                user.name = newUser.name
+                user.email = newUser.email
+                user.passwordHash = newUser.passwordHash
+                return user.update(on: req.db).transform(to: .ok)
+        }
+    }
+    internal func deleteUser(req: Request, user: User) throws -> EventLoopFuture<HTTPStatus>{
+        
+        return User.find(user.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+            $0.delete(on: req.db).transform(to: .ok)
+        }
+    }
+    
 }
