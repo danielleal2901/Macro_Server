@@ -16,6 +16,7 @@ struct CreateFiles: Migration {
             .id()
             .field("document_id", .uuid, .required)
             .field("item_id", .uuid, .required)
+            .unique(on: "item_id")
             .field("data", .data, .required)
             .foreignKey("document_id", references: "documents", "id", onDelete: .cascade, onUpdate: .restrict)
             .create()

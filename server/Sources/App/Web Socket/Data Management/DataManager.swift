@@ -175,6 +175,11 @@ class DataManager: DataManagerLogic{
     
     //Files
     internal func deleteFile(req: Request, fileId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+        return Files.query(on: req.db)
+            .filter("item_id", .equal, fileId)
+            .all().mapEach { files in
+                return Files.Inoutput(id: files.id!, data: files.data, itemId: files.itemId, documentId: files.$document.id)
+        }
         return Files.find(fileId, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
         }

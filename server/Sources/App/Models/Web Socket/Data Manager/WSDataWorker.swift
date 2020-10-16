@@ -306,7 +306,7 @@ internal class WSDataWorker{
             }
             
         case .file:
-            let fileId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
+            let fileItemId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
             
             do{
                 let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileId: fileId!)
