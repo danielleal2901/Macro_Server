@@ -345,7 +345,7 @@ internal class WSDataWorker{
                 completion(user.userState)
             }
         }
-       }
+    }
     
     func removeUser(userID: UUID,socket: WebSocket){
         connections = self.connections.filter {

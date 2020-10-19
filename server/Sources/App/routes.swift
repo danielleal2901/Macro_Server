@@ -33,15 +33,9 @@ func routes(_ app: Application) throws {
     
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(AuthEntity.self)
-        let user = try User(
-            name: create.name,
-            email: create.email,
-            passwordHash: Bcrypt.hash(create.password),
-            userType: create.userType
-        )
-        return user.save(on: req.db)
-            .map { user }
+        let create = try req.content.decode(User.self)
+        return create.save(on: req.db)
+            .map { create }
     }
     
     let passwordProtected = app.grouped(User.authenticator())
@@ -67,7 +61,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: StatusController())
     try app.register(collection: DocumentController())
     try app.register(collection: FilesController())
-    
+    try app.register(collection: TeamController())
     
 }
 
