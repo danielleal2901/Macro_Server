@@ -12,18 +12,13 @@ func routes(_ app: Application) throws {
         let create = try req.content.decode(WSUserState.self)
         let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
         
-        let user = User.query(on: req.db).filter("id", .equal, state.respUserID).first()
-        user.whenSuccess { (findedUser) in
-            state.name = findedUser?.name
-            state.photo = findedUser?.name
-        }
-        
-        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
-            state.name = user?.name
-            state.photo = user?.name
-            state.save(on: req.db)
-            return state
-        }
+        return User.find(state.respUserID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (optionalUserState) -> EventLoopFuture<WSUserState> in
+                state.name = optionalUserState.name
+                state.photo = optionalUserState.name
+                return state.save(on: req.db).transform(to: state)
+            }
     }
     
     //@gui - > Change to Post for specified with Team
@@ -33,14 +28,9 @@ func routes(_ app: Application) throws {
     
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(RegisterEntity.self)
-        let user = try User(
-            name: create.name,
-            email: create.email,
-            passwordHash: Bcrypt.hash(create.password)
-        )
-        return user.save(on: req.db)
-            .map { user }
+        let create = try req.content.decode(User.self)
+        return create.save(on: req.db)
+            .map { create }
     }
     
     
@@ -75,7 +65,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: StatusController())
     try app.register(collection: DocumentController())
     try app.register(collection: FilesController())
-    
+    try app.register(collection: TeamController())
     
 }
 
@@ -92,7 +82,7 @@ func webSockets(_ app: Application) throws{
         
         ws.onText{ (ws,data) in
             if let dataCov = data.data(using: .utf8){
-                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
+                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
                 if let user = WSDataWorker.shared.connections.first(where: {
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
@@ -126,8 +116,8 @@ func webSockets(_ app: Application) throws{
             
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
-                guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
-                dataController.updateUserId(id: message.respUserID, previousId: id)
+                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
+                    dataController.updateUserId(id: message.respUserID, previousId: id)
                 
                 switch message.operation{
                 case 0:

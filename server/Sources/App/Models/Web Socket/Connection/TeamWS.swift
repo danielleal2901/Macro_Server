@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct Team: Codable{
+internal struct TeamWS: Codable{
     // MARK - Variables
     internal private(set) var id: Int
     

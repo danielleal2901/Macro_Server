@@ -16,7 +16,7 @@ internal class WSInteractor{
         WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: data.data,idUser: data.data.respUserID)
+                self.broadcastData(data: data.data,idUser: data.data.respUserID, idTeam: data.data.destTeamID)
             case .Error:
                 print()
             default:
@@ -44,7 +44,7 @@ internal class WSInteractor{
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
             switch response!.actionStatus{
             case .Completed:
-                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID)
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID)
             case .Error:
                 print()
             default:
@@ -59,7 +59,7 @@ internal class WSInteractor{
             completion(response)
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: package,idUser: package.respUserID)
+                self.broadcastData(data: package,idUser: package.respUserID, idTeam: package.destTeamID)
             case .Error:
                 print()
             default:
@@ -95,7 +95,7 @@ internal class WSInteractor{
     internal func changeStage(userState: WSUserState,connection: WebSocket){
         WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
             let data = try! JSONEncoder().encode(user)
-            self.broadcastData(data: data, idUser: user.respUserID)
+            self.broadcastData(data: data, idUser: user.respUserID, idTeam: user.destTeamID)
         })
     }
     
@@ -106,12 +106,12 @@ internal class WSInteractor{
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
-    internal func broadcastData<T>(data: T,idUser: UUID) where T:Codable {
+    internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser{
+            if $0.userState.respUserID != idUser && $0.userState.destTeamID == idTeam {
                 $0.webSocket.send(encoded)
             }
         })
