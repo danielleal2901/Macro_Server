@@ -34,11 +34,11 @@ internal class WSDataWorker{
         guard let dataType = request.data.dataType as? DataTypes else {return}
         
         switch dataType{
-        case .terrain:
+        case .container:
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
+            let containerInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: StagesContainer.Inoutput.self)
             do{
-                let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
+                let akaresponse = try dataManager.createContainer(containerInput: containerInput!, req: sessionRequest)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -125,17 +125,8 @@ internal class WSDataWorker{
     ///   - request: Request of Receive action, having id for search in database
     ///   - completion: Response of Receive action, having the data found on the database, including the result of action Status
     internal func fetchData(sessionRequest: Request , dataRequest: ServiceTypes.Receive.Request,completion: @escaping (ServiceTypes.Receive.Response?) -> ()){
-//        var response:  ServiceTypes.Receive.Response = .init(dataReceived: .none, actionStatus: .Requesting)
+
         
-        switch dataRequest.data.dataType{
-        case .terrain:
-            print()
-        case .stage:
-            print()
-        default:
-            print()
-            
-        }
     }
     
     
@@ -143,10 +134,10 @@ internal class WSDataWorker{
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
-        case .terrain:
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
+        case .container:
+            let containerInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: StagesContainer.Inoutput.self)
             do{
-                let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
+                let akaresponse = try dataManager.updateContainer(req: sessionRequest, newContainer: containerInput!)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -228,11 +219,12 @@ internal class WSDataWorker{
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataType{
-        case .terrain:
-            let terrainInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
+            
+        case .container:
+            let containerInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: StagesContainer.Inoutput.self)
             
             do{
-                let akaresponse = try dataManager.deleteTerrain(req: sessionRequest, terrain: terrainInoutput!)
+                let akaresponse = try dataManager.deleteContainer(req: sessionRequest, container: containerInput!)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)

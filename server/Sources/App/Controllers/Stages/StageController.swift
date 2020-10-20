@@ -50,7 +50,7 @@ class StageController: RouteCollection {
             .filter(\.$type == stageType)
             .all().map { stages in
                 let outputs = stages.map { stage in
-                    Stage.Inoutput(id: stage.id!, terrain: stage.$terrain.id, stageType: StageTypes(rawValue: stage.type.rawValue)!)
+                    Stage.Inoutput(id: stage.id!, container: stage.$container.id, stageType: StageTypes(rawValue: stage.type.rawValue)!)
                 }
                 return outputs
         }
@@ -68,7 +68,7 @@ class StageController: RouteCollection {
                     throw Abort(.badRequest)
                 }
                 
-                return Stage.Inoutput(id: $0.id!, terrain: $0.$terrain.id , stageType: StageTypes(rawValue: $0.type.rawValue)!)
+                return Stage.Inoutput(id: $0.id!, container: $0.$container.id , stageType: StageTypes(rawValue: $0.type.rawValue)!)
         }
     }
     
@@ -85,7 +85,7 @@ class StageController: RouteCollection {
                 group.filter(\.$type == stageType).filter("terrain_id", .equal, terrainId)
             }.first().unwrap(or: Abort(.notFound))
             .map {
-                return Stage.Inoutput(id: $0.id!, terrain: $0.$terrain.id, stageType: StageTypes(rawValue: $0.type.rawValue)!)
+                return Stage.Inoutput(id: $0.id!, container: $0.$container.id, stageType: StageTypes(rawValue: $0.type.rawValue)!)
             }
 
     }

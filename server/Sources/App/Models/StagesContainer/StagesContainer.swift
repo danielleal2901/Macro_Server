@@ -10,30 +10,30 @@ import Vapor
 import Fluent
 
 
-final class Terrain: Model, Content {
+final class StagesContainer: Model, Content {
     
     struct Inoutput: Content {
-        let name: String
+        let type: StagesContainerTypes
         let stages: [StageTypes]
         let id: UUID
     }
 
-    static let schema = "terrains"
+    static let schema = "stagesContainer"
     
     @ID(key: .id)
     var id: UUID?
     
-    @Field(key: "name")
-    var name: String
+    @Enum(key: "type")
+    var type: StagesContainerTypes
     
     @Field(key: "stages_names")
     var stages: [String]
     
     init() {}
     
-    init(id: UUID = UUID(), name: String, stages: [String]) {
+    init(id: UUID = UUID(), type: StagesContainerTypes, stages: [String]) {
         self.id = id
-        self.name = name
+        self.type = type
         self.stages = stages
     }
 }

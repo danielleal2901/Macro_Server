@@ -15,24 +15,24 @@ final class Stage: Model, Content {
     
     struct Inoutput: Content {
         let id: UUID
-        let terrain: UUID
+        let container: UUID
         let stageType: StageTypes
     }
     
     @ID(key: .id)
     var id: UUID?
     
-    @Parent(key: "terrain_id")
-    var terrain: Terrain
+    @Parent(key: "container_id")
+    var container: StagesContainer
     
     @Enum (key: "type")
     var type: StageTypes
     
     init() {}
     
-    init(id: UUID = UUID(), type: StageTypes, terrainID: UUID) {
+    init(id: UUID = UUID(), type: StageTypes, containerId: UUID) {
         self.type = type
-        self.$terrain.id = terrainID
+        self.$container.id = containerId
         self.id = id
     }
 }

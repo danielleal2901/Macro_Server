@@ -10,7 +10,7 @@ import Foundation
 
 /// Using for identify current data requests (disabled for a while)
 enum DataTypes: String, Codable{
-    case terrain = "terrain"
+    case container = "container"
     case status = "status"
     case document = "document"
     case overview = "overview"

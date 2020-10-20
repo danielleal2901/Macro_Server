@@ -8,12 +8,12 @@
 import Vapor
 import Foundation
 
-typealias DataManagerLogic = TerrainManagement & StageManagement & OverviewManagement & StatusManagement
+typealias DataManagerLogic = ContainerManagement & StageManagement & OverviewManagement & StatusManagement
 
-protocol TerrainManagement{
-    func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>
-    func updateTerrain(req: Request,newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>
-    func deleteTerrain(req: Request,terrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>
+protocol ContainerManagement{
+    func createContainer(containerInput: StagesContainer.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>
+    func updateContainer(req: Request, newContainer: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>
+    func deleteContainer(req: Request, container: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>
 }
 
 protocol StageManagement{

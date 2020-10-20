@@ -11,12 +11,12 @@ import Fluent
 
 class DataManager: DataManagerLogic{
     // Terrain
-    internal func createTerrain(terrainInput: Terrain.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>{
+    internal func createContainer(containerInput: StagesContainer.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>{
         
-        let terrain = Terrain(id: terrainInput.id, name: terrainInput.name, stages: terrainInput.stages.map({$0.rawValue}))
-        
-        let stages = terrainInput.stages.map{
-            Stage(type: $0.self, terrainID: terrain.id!)
+        let terrain = StagesContainer(id: containerInput.id, type: containerInput.type, stages: containerInput.stages.map({$0.rawValue}))
+
+        let stages = containerInput.stages.map{
+            Stage(type: $0.self, containerId: terrain.id!)
         }
         
         return terrain.create(on: req.db).map { _ in
@@ -34,19 +34,21 @@ class DataManager: DataManagerLogic{
             }
         }.transform(to: .ok)
     }
-    internal func updateTerrain(req: Request, newTerrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
+    
+    internal func updateContainer(req: Request, newContainer: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         
-        return Terrain.find(newTerrain.id, on: req.db)
+        return StagesContainer.find(newContainer.id, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (terrain) in
-                terrain.name = newTerrain.name
-                terrain.stages = newTerrain.stages.map({$0.rawValue})
-                return terrain.update(on: req.db).transform(to: .ok)
+            .flatMap { (oldContainer) in
+                oldContainer.type = newContainer.type
+                oldContainer.stages = newContainer.stages.map({$0.rawValue})
+                return oldContainer.update(on: req.db).transform(to: .ok)
         }
     }
-    internal func deleteTerrain(req: Request, terrain: Terrain.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
+    
+    internal func deleteContainer(req: Request, container: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         
-        return Terrain.find(terrain.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+        return StagesContainer.find(container.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
         }
     }
@@ -54,11 +56,11 @@ class DataManager: DataManagerLogic{
     // Stage
     internal func createStage(req: Request, stage: Stage.Inoutput) throws -> EventLoopFuture<HTTPStatus> {
         
-        let originalStage = Stage(id: stage.id, type: stage.stageType, terrainID: stage.terrain)
+        let originalStage = Stage(id: stage.id, type: stage.stageType, containerId: stage.container)
         
         return Stage.query(on: req.db)
             .group(.and) { group in
-                group.filter(\.$type == originalStage.type).filter("terrain_id", .equal, originalStage.$terrain.id)
+                group.filter(\.$type == originalStage.type).filter("terrain_id", .equal, originalStage.$container.id)
         }.count().flatMapThrowing { count in
             if (count > 0) {
                 throw Abort(.badRequest)
@@ -83,7 +85,7 @@ class DataManager: DataManagerLogic{
         return Stage.find(stage.id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { optionalStage in
-                Terrain.find(optionalStage.$terrain.id, on: req.db)
+                StagesContainer.find(optionalStage.$container.id, on: req.db)
                     .unwrap(or: Abort(.notFound))
                     .flatMap { optionalTerrain in
                         optionalTerrain.stages.removeAll(where: {$0 == stage.stageType.rawValue})
