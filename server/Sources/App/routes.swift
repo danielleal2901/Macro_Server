@@ -25,7 +25,7 @@ func routes(_ app: Application) throws {
             return state
         }
     }
-        
+    
     //@gui - > Change to Post for specified with Team
     app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
         return WSUserState.query(on: req.db).all()
@@ -33,10 +33,7 @@ func routes(_ app: Application) throws {
     
     // @gui -> Going to Change Path, using for testing
     app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(AuthEntity.self)
-        guard create.password == create.confirmPassword else {
-            throw Abort(.badRequest, reason: "Passwords did not match")
-        }
+        let create = try req.content.decode(RegisterEntity.self)
         let user = try User(
             name: create.name,
             email: create.email,
@@ -46,21 +43,30 @@ func routes(_ app: Application) throws {
             .map { user }
     }
     
+    
+    //    // @gui -> Going to Change Path, using for testing
+    //    passwordProtected.post("userlogin") { req -> EventLoopFuture<UserToken> in
+    //        let user = try req.auth.require(AuthE.self)
+    //        let token = try user.generateToken()
+    //
+    //        return token.save(on: req.db)
+    //            .map { token }
+    //    }
     let passwordProtected = app.grouped(User.authenticator())
-    // @gui -> Going to Change Path, using for testing
-    passwordProtected.post("userlogin") { req -> EventLoopFuture<UserToken> in
+    
+    passwordProtected.post("userlogin") { req -> EventLoopFuture<User> in
         let user = try req.auth.require(User.self)
-        let token = try user.generateToken()
         
-        return token.save(on: req.db)
-            .map { token }
+        return User.query(on: req.db).filter("id", .equal, user.id).first().map { (user) in
+            return (user ?? User(name: "", email: "", passwordHash: ""))
+        }
     }
     
-    let tokenProtected = app.grouped(UserToken.authenticator())
-    
-    tokenProtected.get("me") { req -> User in
-        try req.auth.require(User.self)
-    }
+//    let tokenProtected = app.grouped(UserToken.authenticator())
+//
+//    tokenProtected.get("me") { req -> User in
+//        try req.auth.require(User.self)
+//    }
     
     
     try app.register(collection: TerrainController())
@@ -117,11 +123,11 @@ func webSockets(_ app: Application) throws{
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
-                        
+            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
-                    dataController.updateUserId(id: message.respUserID, previousId: id)
+                dataController.updateUserId(id: message.respUserID, previousId: id)
                 
                 switch message.operation{
                 case 0:
