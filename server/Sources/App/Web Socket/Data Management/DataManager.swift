@@ -180,19 +180,4 @@ class DataManager: DataManagerLogic{
         }
     }
     
-    //Teams
-    
-    internal func updateTeam(req: Request, newTeam: TeamResponse) throws -> EventLoopFuture<HTTPStatus> {
-        
-        return Team.find(newTeam.id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap { (team) in
-                team.name = newTeam.name
-                team.description = newTeam.description
-                team.image = newTeam.image
-                return team.update(on: req.db).transform(to: .ok)
-            }
-        
-    }
-    
 }

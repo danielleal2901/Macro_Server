@@ -19,6 +19,9 @@ class TeamController: RouteCollection {
         
         teamMain.group(TeamRoutes.getPathComponent(.id)) { (teams) in
             teams.get(use: getTeamById(req:))
+            teams.on(.PUT, body: .collect(maxSize: "1mb")) { (req) in
+                try self.updateTeamById(req: req)
+            }
         }
         
     }
@@ -42,6 +45,22 @@ class TeamController: RouteCollection {
             .unwrap(or: Abort(.notFound))
             .map { (optionalTeam) in
                 return TeamResponse(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image)
+            }
+    }
+    
+    func updateTeamById(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        guard let teamID = req.parameters.get(TeamParameters.teamId.rawValue, as: UUID.self) else {
+            throw Abort(.notFound)
+        }
+        let newTeam = try req.content.decode(TeamRequest.self)
+        
+        return Team.find(teamID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (team) in
+                team.name = newTeam.name
+                team.description = newTeam.description
+                team.image = newTeam.image
+                return team.update(on: req.db).transform(to: .ok)
             }
     }
     
