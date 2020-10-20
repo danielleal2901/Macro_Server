@@ -16,5 +16,6 @@ enum DataTypes: String, Codable{
     case overview = "overview"
     case stage = "stage"
     case file = "files"
+    case team = "team"
 }
 

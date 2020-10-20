@@ -31,14 +31,14 @@ internal class WSDataWorker{
     ///   - completion: Response of Receive action, including the result of action Status
     internal func appendData(sessionRequest: Request, request: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
-        guard let dataType = request.data.dataType as? DataTypes else {return}
         
-        switch dataType{
+        switch request.data.dataType{
         case .terrain:
             //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
             do{
-                let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput!, req: sessionRequest)
+                let terrainInput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Terrain.Inoutput.self)
+                
+                let akaresponse = try dataManager.createTerrain(terrainInput: terrainInput, req: sessionRequest)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -50,10 +50,10 @@ internal class WSDataWorker{
             }
             
         case .stage:
-            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
-                
             do{
-                let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput!)
+                let stageInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Stage.Inoutput.self)
+                
+                let akaresponse = try dataManager.createStage(req: sessionRequest, stage: stageInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -65,10 +65,10 @@ internal class WSDataWorker{
             }
             
         case .overview:
-            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput!)
+                let overviewInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Overview.Inoutput.self)
+                
+                let akaresponse = try dataManager.createOverview(req: sessionRequest, overviewInput: overviewInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -80,10 +80,10 @@ internal class WSDataWorker{
             }
             
         case .status:
-            let statusInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInput!)
+                let statusInput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Status.Inoutput.self)
+                
+                let akaresponse = try dataManager.createStatus(req: sessionRequest, statusInoutput: statusInput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -95,10 +95,10 @@ internal class WSDataWorker{
             }
             
         case .document :
-            let documentInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Document.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.createDocument(req: sessionRequest, documentInoutput: documentInput!)
+                let documentInput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: Document.Inoutput.self)
+                
+                let akaresponse = try dataManager.createDocument(req: sessionRequest, documentInoutput: documentInput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -144,9 +144,10 @@ internal class WSDataWorker{
         
         switch dataRequest.data.dataType{
         case .terrain:
-            let terrainInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
             do{
-                let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput!)
+                let terrainInput = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Terrain.Inoutput.self)
+                
+                let akaresponse = try dataManager.updateTerrain(req: sessionRequest,newTerrain: terrainInput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -158,10 +159,10 @@ internal class WSDataWorker{
             }
             
         case .stage:
-            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.updateStage(req: sessionRequest, newStage: stageInoutput!)
+                let stageInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Stage.Inoutput.self)
+                
+                let akaresponse = try dataManager.updateStage(req: sessionRequest, newStage: stageInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -174,9 +175,11 @@ internal class WSDataWorker{
             
             
         case .overview:
-            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Inoutput.self)
+            
             do{
-                let akaresponse = try dataManager.updateOverview(req: sessionRequest, newOverview: overviewInoutput!)
+                let overviewInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Overview.Inoutput.self)
+                
+                let akaresponse = try dataManager.updateOverview(req: sessionRequest, newOverview: overviewInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -188,10 +191,10 @@ internal class WSDataWorker{
             }
             
         case .status:
-            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
-
             do{
-                let akaresponse = try dataManager.updateStatus(req: sessionRequest, newStatus: statusInoutput!)
+                let statusInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Status.Inoutput.self)
+                
+                let akaresponse = try dataManager.updateStatus(req: sessionRequest, newStatus: statusInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -203,9 +206,10 @@ internal class WSDataWorker{
             }
         
         case .document:
-            let documentInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Document.Inoutput.self)
             do{
-                let akaresponse = try dataManager.updateDocument(req: sessionRequest, newDocument: documentInoutput!)
+                let documentInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Document.Inoutput.self)
+                
+                let akaresponse = try dataManager.updateDocument(req: sessionRequest, newDocument: documentInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -215,12 +219,28 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
-            
+        case .team:
+            do {
+                let teamResponse = try
+                    CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: TeamResponse.self)
+                
+                let akaresponse = try dataManager.updateTeam(req: sessionRequest, newTeam: teamResponse)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch(let error) {
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
         default:
             print("Not working")
             response.actionStatus = .Error
             completion(response)
         }
+        
+            
         
     }
     
@@ -229,10 +249,12 @@ internal class WSDataWorker{
         
         switch dataType{
         case .terrain:
-            let terrainInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
+            
             
             do{
-                let akaresponse = try dataManager.deleteTerrain(req: sessionRequest, terrain: terrainInoutput!)
+                let terrainInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Terrain.Inoutput.self)
+                
+                let akaresponse = try dataManager.deleteTerrain(req: sessionRequest, terrain: terrainInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -245,10 +267,12 @@ internal class WSDataWorker{
             }
             
         case .stage:
-            let stageInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Stage.Inoutput.self)
+            
             
             do{
-                let akaresponse = try dataManager.deleteStage(req: sessionRequest, stage: stageInoutput!)
+                let stageInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Stage.Inoutput.self)
+                
+                let akaresponse = try dataManager.deleteStage(req: sessionRequest, stage: stageInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -260,10 +284,10 @@ internal class WSDataWorker{
                 
             }
         case .overview:
-            let overviewInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Overview.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.deleteOverview(req: sessionRequest, overview: overviewInoutput!)
+                let overviewInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Overview.Inoutput.self)
+                
+                let akaresponse = try dataManager.deleteOverview(req: sessionRequest, overview: overviewInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -275,10 +299,10 @@ internal class WSDataWorker{
                 
             }
         case .status:
-            let statusInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Status.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.deleteStatus(req: sessionRequest, status: statusInoutput!)
+                let statusInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Status.Inoutput.self)
+                
+                let akaresponse = try dataManager.deleteStatus(req: sessionRequest, status: statusInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -290,10 +314,10 @@ internal class WSDataWorker{
                 
             }
         case .document:
-            let documentInoutput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Document.Inoutput.self)
-            
             do{
-                let akaresponse = try dataManager.deleteDocument(req: sessionRequest, document: documentInoutput!)
+                let documentInoutput = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: Document.Inoutput.self)
+                
+                let akaresponse = try dataManager.deleteDocument(req: sessionRequest, document: documentInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -306,10 +330,10 @@ internal class WSDataWorker{
             }
             
         case .file:
-            let fileId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
-            
             do{
-                let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileId: fileId!)
+                let fileId = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
+                
+                let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileId: fileId)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
@@ -320,6 +344,9 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
+            case .team:
+                //TODO: Implementar o deletar do time
+                break
 
         }
         
