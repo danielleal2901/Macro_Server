@@ -116,11 +116,11 @@ class DataManager: DataManagerLogic{
     }
     
     internal func deleteOverview(req: Request, overview: Overview.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
-
+        
         return  Overview.find(overview.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
         }
-
+        
     }
     
     
@@ -150,7 +150,7 @@ class DataManager: DataManagerLogic{
     
     // Documents
     internal func createDocument(req: Request, documentInoutput: Document.Inoutput) throws -> EventLoopFuture<HTTPStatus> {
-
+        
         let doc = Document(id: documentInoutput.id, stageId: documentInoutput.stageId, sections: documentInoutput.sections)
         return doc.create(on: req.db).map({ doc }).transform(to: .ok)
         
@@ -174,12 +174,16 @@ class DataManager: DataManagerLogic{
     }
     
     //Files
-    internal func deleteFile(req: Request, fileId: UUID) throws -> EventLoopFuture<HTTPStatus>{
-        return Files.find(fileId, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
-            $0.delete(on: req.db).transform(to: .ok)
+    internal func deleteFile(req: Request, fileItemId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+        return Files.query(on: req.db)
+            .filter("item_id", .equal, fileItemId)
+            .first().unwrap(or: Abort(.notFound))
+            .flatMap {
+                $0.delete(on: req.db).transform(to: .ok)
         }
     }
     
+    //Users
     internal func updateUser(req: Request, newUser: User) throws -> EventLoopFuture<HTTPStatus>{
         
         return User.find(newUser.id, on: req.db)
@@ -197,5 +201,5 @@ class DataManager: DataManagerLogic{
             $0.delete(on: req.db).transform(to: .ok)
         }
     }
-    
+
 }

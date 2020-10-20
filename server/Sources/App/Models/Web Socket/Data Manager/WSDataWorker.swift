@@ -306,10 +306,14 @@ internal class WSDataWorker{
             }
             
         case .file:
-            let fileId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
+            guard let fileItemId = try? CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self) else {
+                response.actionStatus = .Error
+                completion(response)
+                return
+            }
             
             do{
-                let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileId: fileId!)
+                let akaresponse = try dataManager.deleteFile(req: sessionRequest, fileItemId: fileItemId)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)
