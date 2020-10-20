@@ -14,7 +14,8 @@ struct AuthEntity: Codable {
     var password: String
     var confirmPassword: String
     
-    init(name: String,email: String,password: String,confirmPassword: String) {
+    init(id: UUID, name: String,email: String,password: String,confirmPassword: String) {
+        self.id = id.uuidString
         self.name = name
         self.email = email
         self.password = password
@@ -23,6 +24,7 @@ struct AuthEntity: Codable {
     
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(UUID.self, forKey: .id).uuidString
         name = try values.decode(String.self,forKey: .name)
         email = try values.decode(String.self,forKey: .email)
         password = try values.decode(String.self,forKey: .password)

@@ -14,7 +14,7 @@ class UserController: RouteCollection {
 
         //users
         let users = routes.grouped(UserRoutes.getPathComponent(.main))
-
+        users.post(use: createUser)
         users.get(use: fetchAllUsers)
 
         //users/:userId
@@ -25,6 +25,12 @@ class UserController: RouteCollection {
         }
     }
 
+    func createUser(req: Request) throws -> EventLoopFuture<User> {
+        let user = try req.content.decode(AuthEntity.self)
+        let entity = try User(id: UUID(uuidString: user.id!), name: user.name, email: user.email, passwordHash: Bcrypt.hash(user.password))
+        return entity.save(on: req.db).map {entity}
+    }
+    
     func fetchAllUsers(req: Request) throws -> EventLoopFuture<[User]>  {
         return User.query(on: req.db).all()
     }

@@ -31,21 +31,6 @@ func routes(_ app: Application) throws {
         return WSUserState.query(on: req.db).all()
     }
     
-    // @gui -> Going to Change Path, using for testing
-    app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(AuthEntity.self)
-        guard create.password == create.confirmPassword else {
-            throw Abort(.badRequest, reason: "Passwords did not match")
-        }
-        let user = try User(
-            name: create.name,
-            email: create.email,
-            passwordHash: Bcrypt.hash(create.password)
-        )
-        return user.save(on: req.db)
-            .map { user }
-    }
-    
     let passwordProtected = app.grouped(User.authenticator())
     // @gui -> Going to Change Path, using for testing
     passwordProtected.post("userlogin") { req -> EventLoopFuture<UserToken> in
