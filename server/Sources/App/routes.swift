@@ -69,6 +69,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: StatusController())
     try app.register(collection: DocumentController())
     try app.register(collection: FilesController())
+    try app.register(collection: UserController())
     
     
 }

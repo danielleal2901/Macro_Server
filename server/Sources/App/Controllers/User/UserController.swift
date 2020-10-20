@@ -20,6 +20,8 @@ class UserController: RouteCollection {
         //users/:userId
         users.group(UserRoutes.getPathComponent(.id)) { (user) in
             user.get(use: fetchUserById)
+            user.delete(use: deleteUserById)
+            user.put(use: updateUserById)
         }
     }
 
@@ -31,5 +33,24 @@ class UserController: RouteCollection {
         return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
     }
+    
+    func deleteUserById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
+
+        return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+            $0.delete(on: req.db).transform(to: .ok)
+        }
+    }
+    
+    func updateUserById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
+
+        let newUser = try req.content.decode(AuthEntity.self)
+        return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
+               .unwrap(or: Abort(.notFound))
+               .flatMap { (user) in
+                   user.name = newUser.name
+                   user.email = newUser.email
+                   return user.update(on: req.db).transform(to: .ok)
+           }
+       }
 
 }
