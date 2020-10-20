@@ -43,15 +43,6 @@ func routes(_ app: Application) throws {
             .map { user }
     }
     
-    
-    //    // @gui -> Going to Change Path, using for testing
-    //    passwordProtected.post("userlogin") { req -> EventLoopFuture<UserToken> in
-    //        let user = try req.auth.require(AuthE.self)
-    //        let token = try user.generateToken()
-    //
-    //        return token.save(on: req.db)
-    //            .map { token }
-    //    }
     let passwordProtected = app.grouped(User.authenticator())
     
     passwordProtected.post("userlogin") { req -> EventLoopFuture<User> in
