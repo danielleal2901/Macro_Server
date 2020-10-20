@@ -26,13 +26,6 @@ func routes(_ app: Application) throws {
         return WSUserState.query(on: req.db).all()
     }
     
-    // @gui -> Going to Change Path, using for testing
-    app.post("userregister") { (req) -> EventLoopFuture<User> in
-        let create = try req.content.decode(User.self)
-        return create.save(on: req.db)
-            .map { create }
-    }
-    
     let passwordProtected = app.grouped(User.authenticator())
     
     passwordProtected.post("userlogin") { req -> EventLoopFuture<User> in
@@ -56,6 +49,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: StatusController())
     try app.register(collection: DocumentController())
     try app.register(collection: FilesController())
+    try app.register(collection: UserController())
     try app.register(collection: TeamController())
     
 }
