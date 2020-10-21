@@ -193,7 +193,7 @@ class DataManager: DataManagerLogic{
             .flatMap { (user) in
                 user.name = newUser.name
                 user.email = newUser.email
-                user.passwordHash = newUser.passwordHash
+                user.password = newUser.password
                 return user.update(on: req.db).transform(to: .ok)
         }
     }
