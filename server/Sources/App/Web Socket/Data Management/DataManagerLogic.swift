@@ -11,6 +11,7 @@ import Foundation
 typealias DataManagerLogic = ContainerManagement & StageManagement & OverviewManagement & StatusManagement
 
 protocol ContainerManagement{
+
     func createContainer(containerInput: StagesContainer.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>
     func updateContainer(req: Request, newContainer: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>
     func deleteContainer(req: Request, container: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>

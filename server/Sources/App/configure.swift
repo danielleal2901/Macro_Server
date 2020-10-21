@@ -18,12 +18,13 @@ public func configure(_ app: Application) throws {
     
     app.http.server.configuration.hostname = "127.0.0.1"    
     app.http.server.configuration.port = 8080
-    
-    app.migrations.add(CreateTerrain())
-    
+        
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
     
+    
+    app.migrations.add(CreateFarm())
+    app.migrations.add(CreateStagesContainer())
     app.migrations.add(CreateStage())
     app.migrations.add(CreateDocument())
     app.migrations.add(CreateOverview())
@@ -32,7 +33,11 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateUser())
     app.migrations.add(CreateUserToken())
     app.migrations.add(CreateUserState())
-//    app.migrations.add(CreateEnum())
+    
+//
+    //Enums: should be called first
+//    app.migrations.add(CreateStageTypesEnum())
+//    app.migrations.add(CreateStagesContainersTypesEnum())
 
     // register routes
     try routes(app)

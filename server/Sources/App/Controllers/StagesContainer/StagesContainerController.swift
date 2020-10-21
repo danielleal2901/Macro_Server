@@ -1,8 +1,8 @@
 //
-//  TerrainController.swift
+//  StagesContainerController.swift
 //  
 //
-//  Created by Antonio Carlos on 11/09/20.
+//  Created by Daniel Leal on 20/10/20.
 //
 
 import Fluent
@@ -15,26 +15,31 @@ struct StagesContainerController: RouteCollection {
         
         //containers
         let containers = routes.grouped(StagesContainerRoutes.getPathComponent(.main))
-        
-        containers.get(use: fetchAllContainers(req:))
+            
+        //containers/:containerType
+        containers.group(StagesContainerRoutes.getPathComponent(.withType)) { (container) in
+            container.group(StagesContainerRoutes.getPathComponent(.containerType)) { (container) in
+                container.get(use: fetchAllWithTypeContainers(req:))
+            }
+        }
         
         //containers/:containerId
-        containers.group(StagesContainerRoutes.getPathComponent(.id)) { (terrain) in
-            terrain.get(use: fetchContainerById(req: ))
+        containers.group(StagesContainerRoutes.getPathComponent(.id)) { (container) in
+            container.get(use: fetchContainerById(req: ))
         }
     }
     
-    func fetchAllContainers(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
+    func fetchAllWithTypeContainers(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
         
         let containerType = try self.verifyContainerTypes(req: req)
         
         return StagesContainer.query(on: req.db)
             .filter(\.$type == containerType)
-            .all().map { containers in
+            .all().flatMapThrowing { containers in
                 let outputs = containers.map { container in
                     StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                         return StageTypes(rawValue: stageString)
-                    }), id: container.id!)
+                    }), id: container.id!, farmId: container.$farm.id)
                 }
                 return outputs
         }
@@ -42,30 +47,22 @@ struct StagesContainerController: RouteCollection {
     
     func fetchContainerById(req: Request) throws -> EventLoopFuture<StagesContainer.Inoutput> {
         
-        let containerType = try self.verifyContainerTypes(req: req)
-
         return StagesContainer.find(req.parameters.get(StagesContainerRoutes.id.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing {
-                
-                //Valida se o a etapa informada na url eh a mesma que ira ser retornada no output.
-                if containerType != $0.type {
-                    throw Abort(.badRequest)
-                }
-                
                 return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
                     return StageTypes(rawValue: stageString)
-                }) , id: $0.id!)
+                }) , id: $0.id!, farmId: $0.$farm.id)
         }
     }
     
-    /// Method used to validate and get a stage type from data request
-    /// - Parameter req: data request
+    /// Method used to validate and get a container type from request
+    /// - Parameter req: request
     /// - Throws: possible error in validation
-    /// - Returns: returns a stage type getted from url
+    /// - Returns: returns a container type getted from url
     func verifyContainerTypes(req: Request) throws -> StagesContainerTypes{
         
         //Verifica se consegue pegar o parametro da url
-        guard let reqParameter = req.parameters.get(StagesContainerRoutes.containerType.rawValue, as: String.self) else {
+        guard let reqParameter = req.parameters.get(StagesContainerParameters.containerType.rawValue, as: String.self) else {
             throw Abort(.badRequest)
         }
         

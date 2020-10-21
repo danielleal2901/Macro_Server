@@ -10,7 +10,7 @@ import Foundation
 import Fluent
 import FluentPostgresDriver
 
-struct CreateEnum: Migration {
+struct CreateStageTypesEnum: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         return database.enum("stages_types")
         .case("georeferencing")

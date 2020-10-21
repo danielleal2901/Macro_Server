@@ -68,7 +68,7 @@ class FilesController: RouteCollection {
         }
         
         return Files.find(fileId, on: req.db)
-            .unwrap(or: Abort(.notFound)).map { optionalFile in
+            .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalFile in
                 return Files.Inoutput(id: optionalFile.id!, data: optionalFile.data, itemId: optionalFile.itemId, documentId: optionalFile.$document.id)
         }
     }
@@ -99,7 +99,7 @@ class FilesController: RouteCollection {
         }
         .first()
         .unwrap(or: Abort(.notFound))
-        .map { file in
+        .flatMapThrowing { file in
             Files.Inoutput(id: file.id!, data: file.data, itemId: file.itemId, documentId: file.$document.id)
         }
         

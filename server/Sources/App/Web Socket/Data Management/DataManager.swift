@@ -10,16 +10,16 @@ import Foundation
 import Fluent
 
 class DataManager: DataManagerLogic{
-    // Terrain
+    // Containers
     internal func createContainer(containerInput: StagesContainer.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>{
         
-        let terrain = StagesContainer(id: containerInput.id, type: containerInput.type, stages: containerInput.stages.map({$0.rawValue}))
+        let newContainer = StagesContainer(id: containerInput.id, type: containerInput.type, stages: containerInput.stages.map({$0.rawValue}), farmId: containerInput.farmId)
 
         let stages = containerInput.stages.map{
-            Stage(type: $0.self, containerId: terrain.id!)
+            Stage(type: $0.self, containerId: newContainer.id!)
         }
         
-        return terrain.create(on: req.db).map { _ in
+        return newContainer.create(on: req.db).map { _ in
             stages.map { stage in
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
@@ -60,7 +60,7 @@ class DataManager: DataManagerLogic{
         
         return Stage.query(on: req.db)
             .group(.and) { group in
-                group.filter(\.$type == originalStage.type).filter("terrain_id", .equal, originalStage.$container.id)
+                group.filter(\.$type == originalStage.type).filter("container_id", .equal, originalStage.$container.id)
         }.count().flatMapThrowing { count in
             if (count > 0) {
                 throw Abort(.badRequest)
@@ -87,9 +87,9 @@ class DataManager: DataManagerLogic{
             .flatMap { optionalStage in
                 StagesContainer.find(optionalStage.$container.id, on: req.db)
                     .unwrap(or: Abort(.notFound))
-                    .flatMap { optionalTerrain in
-                        optionalTerrain.stages.removeAll(where: {$0 == stage.stageType.rawValue})
-                        return optionalTerrain.update(on: req.db)
+                    .flatMap { optionalContainer in
+                        optionalContainer.stages.removeAll(where: {$0 == stage.stageType.rawValue})
+                        return optionalContainer.update(on: req.db)
                             .flatMap { _  in
                                 optionalStage.delete(on: req.db).transform(to: HTTPStatus.ok)
                         }

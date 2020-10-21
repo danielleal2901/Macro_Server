@@ -10,6 +10,7 @@ import Vapor
 enum StagesContainerRoutes: String {
     case main = "containers"
     case id = ":containerId"
+    case withType = "type"
     case containerType = ":containerType"
     
     static func getPathComponent(_ route: StagesContainerRoutes) -> PathComponent {

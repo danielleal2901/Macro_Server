@@ -54,8 +54,8 @@ class DocumentController: RouteCollection {
     
     func fetchDocById(req: Request) throws -> EventLoopFuture<Document.Inoutput> {
         return Document.find(req.parameters.get(DocumentParameters.documentId.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound)).map { optionalDoc in
-                return Document.Inoutput(id: optionalDoc.id!, stageId: optionalDoc.stage.id!, sections: optionalDoc.sections)
+            .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalDoc in
+                return Document.Inoutput(id: optionalDoc.id!, stageId: optionalDoc.$stage.id, sections: optionalDoc.sections)
         }
     }
     

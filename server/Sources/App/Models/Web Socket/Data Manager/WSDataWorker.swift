@@ -35,7 +35,7 @@ internal class WSDataWorker{
         
         switch dataType{
         case .container:
-            //TerrainController().insertTerrainSQL(terrain: dataDecoded!, req: sessionRequest)
+
             let containerInput = try? CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: StagesContainer.Inoutput.self)
             do{
                 let akaresponse = try dataManager.createContainer(containerInput: containerInput!, req: sessionRequest)

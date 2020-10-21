@@ -9,12 +9,12 @@ import Foundation
 import Vapor
 
 enum StagesContainerTypes: String, Content {
-    case terrain = "Terreno"
-    case stage = "Etapa"
-    case territorialDiagnosis = "Diagnostico Territorial"
-    case socialMobilization = "Mobilizacao Social"
-    case descriptiveMemorial = "Memorial Descritivo"
-    case environmentalStudy = "Estudo Ambiental"
+    case terrain = "terrain"
+    case stage = "stage"
+    case territorialDiagnosis = "territorial_Diagnosis"
+    case socialMobilization = "social_Mobilization"
+    case descriptiveMemorial = "descriptive_Memorial"
+    case environmentalStudy = "environmental_Study"
 }
 
 

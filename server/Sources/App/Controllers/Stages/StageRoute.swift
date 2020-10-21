@@ -12,14 +12,14 @@ enum StageRoute : String {
     case main = "stages"
     case stageName = ":stageName"
     case stageId = ":stageId"
-    case withTerrain = "terrain"
-    case terrainId = ":terrainId"
+    case withContainer = "container"
+    case containerId = ":containerId"
 }
 
 enum StageParameters: String {
     case stageName = "stageName"
     case stageId = "stageId"
-    case terrainId = "terrainId"
+    case containerId = "containerId"
 }
 
     

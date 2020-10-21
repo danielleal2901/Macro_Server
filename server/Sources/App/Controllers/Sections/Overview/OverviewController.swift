@@ -42,8 +42,8 @@ class OverviewController: RouteCollection {
     
     func fetchOverviewById(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
         return Overview.find(req.parameters.get(OverviewRoutes.id.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound)).map { optionalOverview in
-                return Overview.Inoutput(id: optionalOverview.id!, stageId: optionalOverview.stage.id!, sections: optionalOverview.sections)
+            .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalOverview in
+                return Overview.Inoutput(id: optionalOverview.id!, stageId: optionalOverview.$stage.id, sections: optionalOverview.sections)
         }
     }
     

@@ -35,16 +35,16 @@ class StatusController: RouteCollection {
 
     func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status.Inoutput]> {
         return Status.query(on: req.db).all().map { allStatus in
-            return allStatus.map { status in
-                return Status.Inoutput(id: status.id!, stageId: status.stage.id!, sections: status.sections)
+            allStatus.map { status in
+                return Status.Inoutput(id: status.id!, stageId: status.$stage.id, sections: status.sections)
             }
         }
     }
     
     func fetchStatusById(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
         return Status.find(req.parameters.get(StatusRoutes.id.rawValue), on: req.db)
-            .unwrap(or: Abort(.notFound)).map { optionalStatus in
-                return Status.Inoutput(id: optionalStatus.id!, stageId: optionalStatus.stage.id!, sections: optionalStatus.sections)
+            .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalStatus in
+                return Status.Inoutput(id: optionalStatus.id!, stageId: optionalStatus.$stage.id, sections: optionalStatus.sections)
         }
     }
     
