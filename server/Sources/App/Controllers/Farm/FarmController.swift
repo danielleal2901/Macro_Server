@@ -16,10 +16,10 @@ class FarmController: RouteCollection {
         farmMain.post(use: insertFarm)
         farmMain.get(use: fetchAllFarms)
         
-        farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in
-            farmMain.get(use: fetchFarmById)
-            farmMain.put(use: updateFarmById)
-            farmMain.delete(use: deleteFarmById)
+        farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
+            farm.get(use: fetchFarmById)
+            farm.put(use: updateFarmById)
+            farm.delete(use: deleteFarmById)
         }
     }
     
@@ -32,7 +32,9 @@ class FarmController: RouteCollection {
     func updateFarmById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
         let newFarm = try req.content.decode(Farm.self)
         
-        return Farm.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
+        guard let id = req.parameters.get(FarmParameters.idFarm.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+        
+        return Farm.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (farm) in
                 farm.name = newFarm.name
@@ -60,9 +62,12 @@ class FarmController: RouteCollection {
     }
     
     func deleteFarmById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        return Farm.find(req.parameters.get(FarmParameters.idFarm.rawValue), on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+        guard let id = req.parameters.get(FarmParameters.idFarm.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+            
+        return Farm.find(id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
         }
+            
     }
     
     

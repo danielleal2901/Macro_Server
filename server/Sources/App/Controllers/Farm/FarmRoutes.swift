@@ -10,7 +10,7 @@ import Vapor
 
 enum FarmRoutes: String{
     case main = "farms"
-    case id = ":farmID"
+    case id = ":farmId"
     
     static func getPathComponent(_ route: FarmRoutes) -> PathComponent{
         return PathComponent(stringLiteral: route.rawValue)
