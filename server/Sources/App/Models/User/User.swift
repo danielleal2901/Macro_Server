@@ -47,6 +47,10 @@ final class User: Model, Content {
         self.password = try Bcrypt.hash(values.decode(String.self, forKey: .password))
         self.isAdmin = try values.decode(Bool.self, forKey: .isAdmin)
         self.$team.id = try values.decode(UUID.self, forKey: .teamId)
+        self.employeeToken = try values.decode(String.self, forKey: .employeeToken)
+        if self.isAdmin {
+            self.guestToken = try values.decode(String.self, forKey: .guestToken)
+        }
     }
 }
 
@@ -60,6 +64,8 @@ extension User{
         case password
         case isAdmin
         case teamId = "teamId"
+        case employeeToken
+        case guestToken
     }
     
     func generateToken() throws -> UserToken {

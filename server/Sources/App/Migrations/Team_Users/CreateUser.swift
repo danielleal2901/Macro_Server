@@ -18,6 +18,8 @@ struct CreateUser: Migration {
             .field("is_admin", .bool, .required)
             .field("team_id", .uuid, .required)
             .foreignKey("team_id", references: "teams", "id", onDelete: .cascade, onUpdate: .restrict)
+            .field("employee_token", .string, .required)
+            .field("guest_token", .string)
             .create()
     }
 
