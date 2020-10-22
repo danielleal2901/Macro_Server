@@ -13,11 +13,12 @@ struct CreateFarm: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         
         return database.schema("farms")
-                .id()
-                .field("teamId", .uuid, .required)
-                .field("name", .string, .required)
-                .unique(on: "name")
-                .create()
+            .id()
+            .field("name", .string, .required)
+            .field("teamId", .uuid, .required)
+            .field("desc",.string)
+            .unique(on: "name")
+            .create()
     }
     
     

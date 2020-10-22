@@ -37,7 +37,7 @@ internal class WSDataWorker{
 
             do{
                 let containerInput = try CoderHelper.shared.decodeDataSingle(valueToDecode: request.data.content, intendedType: StagesContainer.Inoutput.self)
-                let akaresponse = try dataManager.createContainer(containerInput: containerInput, req: sessionRequest)
+                let akaresponse = try dataManager.createContainer(containerInput: containerInput, req: sessionRequest)                
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
                     completion(response)

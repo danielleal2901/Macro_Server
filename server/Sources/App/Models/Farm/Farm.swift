@@ -15,15 +15,16 @@ final class Farm: Model, Content {
     
     struct Inoutput: Content {
         let id: UUID
-        let teamId: UUID
         let name: String
+        let teamId: UUID
+        let icon: Data
         let desc: String
     }
 
     @ID(key: .id)
     var id: UUID?
     
-    @Field(key: "team_Id")
+    @Field(key: "teamId")
     var teamId: UUID
     
     @Field(key: "name")
