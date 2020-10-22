@@ -11,4 +11,6 @@ struct TeamRequest: Content {
     var name: String
     var description: String
     var image: Data
+    var employeeToken: String
+    var guestToken: String
 }

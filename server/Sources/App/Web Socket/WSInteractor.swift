@@ -77,7 +77,7 @@ internal class WSInteractor{
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
             user.name = "User"
             user.photo = "Photo"
-            let data = try! JSONEncoder().encode(user)
+            //let data = try! JSONEncoder().encode(user)
 //            self.broadcastData(data: data, idUser: user.respUserID)
         })
     }

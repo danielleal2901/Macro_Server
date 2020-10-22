@@ -29,7 +29,7 @@ class TeamController: RouteCollection {
     func insertTeam(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let teamReq = try req.content.decode(TeamRequest.self)
         
-        let team = Team(id: nil, name: teamReq.name, description: teamReq.description, image: teamReq.image)
+        let team = Team(id: nil, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken)
            
         return team.create(on: req.db)
             .map({ team })
@@ -44,7 +44,7 @@ class TeamController: RouteCollection {
         return Team.find(teamID, on: req.db)
             .unwrap(or: Abort(.notFound))
             .map { (optionalTeam) in
-                return TeamResponse(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image)
+                return TeamResponse(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken)
             }
     }
     
