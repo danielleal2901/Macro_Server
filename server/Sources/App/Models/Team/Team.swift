@@ -24,12 +24,20 @@ final class Team: Model {
     @Field(key: "image")
     var image: Data
     
+    @Field(key: "employee_token")
+    var employeeToken: String
+    
+    @Field(key: "guest_token")
+    var guestToken: String
+    
     init() {}
     
-    init(id: UUID? = nil, name: String, description: String, image: Data) {
+    init(id: UUID? = nil, name: String, description: String, image: Data, employeeToken: String, guestToken: String) {
         self.id = id
         self.name = name
         self.description = description
         self.image = image
+        self.employeeToken = employeeToken
+        self.guestToken = guestToken
     }
 }
