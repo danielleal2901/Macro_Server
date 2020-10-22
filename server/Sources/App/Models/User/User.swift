@@ -46,10 +46,8 @@ final class User: Model, Content {
         self.email = try values.decode(String.self, forKey: .email)
         self.password = try Bcrypt.hash(values.decode(String.self, forKey: .password))
         self.isAdmin = try values.decode(Bool.self, forKey: .isAdmin)
-        self.$team.id = try values.decode(UUID.self, forKey: .teamId)
-        self.employeeToken = try values.decode(String.self, forKey: .employeeToken)
         if self.isAdmin {
-            self.guestToken = try values.decode(String.self, forKey: .guestToken)
+            self.$team.id = try values.decode(UUID.self, forKey: .teamId)
         }
     }
 }
