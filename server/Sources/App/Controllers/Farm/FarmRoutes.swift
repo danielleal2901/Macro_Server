@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Guilherme Martins Dalosto de Oliveira on 22/10/20.
 //
@@ -21,3 +21,4 @@ enum FarmRoutes: String{
 enum FarmParameters: String{
     case idFarm = "farmId"
 }
+
