@@ -111,7 +111,7 @@ internal class WSInteractor{
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser && $0.userState.destTeamID == idTeam {
+            if $0.userState.respUserID != idUser  {
                 $0.webSocket.send(encoded)
             }
         })
