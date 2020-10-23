@@ -18,23 +18,22 @@ class DataManager: DataManagerLogic{
         let stages = containerInput.stages.map{
             Stage(type: $0.self, containerId: newContainer.id!)
         }
-
-        return newContainer.create(on: req.db).map { _ in
-            stages.map { stage in
-                stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informacoes Responsavel", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
-                        .map { _ in
-                            return Status(stageId: stage.id!, sections: [StatusSection(name: "Tarefas Principais", items: [StatusItem(key: "Cooletar dados do shapefile", done: true)])]).create(on: req.db)
-                                .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
-                                    
-                            }
-                    }
-                }
-            }
-        }.transform(to: .ok)
+        
+        switch newContainer.type {
+        case .terrain:
+            return PreSets.setupTerrainPreSet(newContainer: newContainer, req: req, stages: stages)
+        case .descriptiveMemorial:
+            return PreSets.setupDescriptiveMemPreSet(newContainer: newContainer, req: req, stages: stages)
+        case .territorialDiagnosis:
+            return PreSets.setupDiagnosisPreSet(newContainer: newContainer, req: req, stages: stages)
+        case .socialMobilization:
+            return PreSets.setupSocialMobPreSet(newContainer: newContainer, req: req, stages: stages)
+        case .environmentalStudy:
+            return PreSets.setupEnvironmentalPreSet(newContainer: newContainer, req: req, stages: stages)
+        }
+        
     }
-    
+
     internal func updateContainer(req: Request, newContainer: StagesContainer.Inoutput) throws -> EventLoopFuture<HTTPStatus>{
         
         return StagesContainer.find(newContainer.id, on: req.db)

@@ -25,8 +25,20 @@ class FarmController: RouteCollection {
     
     
     func insertFarm(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        
         let farm = try req.content.decode(Farm.self)
-        return farm.create(on: req.db).map({ farm }).transform(to: .ok)
+        
+        return farm.create(on: req.db).flatMapThrowing {
+            try self.setupTerritorialDiagnosisContainer(req: req, farmId: farm.id!).flatMapThrowing({ http in
+                try self.setupSocialMobContainer(req: req, farmId: farm.id!).flatMapThrowing({ (http) in
+                    try self.setupEnvironmentalContainer(req: req, farmId: farm.id!).flatMapThrowing({ (http) in
+                        try self.setupDescMemorialContainer(req: req, farmId: farm.id!).transform(to: ())
+                    })
+                })
+            })
+            
+        }.transform(to: .ok)
+
     }
     
     func updateFarmById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
@@ -68,6 +80,48 @@ class FarmController: RouteCollection {
         }
             
     }
+    
+    private func setupTerritorialDiagnosisContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+        
+        let dataManager = DataManager()
+        
+        let territorialStages : [StageTypes] = [.diagnosticData, .documentaryResearch, .landResearch, .territorialStudy, .finalReport, .workPlan]
+        let territorialDiagContainer = StagesContainer.Inoutput(type: .territorialDiagnosis, stages: territorialStages, id: UUID(), farmId: farmId, name: "Diagnóstico Territorial")
+        
+        return try dataManager.createContainer(containerInput: territorialDiagContainer, req: req)
+    }
+    
+    private func setupSocialMobContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+        
+        let dataManager = DataManager()
+        
+        let socialStages : [StageTypes] = [.socialMobilizationData]
+        
+        let socialMobContainer = StagesContainer.Inoutput(type: .socialMobilization, stages: socialStages, id: UUID(), farmId: farmId, name: "Mobilização Social")
+        
+        return try dataManager.createContainer(containerInput: socialMobContainer, req: req)
+    }
+    
+    private func setupEnvironmentalContainer (req: Request, farmId: UUID) throws ->  EventLoopFuture<HTTPStatus>{
 
+        let dataManager = DataManager()
+
+        let environmentStages : [StageTypes] = [.environmentalStudyData]
+
+        let environmentContainer = StagesContainer.Inoutput(type: .environmentalStudy, stages: environmentStages, id: UUID(), farmId: farmId, name: "Estudo Ambiental")
+
+        return try dataManager.createContainer(containerInput: environmentContainer, req: req)
+    }
+    
+    private func setupDescMemorialContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
+
+        let dataManager = DataManager()
+
+        let descMemorialStages : [StageTypes] = [.descriptiveMemorialData, .georeferencing, .territorialSurvey, .propertyRegistration, .socioeconomicRegistration, .propertyEvaluation]
+
+        let descMemorialContainer = StagesContainer.Inoutput(type: .descriptiveMemorial, stages: descMemorialStages, id: UUID(), farmId: farmId, name: "Memorial Descritivo")
+
+        return try dataManager.createContainer(containerInput: descMemorialContainer, req: req)
+    }
 }
 

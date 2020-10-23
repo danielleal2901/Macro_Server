@@ -12,6 +12,7 @@ enum StagesContainerRoutes: String {
     case id = ":containerId"
     case withType = "type"
     case containerType = ":containerType"
+    case withTerrainType = "terrain"
     case withParent = "farm"
     case parentId = ":farmId"
     
