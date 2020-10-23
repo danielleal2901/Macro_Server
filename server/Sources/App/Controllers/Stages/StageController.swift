@@ -34,7 +34,7 @@ class StageController: RouteCollection {
                 
                 //stages/:stageName/container/:containerId
                 stage.group(PathComponent(stringLiteral: StageRoute.containerId.rawValue)) { (stage) in
-                    stage.get(use: fetchStageByTerrainID)
+                    stage.get(use: fetchStageByContainerId)
                 }
             }
             
@@ -64,7 +64,7 @@ class StageController: RouteCollection {
         }
     }
     
-    func fetchStageByTerrainID(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
+    func fetchStageByContainerId(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -74,7 +74,7 @@ class StageController: RouteCollection {
         
         return Stage.query(on: req.db)
             .group(.and) { group in
-                group.filter(\.$type == stageType).filter("terrain_id", .equal, terrainId)
+                group.filter(\.$type == stageType).filter("container_id", .equal, terrainId)
             }.first().unwrap(or: Abort(.notFound))
             .flatMapThrowing {
                 return Stage.Inoutput(id: $0.id!, container: $0.$container.id, stageType: StageTypes(rawValue: $0.type.rawValue)!)
