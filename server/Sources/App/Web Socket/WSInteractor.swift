@@ -80,8 +80,16 @@ internal class WSInteractor{
     }
     
     @discardableResult
-    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<Void>{
-        return state.save(on: req.db)
+    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
+        return User.find(state.respUserID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (optionalUserState) -> EventLoopFuture<WSUserState> in
+                state.name = optionalUserState.name
+                state.photo = optionalUserState.name
+                print(state)
+                return state.save(on: req.db).transform(to: state)
+                //        }
+        }
     }
     
     func updateUserId(id: UUID, previousId: UUID){
@@ -95,7 +103,7 @@ internal class WSInteractor{
     }
     
     internal func changeStage(userState: WSUserState,connection: WebSocket,req: Request) {
-        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in          
+        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
             do{
                 try updateUserState(req: req, newState: userState)
             } catch(let error){print(error.localizedDescription)}
@@ -109,11 +117,10 @@ internal class WSInteractor{
         
         return WSUserState.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (state) in                
+            .flatMap { (state) in
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
                 state.containerID = newState.containerID
-                state.terrainID = newState.terrainID
                 self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID)
                 return state.update(on: req.db).transform(to: state)
         }
@@ -138,7 +145,7 @@ internal class WSInteractor{
     /// - Parameter data: Data to send to all users
     internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
-        // Do not send to current id sender        
+        // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
             if $0.userState.respUserID != idUser  {

@@ -11,7 +11,7 @@ func routes(_ app: Application) throws {
     //@gui -> Going to Change Path, using for testing
     app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(create.respUserID, create.destTeamID, create.containerID)
+        let state = WSUserState(create.name,create.photo,create.containerID,create.respUserID, create.destTeamID)
         
         return User.find(state.respUserID, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -70,21 +70,19 @@ func webSockets(_ app: Application) throws{
     app.webSocket("UserConnection"){ request,ws in
         var currentUserID: UUID?
         
-        ws.onText{ (ws,data) in
-            if let dataCov = data.data(using: .utf8){
-                guard let message = try? JSONDecoder().decode(WSConnectionPackage.self, from: dataCov) else {return}
-                    if let user = WSDataWorker.shared.connections.first(where: {
-                        return $0.userState.respUserID == message.newUserState.respUserID
-                    }) {
-                        currentUserID = user.userState.respUserID
-                        dataController.changeStage(userState: user.userState, connection: ws, req: request)
-                    } else{
-                        message.newUserState.photo = message.newUserState.name
-                        dataController.enteredUser(userState: message.newUserState, connection: ws, req: request)
-                        currentUserID = message.newUserState.respUserID
-                    }
-                }
-            
+      ws.onText{ (ws,data) in
+        if let dataCov = data.data(using: .utf8){
+            guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
+            if let user = WSDataWorker.shared.connections.first(where: {
+                return $0.userState.respUserID == message.newUserState.respUserID
+            }) {
+                currentUserID = user.userState.respUserID
+                dataController.changeStage(userState: WSUserState(user.userState.name, user.userState.photo, user.userState.destTeamID, user.userState.respUserID, user.userState.containerID) ,connection: ws, req: request)
+            } else{
+                dataController.enteredUser(userState: WSUserState(message.newUserState.name, message.newUserState.photo, message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws, req: request)
+                currentUserID = message.newUserState.respUserID
+            }
+        }
         }
         
         
