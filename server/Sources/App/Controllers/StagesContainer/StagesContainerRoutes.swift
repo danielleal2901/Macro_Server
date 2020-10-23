@@ -12,8 +12,9 @@ enum StagesContainerRoutes: String {
     case id = ":containerId"
     case withType = "type"
     case containerType = ":containerType"
-    case withParent = "parent"
-    case parentId = ":parentId"
+    case withTerrainType = "terrain"
+    case withParent = "farm"
+    case parentId = ":farmId"
     
     static func getPathComponent(_ route: StagesContainerRoutes) -> PathComponent {
         return PathComponent(stringLiteral: route.rawValue)
@@ -23,5 +24,5 @@ enum StagesContainerRoutes: String {
 enum StagesContainerParameters: String {
     case idContainer = "containerId"
     case containerType = "containerType"
-    case withParent = "parent"
+    case withParent = "farmId"
 }

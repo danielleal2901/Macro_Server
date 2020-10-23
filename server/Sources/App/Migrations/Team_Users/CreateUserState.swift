@@ -16,10 +16,10 @@ struct CreateUserState: Migration {
             .field("name", .string, .required)
             .field("photo", .string, .required)
             .field("respUserID", .uuid, .required)
-            .field("stageID", .uuid, .required)
+            .field("containerID", .uuid, .required)
             .field("destTeamID", .uuid, .required)
             .foreignKey("respUserID", references: "users","id")
-            .foreignKey("stageID", references: "stages","id")            
+            .foreignKey("containerID", references: "stagesContainer","id")
                 .create()
     }
     

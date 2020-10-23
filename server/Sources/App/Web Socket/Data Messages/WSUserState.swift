@@ -27,15 +27,15 @@ final class WSUserState: Model, Content {
     @Field(key: "destTeamID")
     var destTeamID: UUID
     
-    @Field(key: "stageID")
-    var stageID: UUID
+    @Field(key: "containerID")
+    var containerID: UUID
     
     init() {}
        
-    init(_ resp: UUID,_ dest: UUID,_ stage: UUID){
+    init(_ resp: UUID,_ dest: UUID,_ container: UUID){
         self.respUserID = resp
         self.destTeamID = dest
-        self.stageID = stage
+        self.containerID = container
     }
         
 }

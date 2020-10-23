@@ -10,7 +10,7 @@ func routes(_ app: Application) throws {
     //@gui -> Going to Change Path, using for testing
     app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
+        let state = WSUserState(create.respUserID, create.destTeamID, create.containerID)
         
         return User.find(state.respUserID, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -73,9 +73,9 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.stageID) ,connection: ws)
+                    dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.containerID) ,connection: ws)
                 } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws)
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws)
                     currentUserID = message.newUserState.respUserID
                 }
             }

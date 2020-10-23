@@ -22,11 +22,36 @@ struct StagesContainerController: RouteCollection {
                 container.get(use: fetchAllContainersByParentId(req: ))
             }
         }
+        
+        //containers/terrain/
+        containers.group(StagesContainerRoutes.getPathComponent(.withTerrainType)) { (container) in
             
-        //containers/:containerType
+            //containers/terrain/parent
+            container.group(StagesContainerRoutes.getPathComponent(.withParent)) { (container) in
+                
+                //containers/:containerType/parent/:parentId
+                container.group(StagesContainerRoutes.getPathComponent(.parentId)) { (container) in
+                    container.get(use: fetchTerrainContainersByParentId(req: ))
+                }
+                
+            }
+        }
+
+        //containers/containerType
         containers.group(StagesContainerRoutes.getPathComponent(.withType)) { (container) in
+            
+            //containers/type/:containerType
             container.group(StagesContainerRoutes.getPathComponent(.containerType)) { (container) in
                 container.get(use: fetchAllWithTypeContainers(req:))
+                
+                //containers/type/:containerType/parent/
+                container.group(StagesContainerRoutes.getPathComponent(.withParent)) { (container) in
+                    
+                    //containers/:containerType/parent/:parentId
+                    container.group(StagesContainerRoutes.getPathComponent(.parentId)) { (container) in
+                        container.get(use: fetchContainerByTypeAndParentId(req: ))
+                    }
+                }
             }
         }
         
@@ -47,7 +72,7 @@ struct StagesContainerController: RouteCollection {
                 let outputs = containers.map { container in
                     StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                         return StageTypes(rawValue: stageString)
-                    }), id: container.id!, farmId: container.$farm.id)
+                    }), id: container.id!, farmId: container.$farm.id, name: container.name)
                 }
                 return outputs
         }
@@ -58,17 +83,57 @@ struct StagesContainerController: RouteCollection {
         
         let containerType = try self.verifyContainerTypes(req: req)
         
+        
         return StagesContainer.query(on: req.db)
             .filter(\.$type == containerType)
             .all().flatMapThrowing { containers in
                 let outputs = containers.map { container in
                     StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                         return StageTypes(rawValue: stageString)
-                    }), id: container.id!, farmId: container.$farm.id)
+                    }), id: container.id!, farmId: container.$farm.id, name: container.name)
                 }
                 return outputs
         }
     }
+    
+    func fetchTerrainContainersByParentId(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
+        
+        guard let parentId = req.parameters.get(StagesContainerParameters.withParent.rawValue, as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+
+        return StagesContainer.query(on: req.db)
+            .group(.and){ group in
+            group.filter(\.$type == .terrain).filter("farm_id", .equal, parentId)}
+            .all().flatMapThrowing { containers in
+            let outputs = containers.map { container in
+                StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
+                    return StageTypes(rawValue: stageString)
+                }), id: container.id!, farmId: container.$farm.id, name: container.name)
+            }
+            return outputs
+        }
+    }
+    
+    func fetchContainerByTypeAndParentId(req: Request) throws -> EventLoopFuture<StagesContainer.Inoutput>  {
+        
+        let containerType = try self.verifyContainerTypes(req: req)
+        guard let parentId = req.parameters.get(StagesContainerParameters.withParent.rawValue, as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+
+        return StagesContainer.query(on: req.db)
+            .group(.and){ group in
+            group.filter(\.$type == containerType).filter("farm_id", .equal, parentId)}
+            .first().unwrap(or: Abort(.notFound))
+            .flatMapThrowing {
+                return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
+                    return StageTypes(rawValue: stageString)
+                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name)
+        }
+        
+    }
+
     
     func fetchContainerById(req: Request) throws -> EventLoopFuture<StagesContainer.Inoutput> {
         
@@ -76,7 +141,7 @@ struct StagesContainerController: RouteCollection {
             .unwrap(or: Abort(.notFound)).flatMapThrowing {
                 return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
                     return StageTypes(rawValue: stageString)
-                }) , id: $0.id!, farmId: $0.$farm.id)
+                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name)
         }
     }
     

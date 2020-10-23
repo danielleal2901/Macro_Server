@@ -75,10 +75,8 @@ internal class WSInteractor{
     ///   - connection: connection identification
     internal func enteredUser(userState: WSUserState,connection: WebSocket){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-            user.name = "User"
-            user.photo = "Photo"
-            //let data = try! JSONEncoder().encode(user)
-//            self.broadcastData(data: data, idUser: user.respUserID)
+            userState.create(on: req.db)             
+            self.broadcastData(data: userState, idUser: user.respUserID, idTeam: UUID())
         })
     }
     
@@ -111,7 +109,7 @@ internal class WSInteractor{
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser && $0.userState.destTeamID == idTeam {
+            if $0.userState.respUserID != idUser  {
                 $0.webSocket.send(encoded)
             }
         })
