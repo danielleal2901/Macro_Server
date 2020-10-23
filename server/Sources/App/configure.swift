@@ -38,8 +38,8 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateUserState())
 
     //Enums: should be called first
-    app.migrations.add(CreateStageTypesEnum())
-    app.migrations.add(CreateStagesContainersTypesEnum())
+//    app.migrations.add(CreateStageTypesEnum())
+//    app.migrations.add(CreateStagesContainersTypesEnum())
 
 
     // register routes
