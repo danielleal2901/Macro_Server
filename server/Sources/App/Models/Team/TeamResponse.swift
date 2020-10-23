@@ -13,4 +13,6 @@ struct TeamResponse: Content {
     let name: String
     let description: String
     let image: Data
+    let employeeToken: String
+    let guestToken: String
 }

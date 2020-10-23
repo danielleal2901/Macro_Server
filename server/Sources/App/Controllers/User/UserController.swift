@@ -7,6 +7,7 @@
 
 import Foundation
 import Vapor
+import Fluent
 
 class UserController: RouteCollection {
 
@@ -14,8 +15,12 @@ class UserController: RouteCollection {
 
         //users
         let users = routes.grouped(UserRoutes.getPathComponent(.main))
-        users.post(use: createUser)
+        users.post(use: createAdmin)
         users.get(use: fetchAllUsers)
+        
+        users.group(UserRoutes.getPathComponent(.employeeToken)) { (token) in
+            token.post(use: createEmployee)
+        }
 
         //users/:userId
         users.group(UserRoutes.getPathComponent(.id)) { (user) in
@@ -25,9 +30,29 @@ class UserController: RouteCollection {
         }
     }
 
-    func createUser(req: Request) throws -> EventLoopFuture<User> {
+    func createAdmin(req: Request) throws -> EventLoopFuture<User> {
         let user = try req.content.decode(User.self)
         return user.save(on: req.db).map {user}
+    }
+    
+    func createEmployee(req: Request) throws -> EventLoopFuture<User> {
+        guard let employeeToken = req.parameters.get(UserParameters.employeeToken.rawValue) else {
+            throw Abort(.notFound)
+        }
+        
+        return Team.query(on: req.db)
+            .filter(\.$employeeToken == employeeToken)
+            .first()
+            .unwrap(or: Abort(.unauthorized, reason: "Token de Acesso Inválido"))
+            .flatMapThrowing { (optionalTeam) -> User in
+                let team = Team(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken)
+                
+                let user = try req.content.decode(User.self)
+                user.$team.id = team.id!
+                return user
+            }.flatMap { (user) in
+                return user.save(on: req.db).transform(to: user)
+            }
     }
     
     func fetchAllUsers(req: Request) throws -> EventLoopFuture<[User]>  {

@@ -1,11 +1,9 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Daniel Leal on 20/10/20.
 //
-
-import Foundation
 
 import Foundation
 import Vapor
@@ -17,24 +15,30 @@ final class Farm: Model, Content {
     
     struct Inoutput: Content {
         let id: UUID
-        let teamId: UUID
         let name: String
+        let teamId: UUID
+        let icon: Data
+        let desc: String
     }
 
     @ID(key: .id)
     var id: UUID?
     
-    @Field(key: "team_Id")
+    @Field(key: "teamId")
     var teamId: UUID
     
     @Field(key: "name")
     var name: String
     
+    @Field(key: "desc")
+    var desc: String
+    
     init() {}
      
-    init(id: UUID = UUID(), teamId: UUID, name: String) {
+    init(id: UUID = UUID(), teamId: UUID, name: String, desc: String) {
         self.id = id
         self.teamId = teamId
         self.name = name
+        self.desc = desc
     }
 }

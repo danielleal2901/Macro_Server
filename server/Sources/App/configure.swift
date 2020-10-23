@@ -22,7 +22,9 @@ public func configure(_ app: Application) throws {
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
     
-    
+    //Enums: should be called first
+//    app.migrations.add(CreateStageTypesEnum())
+//    app.migrations.add(CreateStagesContainersTypesEnum())
     app.migrations.add(CreateFarm())
     app.migrations.add(CreateStagesContainer())
     app.migrations.add(CreateStage())
@@ -34,11 +36,11 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateUser())
     app.migrations.add(CreateUserToken())
     app.migrations.add(CreateUserState())
-    
-//
+
     //Enums: should be called first
-//    app.migrations.add(CreateStageTypesEnum())
-//    app.migrations.add(CreateStagesContainersTypesEnum())
+    app.migrations.add(CreateStageTypesEnum())
+    app.migrations.add(CreateStagesContainersTypesEnum())
+
 
     // register routes
     try routes(app)
