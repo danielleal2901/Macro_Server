@@ -73,13 +73,22 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-    internal func enteredUser(userState: WSUserState,connection: WebSocket){
+    internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-            user.name = "User"
-            user.photo = "Photo"
-            //let data = try! JSONEncoder().encode(user)
-//            self.broadcastData(data: data, idUser: user.respUserID)
+            self.insertUserState(state: user, req: req)
         })
+    }
+    
+    @discardableResult
+    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
+        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
+            state.name = user!.name
+            print(state.name)
+            print(state.photo)
+            self.broadcastData(data: state, idUser: (user?.id)!, idTeam: (user?.team.id)!)
+            state.save(on: req.db)
+            return state
+        }
     }
     
     func updateUserId(id: UUID, previousId: UUID){
@@ -89,30 +98,62 @@ internal class WSInteractor{
                 WSDataWorker.shared.connections[i].userState.respUserID = id
             }
         }
-
+        
     }
     
-    internal func changeStage(userState: WSUserState,connection: WebSocket){
+    internal func changeStage(userState: WSUserState,connection: WebSocket,req: Request) {
         WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
             let data = try! JSONEncoder().encode(user)
             self.broadcastData(data: data, idUser: user.respUserID, idTeam: user.destTeamID)
+            do{
+                try updateUserState(req: req, newState: userState)
+            } catch(let error){print(error.localizedDescription)}
+            
         })
     }
     
+    @discardableResult
+    internal func updateUserState(req: Request,newState: WSUserState) throws -> EventLoopFuture<WSUserState>{
+        guard let uuid = newState.id else {throw Abort(.notFound)}
+        
+        return WSUserState.find(uuid, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (state) in                
+                state.respUserID = newState.respUserID
+                state.destTeamID = newState.destTeamID
+                state.stageType = newState.stageType
+                state.terrainID = newState.terrainID
+                self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID)
+                return state.update(on: req.db).transform(to: state)
+        }
+    }
     
-    internal func signOutUser(userID: UUID,connection: WebSocket){
+    
+    internal func signOutUser(userID: UUID,connection: WebSocket,req: Request) throws -> EventLoopFuture<Void>{
         WSDataWorker.shared.removeUser(userID: userID, socket: connection)
+        return WSUserState.query(on: req.db).all().map {  value in
+            value.forEach { (user) in
+                if user.respUserID == userID{
+                    WSUserState.find(user.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+                        $0.delete(on: req.db)
+                    }
+                }
+            }
+        }
+        
     }
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
     internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
-        // Do not send to current id sender
+        // Do not send to current id sender        
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
             if $0.userState.respUserID != idUser && $0.userState.destTeamID == idTeam {
+                //            if $0.userState.respUserID != idUser{
                 $0.webSocket.send(encoded)
+                //            }
             }
         })
     }

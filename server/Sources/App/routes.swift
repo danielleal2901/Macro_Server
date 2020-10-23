@@ -7,10 +7,11 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
+    
     //@gui -> Going to Change Path, using for testing
     app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(create.respUserID, create.destTeamID, create.stageID)
+        let state = WSUserState(UUID(), create.name, create.photo, create.terrainID, create.respUserID, create.destTeamID, create.stageType)
         
         return User.find(state.respUserID, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -18,11 +19,14 @@ func routes(_ app: Application) throws {
                 state.name = optionalUserState.name
                 state.photo = optionalUserState.name
                 return state.save(on: req.db).transform(to: state)
-            }
+        }
     }
     
     //@gui - > Change to Post for specified with Team
-    app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
+    app.get("userStates",":teamid") { (req) -> EventLoopFuture<[WSUserState]> in
+        if let teamID = req.parameters.get("teamid"){
+            return WSUserState.query(on: req.db).filter("destTeamID", .equal, UUID(uuidString: teamID)).all()
+        }
         return WSUserState.query(on: req.db).all()
     }
     
@@ -36,11 +40,11 @@ func routes(_ app: Application) throws {
         }
     }
     
-//    let tokenProtected = app.grouped(UserToken.authenticator())
-//
-//    tokenProtected.get("me") { req -> User in
-//        try req.auth.require(User.self)
-//    }
+    //    let tokenProtected = app.grouped(UserToken.authenticator())
+    //
+    //    tokenProtected.get("me") { req -> User in
+    //        try req.auth.require(User.self)
+    //    }
     
     
     try app.register(collection: StagesContainerController())
@@ -61,29 +65,38 @@ func webSockets(_ app: Application) throws{
     let dataController = WSInteractor()
     
     /// Aiming to add to a class
-    /// Active session for Web Socket Connection
+    /// Activesession for Web Socket Connection
     
     app.webSocket("UserConnection"){ request,ws in
         var currentUserID: UUID?
         
         ws.onText{ (ws,data) in
             if let dataCov = data.data(using: .utf8){
-                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
-                if let user = WSDataWorker.shared.connections.first(where: {
-                    return $0.userState.respUserID == message.newUserState.respUserID
-                }) {
-                    currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.stageID) ,connection: ws)
-                } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageID),connection: ws)
-                    currentUserID = message.newUserState.respUserID
-                }
+                 
+                if let message = try? JSONDecoder().decode(WSConnectionPackage.self, from: dataCov){
+                
+                    if message.newUserState.name == nil {message.newUserState.name = "";message.newUserState.photo = ""}
+                    if let user = WSDataWorker.shared.connections.first(where: {
+                        return $0.userState.respUserID == message.newUserState.respUserID
+                    }) {
+                        currentUserID = user.userState.respUserID
+                        dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name,user.userState.photo,message.newUserState.terrainID,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageType) ,connection: ws, req: request)
+                    } else{
+                        if message.newUserState.photo == nil {
+                            message.newUserState.photo = message.newUserState.name
+                        }
+                        dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name,message.newUserState.photo,message.newUserState.terrainID,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageType),connection: ws,req:request)
+                        currentUserID = message.newUserState.respUserID
+                    }
+                
+            }
             }
         }
         
         
         ws.onClose.whenComplete { result in
-            dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws)
+            
+            try! dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws,req: request)
             print("Ended Connection")
             // remover usuario
         }
@@ -93,18 +106,15 @@ func webSockets(_ app: Application) throws{
     
     app.webSocket("DataExchange"){ request,ws in
         
-        let id = UUID()
-        dataController.enteredUser(userState: WSUserState(id, UUID(), UUID()),connection: ws)
         
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             
+            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
-                    dataController.updateUserId(id: message.respUserID, previousId: id)
-                
                 switch message.operation{
                 case 0:
                     // INSERT DATA
@@ -163,7 +173,6 @@ func webSockets(_ app: Application) throws{
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
-            dataController.signOutUser(userID: UUID(),connection: ws)
         }
         
         
