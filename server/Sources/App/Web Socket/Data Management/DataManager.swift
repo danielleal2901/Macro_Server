@@ -13,12 +13,12 @@ class DataManager: DataManagerLogic{
     // Containers
     internal func createContainer(containerInput: StagesContainer.Inoutput,req: Request) throws -> EventLoopFuture<HTTPStatus>{
         
-        let newContainer = StagesContainer(id: containerInput.id, type: containerInput.type, stages: containerInput.stages.map({$0.rawValue}), farmId: containerInput.farmId)
+        let newContainer = StagesContainer(id: containerInput.id, type: containerInput.type, stages: containerInput.stages.map({$0.rawValue}), farmId: containerInput.farmId, name: containerInput.name)
 
         let stages = containerInput.stages.map{
             Stage(type: $0.self, containerId: newContainer.id!)
         }
-        
+
         return newContainer.create(on: req.db).map { _ in
             stages.map { stage in
                 stage.create(on: req.db).map { _ in

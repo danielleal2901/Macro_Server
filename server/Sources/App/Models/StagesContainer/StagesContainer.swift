@@ -16,6 +16,7 @@ final class StagesContainer: Model, Content {
         let stages: [StageTypes]
         let id: UUID
         let farmId: UUID
+        let name: String
     }
     
     static let schema = "stagesContainer"
@@ -32,12 +33,16 @@ final class StagesContainer: Model, Content {
     @Field(key: "stages_names")
     var stages: [String]
     
+    @Field(key: "name")
+    var name: String
+    
     init() {}
     
-    init(id: UUID = UUID(), type: StagesContainerTypes, stages: [String], farmId: UUID) {
+    init(id: UUID = UUID(), type: StagesContainerTypes, stages: [String], farmId: UUID, name: String) {
         self.id = id
         self.type = type
         self.stages = stages
         self.$farm.id = farmId
+        self.name = name
     }
 }
