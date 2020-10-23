@@ -339,7 +339,7 @@ internal class WSDataWorker{
     func changeUserStage(userState: WSUserState,socket: WebSocket,completion: (WSUserState) -> ()){
         for user in connections{
             if user.userState.respUserID == userState.respUserID{
-                user.userState.stageType = userState.stageType
+                user.userState.containerID = userState.containerID
                 completion(user.userState)
             }
         }

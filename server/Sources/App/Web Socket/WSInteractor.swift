@@ -80,15 +80,8 @@ internal class WSInteractor{
     }
     
     @discardableResult
-    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
-        return User.query(on: req.db).filter("id", .equal, state.respUserID).first().map { (user) -> (WSUserState) in
-            state.name = user!.name
-            print(state.name)
-            print(state.photo)
-            self.broadcastData(data: state, idUser: (user?.id)!, idTeam: (user?.team.id)!)
-            state.save(on: req.db)
-            return state
-        }
+    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<Void>{
+        return state.save(on: req.db)
     }
     
     func updateUserId(id: UUID, previousId: UUID){
@@ -102,9 +95,7 @@ internal class WSInteractor{
     }
     
     internal func changeStage(userState: WSUserState,connection: WebSocket,req: Request) {
-        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
-            let data = try! JSONEncoder().encode(user)
-            self.broadcastData(data: data, idUser: user.respUserID, idTeam: user.destTeamID)
+        WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in          
             do{
                 try updateUserState(req: req, newState: userState)
             } catch(let error){print(error.localizedDescription)}
@@ -121,7 +112,7 @@ internal class WSInteractor{
             .flatMap { (state) in                
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
-                state.stageType = newState.stageType
+                state.containerID = newState.containerID
                 state.terrainID = newState.terrainID
                 self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID)
                 return state.update(on: req.db).transform(to: state)
@@ -150,8 +141,7 @@ internal class WSInteractor{
         // Do not send to current id sender        
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser && $0.userState.destTeamID == idTeam {
-                //            if $0.userState.respUserID != idUser{
+            if $0.userState.respUserID != idUser  {
                 $0.webSocket.send(encoded)
                 //            }
             }

@@ -11,21 +11,18 @@ import Vapor
 struct CreateUserState: Migration {
     
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        
-        return database.enum("stages_types").read().flatMap { stageType in
-            database.schema("users_states")
-                .id()
-                .field("name", .string)
-                .field("photo", .string)
-                .field("respUserID", .uuid, .required)
-                .field("terrainID", .uuid, .required)
-                .field("stageType",stageType,.required)
-                .field("destTeamID", .uuid, .required)
-                .foreignKey("respUserID", references: "users","id")
-                .foreignKey("terrainID", references: "terrains","id")
-                .create()
-        }
+        database.schema("users_states")
+            .id()
+            .field("name", .string, .required)
+            .field("photo", .string, .required)
+            .field("respUserID", .uuid, .required)
+            .field("containerID", .uuid, .required)
+            .field("destTeamID", .uuid, .required)
+            .foreignKey("respUserID", references: "users","id")
+            .foreignKey("containerID", references: "stagesContainer","id")
+            .create()
     }
+    
     
     func revert(on database: Database) -> EventLoopFuture<Void> {
         database.schema("users").delete()

@@ -10,11 +10,10 @@ import Vapor
 
 enum StagesContainerTypes: String, Content {
     case terrain = "terrain"
-    case stage = "stage"
-    case territorialDiagnosis = "territorial_Diagnosis"
-    case socialMobilization = "social_Mobilization"
-    case descriptiveMemorial = "descriptive_Memorial"
-    case environmentalStudy = "environmental_Study"
+    case territorialDiagnosis = "territorialDiagnosis"
+    case socialMobilization = "socialMobilization"
+    case descriptiveMemorial = "descriptiveMemorial"
+    case environmentalStudy = "environmentalStudy"
 }
 
 

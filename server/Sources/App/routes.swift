@@ -11,7 +11,7 @@ func routes(_ app: Application) throws {
     //@gui -> Going to Change Path, using for testing
     app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(UUID(), create.name, create.photo, create.terrainID, create.respUserID, create.destTeamID, create.stageType)
+        let state = WSUserState(create.respUserID, create.destTeamID, create.containerID)
         
         return User.find(state.respUserID, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -72,25 +72,19 @@ func webSockets(_ app: Application) throws{
         
         ws.onText{ (ws,data) in
             if let dataCov = data.data(using: .utf8){
-                 
-                if let message = try? JSONDecoder().decode(WSConnectionPackage.self, from: dataCov){
-                
-                    if message.newUserState.name == nil {message.newUserState.name = "";message.newUserState.photo = ""}
+                guard let message = try? JSONDecoder().decode(WSConnectionPackage.self, from: dataCov) else {return}
                     if let user = WSDataWorker.shared.connections.first(where: {
                         return $0.userState.respUserID == message.newUserState.respUserID
                     }) {
                         currentUserID = user.userState.respUserID
-                        dataController.changeStage(userState: WSUserState(user.userState.id!,user.userState.name,user.userState.photo,message.newUserState.terrainID,user.userState.respUserID, user.userState.destTeamID, message.newUserState.stageType) ,connection: ws, req: request)
+                        dataController.changeStage(userState: user.userState, connection: ws, req: request)
                     } else{
-                        if message.newUserState.photo == nil {
-                            message.newUserState.photo = message.newUserState.name
-                        }
-                        dataController.enteredUser(userState: WSUserState(message.newUserState.id!,message.newUserState.name,message.newUserState.photo,message.newUserState.terrainID,message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.stageType),connection: ws,req:request)
+                        message.newUserState.photo = message.newUserState.name
+                        dataController.enteredUser(userState: message.newUserState, connection: ws, req: request)
                         currentUserID = message.newUserState.respUserID
                     }
-                
-            }
-            }
+                }
+            
         }
         
         

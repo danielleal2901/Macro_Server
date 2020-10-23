@@ -14,10 +14,10 @@ struct CreateStagesContainersTypesEnum: Migration {
         return database.enum("stagesContainers_types")
         .case("terrain")
         .case("stage")
-        .case("territorial_Diagnosis")
-        .case("social_Mobilization")
-        .case("descriptive_Memorial")
-        .case("environmental_Study")
+        .case("territorialDiagnosis")
+        .case("socialMobilization")
+        .case("descriptiveMemorial")
+        .case("environmentalStudy")
             .create().transform(to: ())
     }
     

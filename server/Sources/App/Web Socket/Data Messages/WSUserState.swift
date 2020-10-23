@@ -30,19 +30,15 @@ final class WSUserState: Model, Content {
     @Field(key: "destTeamID")
     var destTeamID: UUID
     
-    @Enum (key: "stageType")
-    var stageType: StageTypes
+    @Field(key: "containerID")
+    var containerID: UUID
     
     init() {}
        
-    init(_ id: UUID,_ name: String, _ photo: String,_ terrain: UUID,_ resp: UUID,_ dest: UUID,_ stage: StageTypes){
-        self.id = id
-        self.name = name
-        self.photo = photo
-        self.terrainID = terrain
+    init(_ resp: UUID,_ dest: UUID,_ container: UUID){
         self.respUserID = resp
         self.destTeamID = dest
-        self.stageType = stage
+        self.containerID = container
     }
         
 }
