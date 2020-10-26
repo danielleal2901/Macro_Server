@@ -117,9 +117,7 @@ internal class WSInteractor{
         
         return WSUserState.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (state) in
-                state.respUserID = newState.respUserID
-                state.destTeamID = newState.destTeamID
+            .flatMap { (state) in                
                 state.containerID = newState.containerID
                 self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
                 return state.update(on: req.db).transform(to: state)
@@ -150,7 +148,6 @@ internal class WSInteractor{
         connections.forEach({
          if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
                 $0.webSocket.send(encoded)
-                //            }
             }
         })
     }

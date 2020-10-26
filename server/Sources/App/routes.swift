@@ -70,19 +70,19 @@ func webSockets(_ app: Application) throws{
     app.webSocket("UserConnection"){ request,ws in
         var currentUserID: UUID?
         
-      ws.onText{ (ws,data) in
-        if let dataCov = data.data(using: .utf8){
-            guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
-            if let user = WSDataWorker.shared.connections.first(where: {
-                return $0.userState.respUserID == message.newUserState.respUserID
-            }) {
-                currentUserID = user.userState.respUserID
-                dataController.changeStageState(userState: WSUserState(user.userState.name, user.userState.photo, user.userState.destTeamID, user.userState.respUserID, user.userState.containerID) ,connection: ws, req: request)
-            } else{
-                dataController.enteredUser(userState: WSUserState(message.newUserState.name, message.newUserState.photo, message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws, req: request)
-                currentUserID = message.newUserState.respUserID
+        ws.onText{ (ws,data) in
+            if let dataCov = data.data(using: .utf8){
+                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSConnectionPackage.self) else {return}
+                if let user = WSDataWorker.shared.connections.first(where: {
+                    return $0.userState.respUserID == message.newUserState.respUserID
+                }) {
+                    currentUserID = user.userState.respUserID
+                    dataController.changeStageState(userState: WSUserState(user.userState.name, user.userState.photo, user.userState.destTeamID, user.userState.respUserID, user.userState.containerID) ,connection: ws, req: request)
+                }else{
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.name, message.newUserState.photo, message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws, req: request)
+                    currentUserID = message.newUserState.respUserID
+                }
             }
-        }
         }
         
         
