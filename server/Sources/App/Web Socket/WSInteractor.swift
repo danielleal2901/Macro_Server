@@ -12,11 +12,11 @@ internal class WSInteractor{
     typealias Services = ServiceTypes
     
     
-    internal func addData(sessionRequest: Request, data: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
+    internal func addData(sessionRequest: Request, dataMessage: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
+        WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: dataMessage) { (response) in
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: data.data,idUser: data.data.respUserID, idTeam: data.data.destTeamID)
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID,idContainer: dataMessage.data.containerID)
             case .Error:
                 print()
             default:
@@ -44,7 +44,7 @@ internal class WSInteractor{
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
             switch response!.actionStatus{
             case .Completed:
-                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID)
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID,idContainer: dataMessage.data.containerID)
             case .Error:
                 print()
             default:
@@ -54,12 +54,12 @@ internal class WSInteractor{
     }
     
     
-    internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
+    internal func deleteData(sessionRequest: Request,dataMessage: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: dataMessage,dataType: dataMessage.dataType) { (response) in
             completion(response)
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: package,idUser: package.respUserID, idTeam: package.destTeamID)
+                self.broadcastData(data: dataMessage,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
             case .Error:
                 print()
             default:
@@ -87,7 +87,7 @@ internal class WSInteractor{
                 state.name = optionalUserState.name
                 state.photo = optionalUserState.name
                 print(state)
-                self.broadcastUserState(data: state, idUser: state.respUserID, idTeam: state.destTeamID)
+                self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
                 return state.save(on: req.db).transform(to: state)
                 
         }
@@ -121,7 +121,7 @@ internal class WSInteractor{
                 state.respUserID = newState.respUserID
                 state.destTeamID = newState.destTeamID
                 state.containerID = newState.containerID
-                self.broadcastUserState(data: state, idUser: state.respUserID, idTeam: state.destTeamID)
+                self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
                 return state.update(on: req.db).transform(to: state)
         }
     }
@@ -143,29 +143,19 @@ internal class WSInteractor{
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
-    internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
+  internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID,idContainer: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser  {
+         if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
                 $0.webSocket.send(encoded)
                 //            }
             }
         })
     }
     
-    internal func broadcastUserState<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
-           let connections = WSDataWorker.shared.fetchConnections()
-           // Do not send to current id sender
-           let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
-           connections.forEach({
-            if $0.userState.respUserID != idUser {
-                   $0.webSocket.send(encoded)
-                   //            }
-               }
-           })
-       }
+    
     
     
 }

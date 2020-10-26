@@ -110,7 +110,7 @@ func webSockets(_ app: Application) throws{
                 switch message.operation{
                 case 0:
                     // INSERT DATA
-                    dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
+                    dataController.addData(sessionRequest: request, dataMessage: .init(data: message)) { (response) in
                         switch response.actionStatus{
                         case .Completed:
                             print("Adicionou")
@@ -143,7 +143,7 @@ func webSockets(_ app: Application) throws{
                     }
                 case 3:
                     // DELETE DATA
-                    dataController.deleteData(sessionRequest: request, package: message) { (response) in
+                    dataController.deleteData(sessionRequest: request, dataMessage: message) { (response) in
                         print(response.actionStatus)
                     }
                 default:
