@@ -106,39 +106,23 @@ class FilesController: RouteCollection {
     }
     
     func insertFile(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        
+        
+        guard let _id = req.headers.first(name: FilesParameters.id.rawValue), let id = UUID(uuidString:  _id),
+         let _itemId = req.headers.first(name: FilesParameters.itemId.rawValue), let itemId = UUID(uuidString: _itemId),
+         let _docId = req.headers.first(name: FilesParameters.documentId.rawValue), let docId = UUID(uuidString: _docId)
+        else {
+            throw Abort(.badRequest)
+        }
 
-        guard let contentType = req.content.contentType, let boundary = contentType.parameters["boundary"] else {throw Abort(.badRequest)}
-
-        let parser = MultipartParser(boundary: boundary)
-        var parts: [MultipartPart] = []
-        var headers: HTTPHeaders = [:]
         var body: Data = Data()
-
-        parser.onHeader = { (field, value) in
-            headers.replaceOrAdd(name: field, value: value)
-        }
-        parser.onBody = { new in
-            body += Data(buffer: new)
-//            body += String(buffer: new)
-        }
-        parser.onPartComplete = {
-            let part = MultipartPart(headers: headers, body: body)
-            headers = [:]
-            body = Data()
-            parts.append(part)
-        }
 
         let promise = req.eventLoop.makePromise(of: Bool.self)
 
         req.body.drain { part in
             switch part {
             case .buffer(let buffer):
-                do {
-                    try parser.execute(buffer)
-                }catch (let error){
-                    print(error)
-                    promise.completeWith(.success(false))
-                }
+                body += Data(buffer: buffer)
                 return req.eventLoop.makeSucceededFuture(())
 
             case .error(let error):
@@ -151,29 +135,84 @@ class FilesController: RouteCollection {
                 return req.eventLoop.makeSucceededFuture(())
             }
         }
-
+        
         return promise.futureResult.flatMapThrowing { result -> Files in
             if (!result){
                 throw Abort(.badRequest)
             }
-
-            guard let fileData = parts.firstPart(named: "data")?.body else {throw Abort(.badRequest)}
-            guard let idBuffer = parts.firstPart(named: "id")?.body else {throw Abort(.badRequest)}
-            guard let documentIdBuffer = parts.firstPart(named: "documentId")?.body else {throw Abort(.badRequest)}
-            guard let itemIdBuffer = parts.firstPart(named: "itemId")?.body else {throw Abort(.badRequest)}
-
-            let id = String(buffer: idBuffer)
-            let documentId = String(buffer: documentIdBuffer)
-            let itemId = String(buffer: itemIdBuffer)
-            let data = Data(buffer: fileData)
-
-            let file = Files(id: UUID(uuidString: id)!, itemId: UUID(uuidString: itemId)!, documentId: UUID(uuidString: documentId)!, data: data)
-            return file
+            return Files(id: id, itemId: itemId, documentId: docId, data: body)
         }.flatMap { (file)  in
             file.create(on: req.db).transform(to: .ok)
         }
-        
     }
+}
+//        guard let contentType = req.content.contentType, let boundary = contentType.parameters["boundary"] else {throw Abort(.badRequest)}
+        
+
+//        let parser = MultipartParser(boundary: "")
+//        var parts: [MultipartPart] = []
+//        var headers: HTTPHeaders = [:]
+//        var body: Data = Data()
+//
+//        parser.onHeader = { (field, value) in
+//            headers.replaceOrAdd(name: field, value: value)
+//        }
+//        parser.onBody = { new in
+//            body += Data(buffer: new)
+//        }
+//        parser.onPartComplete = {
+//            let part = MultipartPart(headers: headers, body: body)
+//            headers = [:]
+//            body = Data()
+//            parts.append(part)
+//        }
+//
+//        let promise = req.eventLoop.makePromise(of: Bool.self)
+//
+//        req.body.drain { part in
+//            switch part {
+//            case .buffer(let buffer):
+//                do {
+//                    try parser.execute(buffer)
+//                }catch (let error){
+//                    print(error)
+//                    promise.completeWith(.success(false))
+//                }
+//                return req.eventLoop.makeSucceededFuture(())
+//
+//            case .error(let error):
+//                print(error)
+//                promise.completeWith(.success(false))
+//                return req.eventLoop.makeSucceededFuture(())
+//
+//            case .end:
+//                promise.completeWith(.success(true))
+//                return req.eventLoop.makeSucceededFuture(())
+//            }
+//        }
+//
+//        return promise.futureResult.flatMapThrowing { result -> Files in
+//            if (!result){
+//                throw Abort(.badRequest)
+//            }
+//
+//            guard let fileData = parts.firstPart(named: "data")?.body else {throw Abort(.badRequest)}
+////            guard let idBuffer = parts.firstPart(named: "id")?.body else {throw Abort(.badRequest)}
+////            guard let documentIdBuffer = parts.firstPart(named: "documentId")?.body else {throw Abort(.badRequest)}
+////            guard let itemIdBuffer = parts.firstPart(named: "itemId")?.body else {throw Abort(.badRequest)}
+////
+////            let id = String(buffer: idBuffer)
+////            let documentId = String(buffer: documentIdBuffer)
+////            let itemId = String(buffer: itemIdBuffer)
+//            let data = Data(buffer: fileData)
+//
+//            let file = Files(id: UUID(), itemId: UUID(), documentId: UUID(), data: data)
+//            return file
+//        }.flatMap { (file)  in
+//            file.create(on: req.db).transform(to: .ok)
+//        }
+//
+//    }
 
         
 
@@ -184,5 +223,4 @@ class FilesController: RouteCollection {
 //        return file.create(on: req.db).map({ newFile }).transform(to: .ok)
     
     
-}
 
