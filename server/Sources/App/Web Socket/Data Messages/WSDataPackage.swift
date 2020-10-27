@@ -16,6 +16,7 @@ internal struct WSDataPackage: Codable{
     internal private(set) var dataType: DataTypes
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID
+    internal private(set) var containerID: UUID
     internal private(set) var operation: Operations.RawValue
         
     // In doubt if using this type or another encoder
@@ -24,18 +25,22 @@ internal struct WSDataPackage: Codable{
         case content
         case dataType
         case operation
+        case containerID
         case destTeamID = "destination"
         case respUserID = "user"
     }
     
-    init(packageID: UUID,content: Data,dataType: DataTypes,destTeamID: UUID,respUserID: UUID,operation: Int){
+    // MARK - Initializer
+    init(packageID: UUID,content: Data,dataType: DataTypes,destTeamID: UUID,respUserID: UUID,operation: Int,containerID: UUID){
         self.packageID = packageID
         self.content = content
         self.dataType = dataType
         self.destTeamID = destTeamID
         self.respUserID = respUserID
         self.operation = operation
+        self.containerID = containerID
     }
+    
     
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -45,6 +50,7 @@ internal struct WSDataPackage: Codable{
         destTeamID = try values.decode(UUID.self,forKey: .destTeamID)
         respUserID = try values.decode(UUID.self,forKey: .respUserID)
         operation = try values.decode(Int.self, forKey: .operation)
+        containerID = try values.decode(UUID.self,forKey: .containerID)
     }
     
 }
