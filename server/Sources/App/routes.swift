@@ -75,7 +75,7 @@ func webSockets(_ app: Application) throws{
                     currentUserID = user.userState.respUserID
                     dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.containerID) ,connection: ws)
                 } else{
-                    dataController.enteredUser(userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws)
+                    dataController.enteredUser(req: request, userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws)
                     currentUserID = message.newUserState.respUserID
                 }
             }
@@ -94,7 +94,7 @@ func webSockets(_ app: Application) throws{
     app.webSocket("DataExchange"){ request,ws in
         
         let id = UUID()
-        dataController.enteredUser(userState: WSUserState(id, UUID(), UUID()),connection: ws)
+        dataController.enteredUser(req: request, userState: WSUserState(id, UUID(), UUID()),connection: ws)
         
         // MARK - Variables
         // Actions for control of User Sessions

@@ -73,7 +73,7 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-    internal func enteredUser(userState: WSUserState,connection: WebSocket){
+    internal func enteredUser(req: Request,userState: WSUserState,connection: WebSocket){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
             userState.create(on: req.db)             
             self.broadcastData(data: userState, idUser: user.respUserID, idTeam: UUID())
