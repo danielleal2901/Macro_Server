@@ -15,11 +15,16 @@ class UserController: RouteCollection {
 
         //users
         let users = routes.grouped(UserRoutes.getPathComponent(.main))
-        users.post(use: createAdmin)
+        
+        users.on(.POST, body: .collect(maxSize: "20mb")) {req in
+            try self.createAdmin(req: req)
+        }
         users.get(use: fetchAllUsers)
         
         users.group(UserRoutes.getPathComponent(.employeeToken)) { (token) in
-            token.post(use: createEmployee)
+            token.on(.POST, body: .collect(maxSize: "20mb")) { req in
+                try self.createEmployee(req: req)
+            }
         }
 
         //users/:userId
@@ -30,12 +35,13 @@ class UserController: RouteCollection {
         }
     }
 
-    func createAdmin(req: Request) throws -> EventLoopFuture<User> {
+    func createAdmin(req: Request) throws -> EventLoopFuture<UserResponse> {
         let user = try req.content.decode(User.self)
-        return user.save(on: req.db).map {user}
+        let response = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
+        return user.save(on: req.db).transform(to: response)
     }
     
-    func createEmployee(req: Request) throws -> EventLoopFuture<User> {
+    func createEmployee(req: Request) throws -> EventLoopFuture<UserResponse> {
         guard let employeeToken = req.parameters.get(UserParameters.employeeToken.rawValue) else {
             throw Abort(.notFound)
         }
@@ -51,7 +57,8 @@ class UserController: RouteCollection {
                 user.$team.id = team.id!
                 return user
             }.flatMap { (user) in
-                return user.save(on: req.db).transform(to: user)
+                let response = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
+                return user.save(on: req.db).transform(to: response)
             }
     }
     
