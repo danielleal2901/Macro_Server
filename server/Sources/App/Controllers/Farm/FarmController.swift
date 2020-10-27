@@ -85,7 +85,7 @@ class FarmController: RouteCollection {
         
         let dataManager = DataManager()
         
-        let territorialStages : [StageTypes] = [.diagnosticData, .documentaryResearch, .landResearch, .territorialStudy, .finalReport, .workPlan]
+        let territorialStages : [StageTypes] = [.diagnosticData, .diagnosticDocumentaryResearch, .diagnosticLandResearch, .diagnosticTerritorialStudy, .diagnosticFinalReport, .diagnosticWorkPlan]
         let territorialDiagContainer = StagesContainer.Inoutput(type: .territorialDiagnosis, stages: territorialStages, id: UUID(), farmId: farmId, name: "Diagnóstico Territorial")
         
         return try dataManager.createContainer(containerInput: territorialDiagContainer, req: req)
@@ -117,7 +117,7 @@ class FarmController: RouteCollection {
 
         let dataManager = DataManager()
 
-        let descMemorialStages : [StageTypes] = [.descriptiveMemorialData, .georeferencing, .territorialSurvey, .propertyRegistration, .socioeconomicRegistration, .propertyEvaluation]
+        let descMemorialStages : [StageTypes] = [.descriptiveMemorialData, .descriptiveMemorialGeoreferencing, .descriptiveMemorialTerritorialSurvey, .descriptiveMemorialPropertyRegistration, .descriptiveMemorialSocioeconomicRegistration, .descriptiveMemorialPropertyEvaluation]
 
         let descMemorialContainer = StagesContainer.Inoutput(type: .descriptiveMemorial, stages: descMemorialStages, id: UUID(), farmId: farmId, name: "Memorial Descritivo")
 

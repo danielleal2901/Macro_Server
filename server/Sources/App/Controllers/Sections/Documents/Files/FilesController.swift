@@ -140,7 +140,9 @@ class FilesController: RouteCollection {
             if (!result){
                 throw Abort(.badRequest)
             }
-            return Files(id: id, itemId: itemId, documentId: docId, data: body)
+            let file = Files(id: id, itemId: itemId, documentId: docId, data: body)
+            body.removeAll()
+            return file
         }.flatMap { (file)  in
             file.create(on: req.db).transform(to: .ok)
         }
