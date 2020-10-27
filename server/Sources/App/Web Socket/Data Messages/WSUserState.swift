@@ -9,17 +9,20 @@ import Fluent
 import Vapor
 
 final class WSUserState: Model, Content {
-   
+    
     static let schema = "users_states"
     
     @ID(key: .id)
     var id: UUID?
     
     @Field(key: "name")
-    var name: String?
+    var name: String
     
     @Field(key: "photo")
-    var photo: String?
+    var photo: String
+    
+    @Field(key: "containerID")
+    var containerID: UUID
     
     @Field(key: "respUserID")
     var respUserID: UUID
@@ -27,15 +30,14 @@ final class WSUserState: Model, Content {
     @Field(key: "destTeamID")
     var destTeamID: UUID
     
-    @Field(key: "stageID")
-    var stageID: UUID
-    
     init() {}
-       
-    init(_ resp: UUID,_ dest: UUID,_ stage: UUID){
+    
+    init(_ name: String,_ photo: String,_ resp: UUID,_ dest: UUID,_ container: UUID){
+        self.name = name
+        self.photo = photo
+        self.containerID = container
         self.respUserID = resp
         self.destTeamID = dest
-        self.stageID = stage
     }
-        
+    
 }

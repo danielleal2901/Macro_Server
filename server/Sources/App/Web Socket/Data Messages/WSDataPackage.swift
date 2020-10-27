@@ -14,6 +14,7 @@ internal struct WSDataPackage: Codable{
     
     internal private(set) var content: Data
     internal private(set) var dataType: DataTypes
+    internal private(set) var containerID: UUID
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID
     internal private(set) var containerID: UUID

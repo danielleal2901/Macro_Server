@@ -16,12 +16,13 @@ struct CreateUserState: Migration {
             .field("name", .string, .required)
             .field("photo", .string, .required)
             .field("respUserID", .uuid, .required)
-            .field("stageID", .uuid, .required)
+            .field("containerID", .uuid, .required)
             .field("destTeamID", .uuid, .required)
             .foreignKey("respUserID", references: "users","id")
-            .foreignKey("stageID", references: "stages","id")            
-                .create()
+            .foreignKey("containerID", references: "stagesContainer","id")
+            .create()
     }
+    
     
     func revert(on database: Database) -> EventLoopFuture<Void> {
         database.schema("users").delete()
