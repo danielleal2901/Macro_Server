@@ -7,10 +7,11 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
+    
     //@gui -> Going to Change Path, using for testing
     app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
         let create = try req.content.decode(WSUserState.self)
-        let state = WSUserState(create.respUserID, create.destTeamID, create.containerID)
+        let state = WSUserState(create.name,create.photo,create.containerID,create.respUserID, create.destTeamID)
         
         return User.find(state.respUserID, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -18,11 +19,14 @@ func routes(_ app: Application) throws {
                 state.name = optionalUserState.name
                 state.photo = optionalUserState.name
                 return state.save(on: req.db).transform(to: state)
-            }
+        }
     }
     
     //@gui - > Change to Post for specified with Team
-    app.get("getuserstates") { (req) -> EventLoopFuture<[WSUserState]> in
+    app.get("userStates",":teamid") { (req) -> EventLoopFuture<[WSUserState]> in
+        if let teamID = req.parameters.get("teamid"){
+            return WSUserState.query(on: req.db).filter("destTeamID", .equal, UUID(uuidString: teamID)).all()
+        }
         return WSUserState.query(on: req.db).all()
     }
     
@@ -36,11 +40,11 @@ func routes(_ app: Application) throws {
         }
     }
     
-//    let tokenProtected = app.grouped(UserToken.authenticator())
-//
-//    tokenProtected.get("me") { req -> User in
-//        try req.auth.require(User.self)
-//    }
+    //    let tokenProtected = app.grouped(UserToken.authenticator())
+    //
+    //    tokenProtected.get("me") { req -> User in
+    //        try req.auth.require(User.self)
+    //    }
     
     
     try app.register(collection: StagesContainerController())
@@ -61,7 +65,7 @@ func webSockets(_ app: Application) throws{
     let dataController = WSInteractor()
     
     /// Aiming to add to a class
-    /// Active session for Web Socket Connection
+    /// Activesession for Web Socket Connection
     
     app.webSocket("UserConnection"){ request,ws in
         var currentUserID: UUID?
@@ -73,9 +77,9 @@ func webSockets(_ app: Application) throws{
                     return $0.userState.respUserID == message.newUserState.respUserID
                 }) {
                     currentUserID = user.userState.respUserID
-                    dataController.changeStage(userState: WSUserState(user.userState.respUserID, user.userState.destTeamID, user.userState.containerID) ,connection: ws)
-                } else{
-                    dataController.enteredUser(req: request, userState: WSUserState(message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws)
+                    dataController.changeStageState(userState: WSUserState(user.userState.name, user.userState.photo, user.userState.destTeamID, user.userState.respUserID, user.userState.containerID) ,connection: ws, req: request)
+                }else{
+                    dataController.enteredUser(userState: WSUserState(message.newUserState.name, message.newUserState.photo, message.newUserState.respUserID, message.newUserState.destTeamID, message.newUserState.containerID),connection: ws, req: request)
                     currentUserID = message.newUserState.respUserID
                 }
             }
@@ -83,7 +87,8 @@ func webSockets(_ app: Application) throws{
         
         
         ws.onClose.whenComplete { result in
-            dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws)
+            
+            try! dataController.signOutUser(userID: currentUserID ?? UUID(),connection: ws,req: request)
             print("Ended Connection")
             // remover usuario
         }
@@ -93,22 +98,19 @@ func webSockets(_ app: Application) throws{
     
     app.webSocket("DataExchange"){ request,ws in
         
-        let id = UUID()
-        dataController.enteredUser(req: request, userState: WSUserState(id, UUID(), UUID()),connection: ws)
         
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
             
+            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
                 guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
-                    dataController.updateUserId(id: message.respUserID, previousId: id)
-                
                 switch message.operation{
                 case 0:
                     // INSERT DATA
-                    dataController.addData(sessionRequest: request, data: .init(data: message)) { (response) in
+                    dataController.addData(sessionRequest: request, dataMessage: .init(data: message)) { (response) in
                         switch response.actionStatus{
                         case .Completed:
                             print("Adicionou")
@@ -141,7 +143,7 @@ func webSockets(_ app: Application) throws{
                     }
                 case 3:
                     // DELETE DATA
-                    dataController.deleteData(sessionRequest: request, package: message) { (response) in
+                    dataController.deleteData(sessionRequest: request, dataMessage: message) { (response) in
                         print(response.actionStatus)
                     }
                 default:
@@ -163,7 +165,6 @@ func webSockets(_ app: Application) throws{
         
         ws.onClose.whenComplete { result in
             print("Ended Connection")
-            dataController.signOutUser(userID: UUID(),connection: ws)
         }
         
         

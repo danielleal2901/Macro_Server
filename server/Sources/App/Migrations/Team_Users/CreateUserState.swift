@@ -20,8 +20,9 @@ struct CreateUserState: Migration {
             .field("destTeamID", .uuid, .required)
             .foreignKey("respUserID", references: "users","id")
             .foreignKey("containerID", references: "stagesContainer","id")
-                .create()
+            .create()
     }
+    
     
     func revert(on database: Database) -> EventLoopFuture<Void> {
         database.schema("users").delete()

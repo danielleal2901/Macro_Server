@@ -12,11 +12,11 @@ internal class WSInteractor{
     typealias Services = ServiceTypes
     
     
-    internal func addData(sessionRequest: Request, data: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: data) { (response) in
+    internal func addData(sessionRequest: Request, dataMessage: Services.Dispatch.Request,completion: @escaping (Services.Dispatch.Response) -> ()){
+        WSDataWorker.shared.appendData(sessionRequest: sessionRequest, request: dataMessage) { (response) in
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: data.data,idUser: data.data.respUserID, idTeam: data.data.destTeamID)
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID,idContainer: dataMessage.data.containerID)
             case .Error:
                 print()
             default:
@@ -44,7 +44,7 @@ internal class WSInteractor{
             completion(response ?? Services.Dispatch.Response.init(actionStatus: .Error))
             switch response!.actionStatus{
             case .Completed:
-                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID)
+                self.broadcastData(data: dataMessage.data,idUser: dataMessage.data.respUserID, idTeam: dataMessage.data.destTeamID,idContainer: dataMessage.data.containerID)
             case .Error:
                 print()
             default:
@@ -54,12 +54,12 @@ internal class WSInteractor{
     }
     
     
-    internal func deleteData(sessionRequest: Request,package: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
-        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: package,dataType: package.dataType) { (response) in
+    internal func deleteData(sessionRequest: Request,dataMessage: WSDataPackage,completion: @escaping (Services.Dispatch.Response) -> ()){
+        WSDataWorker.shared.deleteData(sessionRequest: sessionRequest, package: dataMessage,dataType: dataMessage.dataType) { (response) in
             completion(response)
             switch response.actionStatus{
             case .Completed:
-                self.broadcastData(data: package,idUser: package.respUserID, idTeam: package.destTeamID)
+                self.broadcastData(data: dataMessage,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
             case .Error:
                 print()
             default:
@@ -73,47 +73,87 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-    internal func enteredUser(req: Request,userState: WSUserState,connection: WebSocket){
+
+    internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-            userState.create(on: req.db)             
-            self.broadcastData(data: userState, idUser: user.respUserID, idTeam: UUID())
+                self.insertUserState(state: user, req: req)
         })
     }
     
+    @discardableResult
+    func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
+        return User.find(state.respUserID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (optionalUserState) -> EventLoopFuture<WSUserState> in
+                state.name = optionalUserState.name
+                state.photo = optionalUserState.name
+                print(state)
+                self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
+                return state.save(on: req.db).transform(to: state)
+                
+        }
+    }
+    
     func updateUserId(id: UUID, previousId: UUID){
-        
         for i in 0 ..< WSDataWorker.shared.connections.count {
             if (WSDataWorker.shared.connections[i].userState.respUserID == previousId){
                 WSDataWorker.shared.connections[i].userState.respUserID = id
             }
         }
-
+        
     }
     
-    internal func changeStage(userState: WSUserState,connection: WebSocket){
+    internal func changeStageState(userState: WSUserState,connection: WebSocket,req: Request) {
         WSDataWorker.shared.changeUserStage(userState: userState, socket: connection, completion: { user in
-            let data = try! JSONEncoder().encode(user)
-            self.broadcastData(data: data, idUser: user.respUserID, idTeam: user.destTeamID)
+            do{
+                try updateUserState(req: req, newState: userState)
+            } catch(let error){print(error.localizedDescription)}
+            
         })
     }
     
+    @discardableResult
+    internal func updateUserState(req: Request,newState: WSUserState) throws -> EventLoopFuture<WSUserState>{
+        guard let uuid = newState.id else {throw Abort(.notFound)}
+        
+        return WSUserState.find(uuid, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (state) in                
+                state.containerID = newState.containerID
+                self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
+                return state.update(on: req.db).transform(to: state)
+        }
+    }
     
-    internal func signOutUser(userID: UUID,connection: WebSocket){
+    
+    internal func signOutUser(userID: UUID,connection: WebSocket,req: Request) throws -> EventLoopFuture<Void>{
         WSDataWorker.shared.removeUser(userID: userID, socket: connection)
+        return WSUserState.query(on: req.db).all().map {  value in
+            value.forEach { (user) in
+                if user.respUserID == userID{
+                    WSUserState.find(user.id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+                        $0.delete(on: req.db)
+                    }
+                }
+            }
+        }
+        
     }
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
-    internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
+  internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID,idContainer: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-            if $0.userState.respUserID != idUser  {
+         if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
                 $0.webSocket.send(encoded)
             }
         })
     }
+    
+    
     
     
 }
