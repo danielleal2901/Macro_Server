@@ -26,6 +26,9 @@ final class User: Model, Content {
     @Field(key: "is_admin")
     var isAdmin: Bool
     
+    @Field(key: "image")
+    var image: Data
+    
     @Parent(key: "team_id")
     var team: Team
 
@@ -42,10 +45,12 @@ final class User: Model, Content {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
+        self.id = try values.decode(UUID.self, forKey: .id)
         self.name = try values.decode(String.self, forKey: .name)
         self.email = try values.decode(String.self, forKey: .email)
         self.password = try Bcrypt.hash(values.decode(String.self, forKey: .password))
         self.isAdmin = try values.decode(Bool.self, forKey: .isAdmin)
+        self.image = try values.decode(Data.self, forKey: .image)
         if self.isAdmin {
             self.$team.id = try values.decode(UUID.self, forKey: .teamId)
         }
@@ -64,6 +69,7 @@ extension User{
         case teamId = "teamId"
         case employeeToken
         case guestToken
+        case image
     }
     
     func generateToken() throws -> UserToken {

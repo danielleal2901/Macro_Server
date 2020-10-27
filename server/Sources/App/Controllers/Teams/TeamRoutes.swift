@@ -9,7 +9,7 @@ import Foundation
 import Vapor
 
 enum TeamRoutes: String {
-    case main = "team"
+    case main = "teams"
     case id = ":teamID"
     
     static func getPathComponent(_ route: TeamRoutes) -> PathComponent {
