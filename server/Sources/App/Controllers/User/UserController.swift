@@ -84,7 +84,6 @@ class UserController: RouteCollection {
         return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
                .unwrap(or: Abort(.notFound))
                .flatMap { (user) in
-                   user.name = newUser.name
                    user.email = newUser.email
                    return user.update(on: req.db).transform(to: .ok)
            }

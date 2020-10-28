@@ -17,7 +17,6 @@ internal struct WSDataPackage: Codable{
     internal private(set) var containerID: UUID
     internal private(set) var destTeamID: UUID
     internal private(set) var respUserID: UUID
-    internal private(set) var containerID: UUID
     internal private(set) var operation: Operations.RawValue
         
     // In doubt if using this type or another encoder

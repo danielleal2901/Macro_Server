@@ -32,11 +32,18 @@ func routes(_ app: Application) throws {
     
     let passwordProtected = app.grouped(User.authenticator())
     
-    passwordProtected.post("userlogin") { req -> EventLoopFuture<User> in
-        let user = try req.auth.require(User.self)
+    app.post("userlogin") { req -> EventLoopFuture<UserResponse> in
+        let authEntity = try req.content.decode(AuthEntity.self)
         
-        return User.query(on: req.db).filter("id", .equal, user.id).first().flatMapThrowing { (user) in
-            return try (user ?? User(name: "", email: "", password: "", isAdmin: false))
+        return User.query(on: req.db).filter("email", .equal, authEntity.email).first().flatMapThrowing { (user) in
+            guard let user = user else {
+                throw Abort(.notFound)
+            }
+            if try !Bcrypt.verify(authEntity.password, created: user.password) {
+                throw Abort(.unauthorized)
+            } else {
+                return UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
+            }
         }
     }
     
