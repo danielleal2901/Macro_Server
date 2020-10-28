@@ -7,7 +7,7 @@
 
 import Vapor
 
-struct AuthEntity: Authenticatable, Codable {
+struct AuthEntity: Codable {
     var id: String?
     var email: String
     var password: String
