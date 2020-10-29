@@ -27,7 +27,7 @@ internal struct WSDataPackage: Codable{
         case operation
         case containerID
         case destTeamID = "destination"
-        case respUserID = "user"
+        case respUserID = "user"        
     }
     
     // MARK - Initializer

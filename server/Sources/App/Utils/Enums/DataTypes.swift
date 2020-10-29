@@ -9,13 +9,16 @@ import Foundation
 
 
 /// Using for identify current data requests (disabled for a while)
-enum DataTypes: String, Codable{
-    case container = "container"
-    case status = "status"
+enum DataTypes : String, Codable{
     case document = "document"
+    case container =  "container"
     case overview = "overview"
     case stage = "stage"
-    case file = "files"
-    
+    case status = "status"
+    case files = "files"
+    case users = "users"
+    case teams = "teams"
 }
+
+
 

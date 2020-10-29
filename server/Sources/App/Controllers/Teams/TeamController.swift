@@ -28,9 +28,7 @@ class TeamController: RouteCollection {
     
     func insertTeam(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let teamReq = try req.content.decode(TeamRequest.self)
-        
-        let team = Team(id: teamReq.id, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken)
-           
+        let team = Team(id: teamReq.id, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken, activeUsers: [teamReq.admin])        
         return team.create(on: req.db)
             .map({ team })
             .transform(to: .ok)

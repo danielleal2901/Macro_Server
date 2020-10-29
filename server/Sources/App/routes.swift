@@ -30,7 +30,6 @@ func routes(_ app: Application) throws {
         return WSUserState.query(on: req.db).all()
     }
     
-    let passwordProtected = app.grouped(User.authenticator())
     
     app.post("userlogin") { req -> EventLoopFuture<UserResponse> in
         let authEntity = try req.content.decode(AuthEntity.self)
@@ -104,16 +103,12 @@ func webSockets(_ app: Application) throws{
     
     
     app.webSocket("DataExchange"){ request,ws in
-        
-        
         // MARK - Variables
         // Actions for control of User Sessions
         ws.onText { (ws, data) in
-            
-            
             if let dataCov = data.data(using: .utf8){
                 // Make responsability to another class
-                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else {return}
+                guard let message = try? CoderHelper.shared.decodeDataSingle(valueToDecode: dataCov, intendedType: WSDataPackage.self) else { print("NAODEUSABOSTS");return}
                 switch message.operation{
                 case 0:
                     // INSERT DATA
@@ -153,6 +148,10 @@ func webSockets(_ app: Application) throws{
                     dataController.deleteData(sessionRequest: request, dataMessage: message) { (response) in
                         print(response.actionStatus)
                     }
+                    
+                case 4:
+                    // ADD USER
+                    dataController.addUser(req: request,dataMessage: message).whenSuccess( { _ in })
                 default:
                     print()
                     

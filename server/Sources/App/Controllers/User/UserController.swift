@@ -51,7 +51,7 @@ class UserController: RouteCollection {
             .first()
             .unwrap(or: Abort(.unauthorized, reason: "Token de Acesso Inválido"))
             .flatMapThrowing { (optionalTeam) -> User in
-                let team = Team(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken)
+                let team = Team(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken,activeUsers: [])
                 
                 let user = try req.content.decode(User.self)
                 user.$team.id = team.id!

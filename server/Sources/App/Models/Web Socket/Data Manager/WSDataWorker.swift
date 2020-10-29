@@ -303,7 +303,7 @@ internal class WSDataWorker{
                 
             }
             
-        case .file:
+        case .files:
             do{
                 let fileId = try CoderHelper.shared.decodeDataSingle(valueToDecode: package.content, intendedType: UUID.self)
                 
@@ -318,6 +318,10 @@ internal class WSDataWorker{
                 completion(response)
                 
             }
+        case .users:
+            break
+        case .teams:
+            break
 
         }
         

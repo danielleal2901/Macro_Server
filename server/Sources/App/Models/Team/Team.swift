@@ -30,14 +30,18 @@ final class Team: Model {
     @Field(key: "guest_token")
     var guestToken: String
     
+    @Field(key: "activeUsers")
+    var activeUsers: [UUID]
+    
     init() {}
     
-    init(id: UUID? = nil, name: String, description: String, image: Data, employeeToken: String, guestToken: String) {
+    init(id: UUID? = nil, name: String, description: String, image: Data, employeeToken: String, guestToken: String,activeUsers: [UUID]) {
         self.id = id
         self.name = name
         self.description = description
         self.image = image
         self.employeeToken = employeeToken
         self.guestToken = guestToken
+        self.activeUsers = activeUsers
     }
 }

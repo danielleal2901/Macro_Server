@@ -73,12 +73,27 @@ internal class WSInteractor{
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - connection: connection identification
-
+    
     internal func enteredUser(userState: WSUserState,connection: WebSocket,req: Request){
         WSDataWorker.shared.addUser(userState: userState,socket: connection, completion: { user in
-                self.insertUserState(state: user, req: req)
+            self.insertUserState(state: user, req: req)
         })
     }
+    
+    func addUser(req: Request,dataMessage: WSDataPackage) -> EventLoopFuture<HTTPStatus>{
+        return Team.find(dataMessage.destTeamID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .map { (team) in
+                return User.find(dataMessage.respUserID,on: req.db)
+                    .unwrap(or: Abort(.notFound))
+                    .map { (user) in
+                        team.activeUsers.append(dataMessage.respUserID)                        
+                        self.broadcastData(data: team,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
+                }
+        }.transform(to: .ok)
+    }
+    
+    
     
     @discardableResult
     func insertUserState(state: WSUserState,req: Request) -> EventLoopFuture<WSUserState>{
@@ -118,7 +133,7 @@ internal class WSInteractor{
         
         return WSUserState.find(uuid, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (state) in                
+            .flatMap { (state) in
                 state.containerID = newState.containerID
                 self.broadcastData(data: state, idUser: state.respUserID, idTeam: state.destTeamID,idContainer: state.containerID)
                 return state.update(on: req.db).transform(to: state)
@@ -142,18 +157,27 @@ internal class WSInteractor{
     
     /// Broadcast certain data to all users in the connection (currently using one)
     /// - Parameter data: Data to send to all users
-  internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID,idContainer: UUID) where T:Codable {
+    internal func broadcastData<T>(data: T,idUser: UUID, idTeam: UUID,idContainer: UUID) where T:Codable {
         let connections = WSDataWorker.shared.fetchConnections()
         // Do not send to current id sender
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
-         if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
+            if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
                 $0.webSocket.send(encoded)
             }
         })
     }
     
-    
+    internal func broadcastTeam<T>(data: T,idUser: UUID, idTeam: UUID) where T:Codable {
+        let connections = WSDataWorker.shared.fetchConnections()
+        // Do not send to current id sender
+        let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
+        connections.forEach({
+            if $0.userState.respUserID != idUser{
+                $0.webSocket.send(encoded)
+            }
+        })
+    }
     
     
 }

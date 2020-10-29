@@ -17,6 +17,7 @@ struct CreateTeam: Migration {
             .field("image", .data, .required)
             .field("employee_token", .string, .required)
             .field("guest_token", .string, .required)
+            .field("activeUsers", .array(of: .uuid), .required)
             .create()
     }
     
