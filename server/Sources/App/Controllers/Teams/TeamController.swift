@@ -13,7 +13,7 @@ class TeamController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let teamMain = routes.grouped(TeamRoutes.getPathComponent(.main))
         
-        teamMain.on(.POST, body: .collect(maxSize: "1mb")) { req in
+        teamMain.on(.POST, body: .collect(maxSize: "20mb")) { req in
              try self.insertTeam(req: req)
         }
         
@@ -29,7 +29,7 @@ class TeamController: RouteCollection {
     func insertTeam(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let teamReq = try req.content.decode(TeamRequest.self)
         
-        let team = Team(id: nil, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken)
+        let team = Team(id: teamReq.id, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken)
            
         return team.create(on: req.db)
             .map({ team })

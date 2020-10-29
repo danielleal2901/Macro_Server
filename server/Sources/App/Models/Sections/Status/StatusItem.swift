@@ -8,7 +8,9 @@
 import Foundation
 import Vapor
 
-struct StatusItem: Content {
-    let key: String
-    let done: Bool
+struct Task: Content {
+    let title: String
+    let status: TaskStatus.RawValue
+    let tags: [String]
+    let resp: [UUID]
 }

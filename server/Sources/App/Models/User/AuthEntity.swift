@@ -6,24 +6,19 @@
 //
 
 import Vapor
+import Fluent
 
-struct AuthEntity: Codable {
-    var id: String?
+class AuthEntity: Authenticatable, Codable {
     var email: String
     var password: String
-    var name: String
     
-    init(id: UUID, name: String,email: String,password: String,confirmPassword: String) {
-        self.id = id.uuidString
-        self.name = name
+    init(email: String,password: String) {
         self.email = email
         self.password = password
     }
     
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = try values.decode(UUID.self, forKey: .id).uuidString
-        name = try values.decode(String.self,forKey: .name)
         email = try values.decode(String.self,forKey: .email)
         password = try values.decode(String.self,forKey: .password)
     }
@@ -35,6 +30,24 @@ extension AuthEntity: Validatable{
         validations.add("email", as: String.self,is: .email)
         validations.add("password", as: String.self,is: .count(8...))
     }
+}
 
+//extension AuthEntity: ModelAuthenticatable{
+//    static let usernameKey = \AuthEntity.$email
+//    static let passwordHashKey = \AuthEntity.$password
+//
+//    func verify(password: String) throws -> Bool {
+//        try Bcrypt.verify(password, created: self.password)
+//    }
+//}
 
+extension AuthEntity: BasicAuthenticator {
+    typealias User = App.AuthEntity
+
+    func authenticate(basic: BasicAuthorization, for request: Request) -> EventLoopFuture<Void> {
+        if basic.username == self.email && basic.password == self.password {
+            request.auth.login(AuthEntity(email: self.email, password: self.password))
+        }
+        return request.eventLoop.makeSucceededFuture(())
+    }
 }

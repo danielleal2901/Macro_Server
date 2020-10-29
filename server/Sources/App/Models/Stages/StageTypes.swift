@@ -12,33 +12,33 @@ enum StageTypes : String, Content{
     
     //Diagnosticc
     case diagnosticData
-    case documentaryResearch
-    case landResearch
-    case territorialStudy
-    case finalReport
-    case workPlan
+    case diagnosticDocumentaryResearch
+    case diagnosticLandResearch
+    case diagnosticTerritorialStudy
+    case diagnosticFinalReport
+    case diagnosticWorkPlan
     
     //SocialMob
     case socialMobilizationData
     
-    //Environmental
+    //EnvironmentalStudy
     case environmentalStudyData
     
     //DescriptiveMemorial
     case descriptiveMemorialData
-    case georeferencing
-    case territorialSurvey
-    case propertyRegistration
-    case socioeconomicRegistration
-    case propertyEvaluation
+    case descriptiveMemorialGeoreferencing
+    case descriptiveMemorialTerritorialSurvey
+    case descriptiveMemorialPropertyRegistration
+    case descriptiveMemorialSocioeconomicRegistration
+    case descriptiveMemorialPropertyEvaluation
     
     //Terrain
     case terrainData
-    case car
-    case evaluation
-    case environment
-    case register
-    case resident
+    case terrainGeoreferencing
+    case terrainCar
+    case terrainEvaluation
+    case terrainEnvironment
+    case terrainResident
     
     
 }

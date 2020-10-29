@@ -128,7 +128,7 @@ class DataManager: DataManagerLogic{
     // Status
     internal func createStatus(req: Request, statusInoutput: Status.Inoutput) throws -> EventLoopFuture<HTTPStatus> {
         
-        let status = Status(id: statusInoutput.id, stageId: statusInoutput.stageId, sections: statusInoutput.sections)
+        let status = Status(id: statusInoutput.id, stageId: statusInoutput.stageId, tasks: statusInoutput.tasks)
         return status.create(on: req.db).transform(to: .ok)
         
     }
@@ -138,7 +138,7 @@ class DataManager: DataManagerLogic{
         return Status.find(newStatus.id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (status) in
-                status.sections = newStatus.sections
+                status.tasks = newStatus.tasks
                 return status.update(on: req.db).transform(to: .ok)
         }
     }

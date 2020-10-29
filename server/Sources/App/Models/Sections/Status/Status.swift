@@ -16,7 +16,7 @@ final class Status: Model, Content {
     struct Inoutput: Content {
         let id: UUID
         let stageId: UUID
-        let sections: [StatusSection]
+        let tasks: [Task]
     }
 
     @ID(key: .id)
@@ -25,14 +25,14 @@ final class Status: Model, Content {
     @Parent(key: "stage_id")
     var stage: Stage
     
-    @Field(key: "sections")
-    var sections: [StatusSection]
+    @Field(key: "tasks")
+    var tasks: [Task]
     
     init() {}
      
-    init(id: UUID = UUID(), stageId: UUID, sections: [StatusSection]) {
+    init(id: UUID = UUID(), stageId: UUID, tasks: [Task]) {
         self.id = id
         self.$stage.id = stageId
-        self.sections = sections
+        self.tasks = tasks
     }
 }
