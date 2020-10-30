@@ -87,8 +87,10 @@ internal class WSInteractor{
                 return User.find(dataMessage.respUserID,on: req.db)
                     .unwrap(or: Abort(.notFound))
                     .map { (user) in
-                        team.activeUsers.append(dataMessage.respUserID)                        
-                        self.broadcastData(data: team,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
+                        if (!team.activeUsers.contains(dataMessage.respUserID)){
+                            team.activeUsers.append(dataMessage.respUserID)
+                            self.broadcastData(data: team,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
+                        }
                 }
         }.transform(to: .ok)
     }
