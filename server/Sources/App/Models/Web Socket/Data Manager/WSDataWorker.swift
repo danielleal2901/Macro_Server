@@ -128,7 +128,7 @@ internal class WSDataWorker{
     }
     
     
-    internal func updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
+    internal func  updateData(sessionRequest: Request , dataRequest: ServiceTypes.Dispatch.Request,completion: @escaping (ServiceTypes.Dispatch.Response?) -> ()){
         var response:  ServiceTypes.Dispatch.Response = .init(actionStatus: .Requesting)
         
         switch dataRequest.data.dataType{
