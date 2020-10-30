@@ -34,12 +34,14 @@ final class User: Model, Content {
 
     init() { }
 
-    init(id: UUID? = nil, name: String, email: String, password: String, isAdmin: Bool) throws {
+    init(id: UUID? = nil, name: String, email: String, password: String, isAdmin: Bool, image: Data, teamID: UUID) throws {
         self.id = id
         self.name = name
         self.email = email
         self.password = try Bcrypt.hash(password)
         self.isAdmin = isAdmin
+        self.image = image
+        self.$team.id = teamID
     }
     
     init(from decoder: Decoder) throws {

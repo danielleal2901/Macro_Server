@@ -15,4 +15,5 @@ struct TeamResponse: Content {
     let image: Data
     let employeeToken: String
     let guestToken: String
+    var activeUsers: [UserResponse]
 }
