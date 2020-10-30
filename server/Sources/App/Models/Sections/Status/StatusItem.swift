@@ -9,8 +9,9 @@ import Foundation
 import Vapor
 
 struct Task: Content {
+    let id: UUID
     let title: String
-    let status: TaskStatus.RawValue
+    let status: TaskStatus
     let tags: [String]
     let resp: [UUID]
 }

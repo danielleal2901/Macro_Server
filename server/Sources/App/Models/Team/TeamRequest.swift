@@ -14,5 +14,5 @@ struct TeamRequest: Content {
     var employeeToken: String
     var guestToken: String
     var image: Data
-    var admin: UUID
+    var activeUsers: [UUID]
 }
