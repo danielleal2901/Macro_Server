@@ -156,6 +156,10 @@ func webSockets(_ app: Application) throws{
                     // adding user to a team
                     dataController.addUser(req: request,dataMessage: message).whenSuccess( { _ in })
                     break
+                case 5:
+                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                        print(response.actionStatus)
+                    }
                 default:
                     print()
                     

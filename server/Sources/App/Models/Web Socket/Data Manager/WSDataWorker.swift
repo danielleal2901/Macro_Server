@@ -208,6 +208,20 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
+        case .teams:
+            do{
+                let team = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: TeamRequest.self)
+                
+                let akaresponse = try dataManager.updateTeamById(req: sessionRequest, newTeam: team)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
         default:
             print("Not working")
             response.actionStatus = .Error

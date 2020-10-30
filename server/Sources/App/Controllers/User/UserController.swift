@@ -62,8 +62,20 @@ class UserController: RouteCollection {
             }
     }
     
-    func fetchAllUsers(req: Request) throws -> EventLoopFuture<[User]>  {
-        return User.query(on: req.db).all()
+    func fetchAllUsers(req: Request) throws -> EventLoopFuture<[UserResponse]>  {
+        return User.query(on: req.db).all().map { (users) in
+            var usersResponse = [UserResponse]()
+            users.forEach { (user) in
+                usersResponse.append(UserResponse(id: user.id!,
+                                                  name: user.name,
+                                                  email: user.email,
+                                                  password: user.password,
+                                                  isAdmin: user.isAdmin,
+                                                  image: user.image,
+                                                  teamId: user.$team.id))
+            }
+            return usersResponse
+        }
     }
 
     func fetchUserById(req: Request) throws -> EventLoopFuture<User> {

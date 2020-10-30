@@ -202,5 +202,20 @@ class DataManager: DataManagerLogic{
             $0.delete(on: req.db).transform(to: .ok)
         }
     }
+    
+    
+    internal func updateTeamById(req: Request, newTeam: TeamRequest) throws -> EventLoopFuture<HTTPStatus> {
+        return Team.find(newTeam.id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { (team) in
+                team.name = newTeam.name
+                team.description = newTeam.description
+                team.activeUsers = newTeam.activeUsers
+                team.image = newTeam.image
+                team.employeeToken = newTeam.employeeToken
+                team.guestToken = newTeam.guestToken
+                return team.update(on: req.db).transform(to: .ok)
+            }
+    }
 
 }
