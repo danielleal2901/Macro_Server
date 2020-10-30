@@ -122,6 +122,7 @@ func webSockets(_ app: Application) throws{
                             print()
                         }
                     }
+                    break
                 case 1:
                     // FETCH DATA
                     dataController.fetchData(sessionID: request, dataMessage: .init(data: message)) { (response) in
@@ -138,11 +139,13 @@ func webSockets(_ app: Application) throws{
                             print()
                         }
                     }
+                    break
                 case 2:
                     // UPDATE DATA
                     dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
                         print(response.actionStatus)
                     }
+                    break
                 case 3:
                     // DELETE DATA
                     dataController.deleteData(sessionRequest: request, dataMessage: message) { (response) in
@@ -150,8 +153,9 @@ func webSockets(_ app: Application) throws{
                     }
                     
                 case 4:
-                    // ADD USER
+                    // adding user to a team
                     dataController.addUser(req: request,dataMessage: message).whenSuccess( { _ in })
+                    break
                 default:
                     print()
                     
