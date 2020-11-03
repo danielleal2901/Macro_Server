@@ -11,6 +11,8 @@ import Vapor
 enum FarmRoutes: String{
     case main = "farms"
     case id = ":farmId"
+    case team = "team"
+    case teamId = ":teamId"
     
     static func getPathComponent(_ route: FarmRoutes) -> PathComponent{
         return PathComponent(stringLiteral: route.rawValue)
@@ -20,5 +22,6 @@ enum FarmRoutes: String{
 
 enum FarmParameters: String{
     case idFarm = "farmId"
+    case teamId = "teamId"
 }
 

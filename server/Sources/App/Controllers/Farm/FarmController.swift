@@ -14,13 +14,20 @@ class FarmController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let farmMain = routes.grouped(FarmRoutes.getPathComponent(.main))
         farmMain.post(use: insertFarm)
-        farmMain.get(use: fetchAllFarms)
+        
         
         farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
             farm.get(use: fetchFarmById)
             farm.put(use: updateFarmById)
             farm.delete(use: deleteFarmById)
         }
+        
+        farmMain.group(FarmRoutes.getPathComponent(.team)) { farm in
+            farm.group(FarmRoutes.getPathComponent(.teamId)) { farm in
+                farm.get(use: fetchAllFarmsByTeamId(req: ))
+            }
+        }
+
     }
     
     
@@ -64,8 +71,13 @@ class FarmController: RouteCollection {
         }
     }
     
-    func fetchAllFarms(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
-        return Farm.query(on: req.db).all().map { allFarms in
+    func fetchAllFarmsByTeamId(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
+        
+        guard let id = req.parameters.get(FarmParameters.teamId.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+        
+        return Farm.query(on: req.db)
+            .filter("teamId", .equal, id)
+            .all().map { allFarms in
             allFarms.map { farm in
                 Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: Data(), desc: farm.desc)
             }

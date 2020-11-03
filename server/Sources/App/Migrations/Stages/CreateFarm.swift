@@ -16,6 +16,7 @@ struct CreateFarm: Migration {
             .id()
             .field("name", .string, .required)
             .field("teamId", .uuid, .required)
+            .foreignKey("teamId", references: "teams", "id", onDelete: .cascade, onUpdate: .restrict)
             .field("desc",.string)
             .unique(on: "name")
             .create()

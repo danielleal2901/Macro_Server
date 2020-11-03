@@ -26,16 +26,18 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateStageTypesEnum())
     app.migrations.add(CreateStagesContainersTypesEnum())
 
-//    app.migrations.add(CreateFarm())
-//    app.migrations.add(CreateStagesContainer())
-//    app.migrations.add(CreateStage())
-//    app.migrations.add(CreateDocument())
-//    app.migrations.add(CreateOverview())
-//    app.migrations.add(CreateStatus())
-//    app.migrations.add(CreateFiles())
-//    app.migrations.add(CreateTeam())
-//    app.migrations.add(CreateUser())
-//    app.migrations.add(CreateUserToken())
+
+    app.migrations.add(CreateTeam())
+    app.migrations.add(CreateFarm())
+    app.migrations.add(CreateStagesContainer())
+    app.migrations.add(CreateStage())
+    app.migrations.add(CreateDocument())
+    app.migrations.add(CreateOverview())
+    app.migrations.add(CreateStatus())
+    app.migrations.add(CreateFiles())
+    
+    app.migrations.add(CreateUser())
+    app.migrations.add(CreateUserToken())
 //    app.migrations.add(CreateUserState())
 
 
