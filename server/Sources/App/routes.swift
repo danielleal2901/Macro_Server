@@ -151,19 +151,21 @@ func webSockets(_ app: Application) throws{
                     dataController.deleteData(sessionRequest: request, dataMessage: message) { (response) in
                         print(response.actionStatus)
                     }
-                    
+                    break
                 case 4:
                     // adding user to a team
                     dataController.addUser(req: request,dataMessage: message).whenSuccess( { _ in })
                     break
                 case 5:
-                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                        print(response.actionStatus)
-                    }
+                    // remove user
+                    dataController.removeUser(req: request,dataMessage: message).whenSuccess( { _ in })
+                    break
+//                case 5:
+//                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+//                        print(response.actionStatus)
+//                    }
                 default:
                     print()
-                    
-                    
                 }
             }
             
@@ -183,6 +185,5 @@ func webSockets(_ app: Application) throws{
         
         
     }
-    
     
 }

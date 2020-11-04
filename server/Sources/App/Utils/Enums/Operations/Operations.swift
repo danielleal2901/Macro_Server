@@ -12,5 +12,6 @@ enum Operations: Int{
     case read = 1
     case update = 2
     case delete = 3
-    case addUser = 4
+    case login = 4
+    case logout = 5
 }
