@@ -1,11 +1,24 @@
 import Fluent
 import Vapor
+import Mailgun
 
 func routes(_ app: Application) throws {
     
     app.get { req in
         return "It works!"
     }
+    
+    app.post("mailTest") { req -> EventLoopFuture<ClientResponse> in
+        let message = MailgunMessage(
+            from: "postmaster@sandbox2ba48919ec61469e97ff0340e3e77bf1.mailgun.org",
+            to: "gmdalosto@gmail.com",
+            subject: "Working Mailer",
+            text: "This is a newsletter",
+            html: "<h1>This is a newsletter</h1>"
+        )
+        return req.mailgun(.mainDomain).send(message)
+    }
+    
     
     
     //@gui -> Going to Change Path, using for testing

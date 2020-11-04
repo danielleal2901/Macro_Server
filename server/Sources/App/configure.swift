@@ -3,6 +3,7 @@ import FluentPostgresDriver
 import Vapor
 import NIOWebSocket
 import NIOHTTP2
+import Mailgun
 
 
 // configures your application
@@ -21,6 +22,11 @@ public func configure(_ app: Application) throws {
         
     app.middleware.use(app.sessions.middleware)
     app.sessions.use(.memory)
+    
+    // Mailer
+    app.mailgun.configuration = .environment
+    app.mailgun.configuration = .init(apiKey: "ea44b6dc-cd9d4697")
+    app.mailgun.defaultDomain = .mainDomain
     
     //Enums: should be called first
 //    app.migrations.add(CreateStageTypesEnum())
