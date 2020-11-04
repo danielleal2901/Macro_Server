@@ -14,7 +14,7 @@ class TeamController: RouteCollection {
         let teamMain = routes.grouped(TeamRoutes.getPathComponent(.main))
         
         teamMain.on(.POST, body: .collect(maxSize: "20mb")) { req in
-             try self.insertTeam(req: req)
+            try self.insertTeam(req: req)
         }
         
         teamMain.group(TeamRoutes.getPathComponent(.id)) { (teams) in
@@ -36,93 +36,45 @@ class TeamController: RouteCollection {
             throw Abort(.notFound)
         }
         
-        return Team.find(teamID, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap { (optionalTeam) in
-                
-                var teamResponse = TeamResponse(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken, activeUsers: [])
-                
-                let promise = req.eventLoop.makePromise(of: Bool.self)
-                
-                
-                let _ = optionalTeam.activeUsers.map { (id) in
-                    User.find(id, on: req.db)
-                        .unwrap(or: Abort(.notFound))
-                        .map { (optionalUser) -> Void in
-                            let user = UserResponse(id: optionalUser.id!,
-                                            name: optionalUser.name,
-                                            email: optionalUser.email,
-                                            password: optionalUser.password,
-                                            isAdmin: optionalUser.isAdmin,
-                                            image: optionalUser.image,
-                                            teamId: optionalUser.$team.id)
-
-                            teamResponse.activeUsers.append(user)
-                            if(optionalUser.id == teamResponse.activeUsers.last!.id) {
-                                promise.succeed(true)
-                            }
-                            return
+        return User.query(on: req.db).filter("team_id", .equal, teamID).all().flatMap { (users) in
+            Team.find(teamID, on: req.db)
+                .unwrap(or: Abort(.notFound))
+                .map { (optionalTeam) -> TeamResponse in
+                    
+                    let activeUsers = optionalTeam.activeUsers.map { (id) -> UserResponse? in
+                        if let user = users.first(where: { (user) -> Bool in
+                            return user.id == id
+                        }) {
+                            return UserResponse(id: user.id!,
+                                                name: user.name,
+                                                email: user.email,
+                                                password: user.password,
+                                                isAdmin: user.isAdmin,
+                                                image: user.image,
+                                                teamId: user.$team.id)
                         }
-                }
-                
-                return promise.futureResult.flatMapThrowing { (success) in
-                    if !success {
-                        throw Abort(.badRequest)
-                    } else {
-                        return teamResponse
+                        return nil
+                    }.compactMap{$0}
+                    
+                    let allUsers = users.map { (user) -> UserResponse in
+                        return UserResponse(id: user.id!,
+                                            name: user.name,
+                                            email: user.email,
+                                            password: user.password,
+                                            isAdmin: user.isAdmin,
+                                            image: user.image,
+                                            teamId: user.$team.id)
                     }
+                    
+                    return TeamResponse(id: optionalTeam.id!,
+                                        name: optionalTeam.name,
+                                        description: optionalTeam.description,
+                                        image: optionalTeam.image,
+                                        employeeToken: optionalTeam.employeeToken,
+                                        guestToken: optionalTeam.guestToken,
+                                        activeUsers: activeUsers, allUsers: allUsers)
                 }
-                
-//                .map { (response) in
-//                    response.transform(to: teamResponse)
-//                }.f
-                
-//                .map { (_) in
-//                    return teamResponse
-//                }
-                
-                
-                
-//                .map { (users) in
-//                    return users.mapEach { (user) -> User in
-//                        teamResponse.activeUsers.append(user)
-//                        return user
-//                    }.transform(to: teamResponse)
-//                }.flatMap { (teamResponse) in
-//                    return teamResponse
-//                }
-                
-//                return getActiveUsers.map { (usersEvent) in
-//                    usersEvent.mapEach { (user) in
-//                        return user
-//                    }
-//                }
-                
-//                return users.map { (user) in
-//                    teamResponse.activeUsers.append(user)
-//                }
-                
-//                return appendUsers.map { (_) in
-//                    return teamResponse
-//                }
-                
-                
-                
-//                return optionalTeam.activeUsers.map { (id) in
-//                    return User.query(on: req.db)
-//
-//                        .mapEach { (user) in
-//                            return user
-//                        }
-//                        .map { (users) -> TeamResponse in
-//                            let users = [User]()
-//                            users.mapEach { (user) in
-//                                users.append(user)
-//                            }
-//                            return users
-//                        }
-//                }
-            }
+        }
     }
     
     

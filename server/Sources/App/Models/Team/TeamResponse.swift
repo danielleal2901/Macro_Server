@@ -16,4 +16,5 @@ struct TeamResponse: Content {
     let employeeToken: String
     let guestToken: String
     var activeUsers: [UserResponse]
+    var allUsers: [UserResponse]
 }
