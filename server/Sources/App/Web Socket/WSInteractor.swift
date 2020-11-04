@@ -86,15 +86,31 @@ internal class WSInteractor{
             .map { (team) in
                 return User.find(dataMessage.respUserID,on: req.db)
                     .unwrap(or: Abort(.notFound))
-                    .map { (user) in
+                    .flatMapThrowing { (user) -> EventLoopFuture<Void> in
                         if (!team.activeUsers.contains(dataMessage.respUserID)){
                             team.activeUsers.append(dataMessage.respUserID)
                             self.broadcastData(data: team,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID,idContainer: dataMessage.containerID)
+                        }else {
+                            self.throwError(error: .userAlreadyLogged, idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID, idContainer: dataMessage.containerID)
                         }
+                        return team.update(on: req.db)
                 }
         }.transform(to: .ok)
     }
     
+    func removeUser(req: Request,dataMessage: WSDataPackage) -> EventLoopFuture<HTTPStatus>{
+        return Team.find(dataMessage.destTeamID, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .map { (team) in
+                return User.find(dataMessage.respUserID,on: req.db)
+                    .unwrap(or: Abort(.notFound))
+                    .map { (user) -> EventLoopFuture<Void> in
+                        team.activeUsers.removeAll(where: {$0 == dataMessage.respUserID})
+                        self.broadcastData(data: team,idUser: dataMessage.respUserID, idTeam: dataMessage.destTeamID, idContainer: dataMessage.containerID)
+                        return team.update(on: req.db)
+                    }
+        }.transform(to: .ok)
+    }
     
     
     @discardableResult
@@ -165,6 +181,17 @@ internal class WSInteractor{
         let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: data)
         connections.forEach({
             if $0.userState.respUserID != idUser && $0.userState.containerID == idContainer{
+                $0.webSocket.send(encoded)
+            }
+        })
+    }
+    
+    internal func throwError(error: WSErrors, idUser: UUID, idTeam: UUID,idContainer: UUID)  {
+        let connections = WSDataWorker.shared.fetchConnections()
+        // Do not send to current id sender
+        let encoded = CoderHelper.shared.encodeDataToString(valueToEncode: error)
+        connections.forEach({
+            if $0.userState.respUserID == idUser{
                 $0.webSocket.send(encoded)
             }
         })

@@ -13,7 +13,7 @@ struct CreateStagesContainersTypesEnum: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         return database.enum("stagesContainers_types")
         .case("terrain")
-        .case("stage")
+//        .case("stage")
         .case("territorialDiagnosis")
         .case("socialMobilization")
         .case("descriptiveMemorial")
