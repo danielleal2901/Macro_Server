@@ -7,6 +7,7 @@
 
 import Foundation
 
-enum WSErrors: String, Codable{
+enum WSLoginOperations: String, Codable{
     case userAlreadyLogged
+    case loginSucceded
 }

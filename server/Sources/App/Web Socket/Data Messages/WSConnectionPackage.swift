@@ -11,12 +11,12 @@ internal struct WSConnectionPackage: Codable{
     
     // MARK - Variables
     internal private(set) var packageID: UUID
-    internal private(set) var newUserState: WSUserState
+    internal private(set) var user: User
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         packageID = try values.decode(UUID.self,forKey: .packageID)
-        newUserState = try values.decode(WSUserState.self,forKey: .newUserState)
+        user = try values.decode(User.self,forKey: .user)
     }
     
 }

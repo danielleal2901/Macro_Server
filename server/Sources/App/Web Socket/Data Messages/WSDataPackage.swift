@@ -31,13 +31,13 @@ internal struct WSDataPackage: Codable{
     }
     
     // MARK - Initializer
-    init(packageID: UUID,content: Data,dataType: DataTypes,destTeamID: UUID,respUserID: UUID,operation: Int,containerID: UUID){
+    init(packageID: UUID,content: Data,dataType: DataTypes,destTeamID: UUID,respUserID: UUID,operation: Operations,containerID: UUID){
         self.packageID = packageID
         self.content = content
         self.dataType = dataType
         self.destTeamID = destTeamID
         self.respUserID = respUserID
-        self.operation = operation
+        self.operation = operation.rawValue
         self.containerID = containerID
     }
     

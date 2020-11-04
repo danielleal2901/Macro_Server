@@ -18,6 +18,7 @@ enum DataTypes : String, Codable{
     case files = "files"
     case users = "users"
     case teams = "teams"
+    case loginOperations
 }
 
 
