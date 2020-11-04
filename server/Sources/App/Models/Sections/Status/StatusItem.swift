@@ -28,4 +28,5 @@ struct UserIcon: Codable{
     var name: String
     var image: Data
     var isSelected: Bool = false
+    var respTasks: [UUID] = []
 }
