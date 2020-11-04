@@ -16,7 +16,7 @@ final class PreSets {
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Responsável", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
-                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [UUID()])]).create(on: req.db)
+                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [])]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
                             }
@@ -32,7 +32,7 @@ final class PreSets {
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
-                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [UUID()])]).create(on: req.db)
+                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [])]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
                             }
@@ -48,7 +48,7 @@ final class PreSets {
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
-                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [UUID()])]).create(on: req.db)
+                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [])]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
                             }
@@ -64,7 +64,7 @@ final class PreSets {
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
-                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [UUID()])]).create(on: req.db)
+                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [])]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
                             }
@@ -80,7 +80,7 @@ final class PreSets {
                 stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
                         .map { _ in
-                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [UUID()])]).create(on: req.db)
+                            return Status(stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Arrumar a cama", status: .todo, tags: [], resp: [])]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db)
                             }
