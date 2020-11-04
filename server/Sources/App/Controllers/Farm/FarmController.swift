@@ -14,6 +14,7 @@ class FarmController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let farmMain = routes.grouped(FarmRoutes.getPathComponent(.main))
         farmMain.post(use: insertFarm)
+        farmMain.get(use: fetchAllFarms)
         
         
         farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
@@ -70,6 +71,14 @@ class FarmController: RouteCollection {
                 return Farm.Inoutput(id: optionalFarm.id!, name: optionalFarm.name, teamId: optionalFarm.teamId, icon: Data(), desc: optionalFarm.desc)
         }
     }
+    
+    func fetchAllFarms(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
+            return Farm.query(on: req.db).all().map { allFarms in
+                allFarms.map { farm in
+                    Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: Data(), desc: farm.desc)
+                }
+            }
+        }
     
     func fetchAllFarmsByTeamId(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
         
