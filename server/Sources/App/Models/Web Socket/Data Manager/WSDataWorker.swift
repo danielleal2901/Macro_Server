@@ -336,38 +336,32 @@ internal class WSDataWorker{
             break
         case .teams:
             break
-
+        case .loginOperations:
+            break
         }
         
     }
     
-    
+    //MARK: WS Users
     
     /// Add a user to a group (currently using one instance)
     /// - Parameters:
     ///   - userID: user identification
     ///   - teamID: team identification
     ///   - socket: websocket
-    func addUser(userState: WSUserState,socket: WebSocket,completion: (WSUserState) -> ()){
-        let connection = TeamConnection(userState: userState, webSocket: socket)
-        self.connections.append(connection)
-        completion(connection.userState)
-    }
-    
-    func changeUserStage(userState: WSUserState,socket: WebSocket,completion: (WSUserState) -> ()){
-        for user in connections{
-            if user.userState.respUserID == userState.respUserID{
-                user.userState.containerID = userState.containerID
-                completion(user.userState)
-            }
+    func addUser(user: User,socket: WebSocket, currentWsId: UUID,  completion: @escaping (Bool) -> ()){
+        let connection = TeamConnection(user: user, webSocket: socket, webSocketId: currentWsId)
+        if self.connections.contains(where: {$0.user.id == connection.user.id}){
+            completion(false)
+        }else {
+            self.connections.append(connection)
+            completion(true)
         }
     }
     
     func removeUser(userID: UUID,socket: WebSocket){
-        connections = self.connections.filter {
-            return $0.userState.respUserID != userID
-        }
-    }
+        connections.removeAll(where: {$0.user.id == userID})
+   }
     
     /// Fetch all connections active (current using one instance)
     /// - Returns: intended connection
@@ -375,21 +369,19 @@ internal class WSDataWorker{
         return self.connections
     }
     
-    // To implement
-    
-    // Login Management
-    // User
-    internal func createUser(){}
-    internal func fetchUser(){}
-    internal func updateUser(){}
-    internal func deleteUser(){}
-    
-    // Login Management
-    // Team
-    internal func createTeam(){}
-    internal func fetchTeam(){}
-    internal func updateTeam(){}
-    internal func deleteTeam(){}
-    
+//    // Login Management
+//    // User
+//    internal func createUser(){}
+//    internal func fetchUser(){}
+//    internal func updateUser(){}
+//    internal func deleteUser(){}
+//
+//    // Login Management
+//    // Team
+//    internal func createTeam(){}
+//    internal func fetchTeam(){}
+//    internal func updateTeam(){}
+//    internal func deleteTeam(){}
+//
     
 }
