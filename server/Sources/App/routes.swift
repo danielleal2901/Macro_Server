@@ -8,17 +8,15 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
-    app.post("mailTest") { req -> EventLoopFuture<ClientResponse> in
+    app.post("mailTest") { req -> EventLoopFuture<ClientResponse> in        
         let message = MailgunMessage(
-            from: "gmdalosto@gmail.com",
+            from: "Regularize-se <gmdalosto@gmail.com>",
             to: "gmdalosto@gmail.com",
-            subject: "Working Mailer",
-            text: "This is a newsletter",
-            html: "This is a newsletter"
+            subject: "E-mail Funcionando",
+            text: "Recuperação da conta"
         )
         return req.mailgun(.mainDomain).send(message)
     }
-    
     
     
     //@gui -> Going to Change Path, using for testing
@@ -173,10 +171,10 @@ func webSockets(_ app: Application) throws{
                     // remove user
                     dataController.removeUser(req: request,dataMessage: message).whenSuccess( { _ in })
                     break
-//                case 5:
-//                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-//                        print(response.actionStatus)
-//                    }
+                    //                case 5:
+                    //                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
+                    //                        print(response.actionStatus)
+                //                    }
                 default:
                     print()
                 }
