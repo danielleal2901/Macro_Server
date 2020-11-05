@@ -10,11 +10,11 @@ func routes(_ app: Application) throws {
     
     app.post("mailTest") { req -> EventLoopFuture<ClientResponse> in
         let message = MailgunMessage(
-            from: "postmaster@sandbox2ba48919ec61469e97ff0340e3e77bf1.mailgun.org",
+            from: "gmdalosto@gmail.com",
             to: "gmdalosto@gmail.com",
             subject: "Working Mailer",
             text: "This is a newsletter",
-            html: "<h1>This is a newsletter</h1>"
+            html: "This is a newsletter"
         )
         return req.mailgun(.mainDomain).send(message)
     }

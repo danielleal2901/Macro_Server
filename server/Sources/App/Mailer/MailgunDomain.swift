@@ -8,5 +8,5 @@
 import Mailgun
 
 extension MailgunDomain{
-    static var mainDomain: MailgunDomain { .init("https://api.mailgun.net/v3/sandbox2ba48919ec61469e97ff0340e3e77bf1.mailgun.org", .us)}
+    static var mainDomain: MailgunDomain { .init("sandbox2ba48919ec61469e97ff0340e3e77bf1.mailgun.org", .us)}
 }
