@@ -8,14 +8,31 @@ func routes(_ app: Application) throws {
         return "It works!"
     }
     
-    app.post("mailTest") { req -> EventLoopFuture<ClientResponse> in        
-        let message = MailgunMessage(
-            from: "Regularize-se <gmdalosto@gmail.com>",
-            to: "gmdalosto@gmail.com",
-            subject: "E-mail Funcionando",
-            text: "Recuperação da conta"
-        )
-        return req.mailgun(.mainDomain).send(message)
+    app.post("mail") { req -> EventLoopFuture<HTTPStatus> in
+        let mailPackage = try req.content.decode(MailPackage.self)
+        
+        return User.query(on: req.db)
+            .filter("email", .equal, mailPackage.email).all().map { user in
+                if !user.isEmpty{
+                let password = user.first?.password
+                    let message = MailgunMessage(
+                        from: "Regularize-se <gmdalosto@gmail.com>",
+                        to: "\(mailPackage.email)",
+                        subject: "Regularize-se - Recuperação de Senha",
+                        text: """
+                        Olá \(user.first!.name), nos foi submetido uma requisição informando que você esqueceu sua senha.
+                        Caso não tenha solicitado nenhuma informação, favor desconsidere a mensagem.
+                        A sua senha é \(String(describing: password))
+
+                        Atenciosamente Equipe da Regularize-se
+                        """
+                    )
+                    req.mailgun(.mainDomain).send(message)
+                }
+            }.transform(to: .ok)
+            
+        
+
     }
     
     
