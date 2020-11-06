@@ -27,9 +27,6 @@ func routes(_ app: Application) throws {
                     req.mailgun(.mainDomain).send(message)
                 }
             }.transform(to: .ok)
-            
-        
-
     }
     
     
