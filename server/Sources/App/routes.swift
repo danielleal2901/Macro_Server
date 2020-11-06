@@ -189,25 +189,15 @@ func webSockets(_ app: Application) throws{
                         break
                     case 4:
                         // adding user to a team
-                        dataController.addUser(ws: ws, req: request,dataMessage: message).whenSuccess( { _ in })
+                        dataController.addUser(ws: ws, req: request,dataMessage: message).whenSuccess({ _ in })
                         break
-                    case 5:
-                        // remove user
-                        dataController.removeUser(req: request,dataMessage: message).whenSuccess( { _ in })
-                        break
-                        //                case 5:
-                        //                    dataController.updateData(sessionID: request, dataMessage: .init(data: message)) { (response) in
-                        //                        print(response.actionStatus)
-                    //                    }
                     default:
                         print()
                     }
                 }
                 
             }
-            // Receive the Data from the Client and Decode it
-            // Save to DATABASE
-            // Must get Team ID,
+            
         }
         
         ws.onBinary { (ws, binary) in
