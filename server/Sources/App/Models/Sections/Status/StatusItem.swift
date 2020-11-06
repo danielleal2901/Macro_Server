@@ -12,21 +12,6 @@ struct Task: Content {
     let id: UUID
     let title: String
     let status: TaskStatus
-    let tags: [Marker]
-    let resp: [UserIcon]
-}
-
-struct Marker: Codable{
-    var id = UUID()
-    var title: String
-    var color: [Double]
-    var isSelected: Bool = false
-}
-
-struct UserIcon: Codable{
-    var id: UUID
-    var name: String
-    var image: Data
-    var isSelected: Bool = false
-    var respTasks: [UUID] = []
+    let tags: [UUID]
+    let resp: [UUID]
 }

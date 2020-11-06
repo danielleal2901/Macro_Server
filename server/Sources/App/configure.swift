@@ -24,24 +24,13 @@ public func configure(_ app: Application) throws {
     app.sessions.use(.memory)
     
     // Mailer
-    app.mailgun.configuration = .environment
+//    app.mailgun.configuration = .environment
     app.mailgun.configuration = .init(apiKey: "2b7a87ba6bae7abe21d5fe1e1faf56ad-ea44b6dc-cd9d4697")
     app.mailgun.defaultDomain = .mainDomain
         
-//    let message = MailgunMessage(
-//        from: "GuilhermeDalosto <dalostoguilherme@gmail.com>",
-//        to: "gmdalosto@gmail.com",
-//        subject: "E-mail Funcionando",
-//        text: "Recuperação da conta"
-//    )
-//    
-//    app.mailgun(.mainDomain).send(message).whenSuccess { response in
-//        print("just sent: \(response)")
-//    }
-    
     //Enums: should be called first
-//    app.migrations.add(CreateStageTypesEnum())
-//    app.migrations.add(CreateStagesContainersTypesEnum())
+    app.migrations.add(CreateStageTypesEnum())
+    app.migrations.add(CreateStagesContainersTypesEnum())
 
 //
     app.migrations.add(CreateTeam())
