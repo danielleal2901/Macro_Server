@@ -16,7 +16,7 @@ final class Status: Model, Content {
     struct Inoutput: Content {
         let id: UUID
         let stageId: UUID
-        let tasks: [Task]
+        let tasks: [Task]        
     }
 
     @ID(key: .id)
@@ -27,6 +27,7 @@ final class Status: Model, Content {
     
     @Field(key: "tasks")
     var tasks: [Task]
+        
     
     init() {}
      

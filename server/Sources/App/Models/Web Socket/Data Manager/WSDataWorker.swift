@@ -222,6 +222,20 @@ internal class WSDataWorker{
                 response.actionStatus = .Error
                 completion(response)
             }
+            
+        case .markers:
+            do{
+                let marker = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Marker.Inoutput.self)
+                let akaresponse = try dataManager.updateMarker(req: sessionRequest, newMarker: marker)
+                akaresponse.whenSuccess { _ in
+                    response.actionStatus = .Completed
+                    completion(response)
+                }
+            } catch (let error){
+                print(error.localizedDescription)
+                response.actionStatus = .Error
+                completion(response)
+            }
         default:
             print("Not working")
             response.actionStatus = .Error
@@ -337,6 +351,8 @@ internal class WSDataWorker{
         case .teams:
             break
         case .loginOperations:
+            break
+        case .markers:
             break
         }
         
