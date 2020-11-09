@@ -32,12 +32,21 @@ final class PreSets {
             stages.map { stage in
                 let statusID = UUID()
                 _ =  stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                    return Overview(stageId: stage.id!, sections:
+                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "")]),
+                                         OverviewSection(name: "Pesquisa Documental", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
+                                         OverviewSection(name: "Pesquisa Fundiária", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
+                                         OverviewSection(name: "Estudo Territorial", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
+                                         OverviewSection(name: "Plano de Trabalho", items: [OverviewItem(key: "Informações do Responsável", value: "")])
+                                        ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
                                             [Task.init(id: UUID(), title: "Coleta de elementos descritivos - Memoriais, matrículas e etc", status: .todo, tags: [], resp: []),
                                              Task.init(id: UUID(), title: "Buscar documentos em órgãos públicos e cartórios", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Realizar Cartografia Básica: Georeferenciamento", status: .todo, tags: [], resp: []),                                                                                         ]).create(on: req.db)
+                                             Task.init(id: UUID(), title: "Realizar Cartografia Básica: Georeferenciamento", status: .todo, tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Levantamento de Potencialidades e Fragilidades", status: .todo, tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Levantamento de Características Históricas, Físicas e Geográficas", status: .todo, tags: [], resp: []),
+                                            ]).create(on: req.db)
                                 .map { _ in
                                     return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
                                         return createMarkerPreset(req: req, statusID: statusID)
@@ -54,14 +63,21 @@ final class PreSets {
             stages.map { stage in
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                    return Overview(stageId: stage.id!, sections:
+                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "")]),
+                                         OverviewSection(name: "Licença Social", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
+                                         OverviewSection(name: "Grupo de Acompanhamento", items: [OverviewItem(key: "Acompanhamento do Projeto ", value: "")
+                                                            OverviewItem(key: "Informações do Responsável", value: "")]),
+                                         OverviewSection(name: "Engajamento Social", items: [OverviewItem(key: "Ações de Comunicação", value: ""),
+                                                                                             OverviewItem(key: "Nível de Satisfação", value: ""),
+                                                            OverviewItem(key: "Informações do Responsável", value: "")]),                                                                                 ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
                                             [Task.init(id: UUID(), title: "Estabelecer Licença social", status: .todo, tags: [], resp: []),
                                              Task.init(id: UUID(), title: "Assegurar condições de acompanhamento da comunidade", status: .todo, tags: [], resp: []),
                                              Task.init(id: UUID(), title: "Realizar evento de encerramento das atividades do Projeto de Trabalho Social", status: .todo, tags: [], resp: []),
                                              Task.init(id: UUID(), title: "Apresentar resultado de pesquisa de pós ocupação", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Revelar o níve de satisfação da população beneficiada", status: .todo, tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Revelar o nível de satisfação da população beneficiada", status: .todo, tags: [], resp: []),
                                              
                                              
                                              
@@ -82,7 +98,16 @@ final class PreSets {
             stages.map { stage in
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
+                    return Overview(stageId: stage.id!, sections:
+                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")]),
+                                         OverviewSection(name: "Licenciamento Ambiental", items: [OverviewItem(key: "Termos", value: ""),
+                                                                                                OverviewItem(key: "Dados do Responsável",value: "")
+                                         OverviewSection(name: "Relatórios Técnicos", items: [OverviewItem(key: "Relatórios", value: ""),
+                                                                                                OverviewItem(key: "Dados do Responsável",value: "")]),
+                                         OverviewSection(name: "Termos de Referência", items: [OverviewItem(key: "Termos", value: "")]),
+                                        
+                                        
+                                        ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
                                             [Task.init(id: UUID(), title: "Contratar órgão ambiental", status: .todo, tags: [], resp: []),
