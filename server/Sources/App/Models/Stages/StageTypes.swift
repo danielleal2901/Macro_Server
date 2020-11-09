@@ -8,24 +8,29 @@
 import Foundation
 import Vapor
 
-enum StageTypes : String, Content{
+enum StageTypes: String, Content{
     
     //Diagnosticc
-    case diagnosticData
+    case diagnosticMain
     case diagnosticDocumentaryResearch
     case diagnosticLandResearch
     case diagnosticTerritorialStudy
-    case diagnosticFinalReport
     case diagnosticWorkPlan
+    case diagnosticFinalReport
     
     //SocialMob
-    case socialMobilizationData
+    case socialMobilizationMain
+    case socialMobilizationSocialLicense
+    case socialMobilizationFollowUpGroup
+    case socialMobilizationSocialEngaging
     
     //EnvironmentalStudy
-    case environmentalStudyData
+    case environmentalStudyMain
+    case environmentalEnvironmentalLicense
+    case environmentalTechnicalReport
     
     //DescriptiveMemorial
-    case descriptiveMemorialData
+    case descriptiveMemorialMain
     case descriptiveMemorialGeoreferencing
     case descriptiveMemorialTerritorialSurvey
     case descriptiveMemorialPropertyRegistration
@@ -33,13 +38,12 @@ enum StageTypes : String, Content{
     case descriptiveMemorialPropertyEvaluation
     
     //Terrain
-    case terrainData
+    case terrainMain
     case terrainGeoreferencing
     case terrainCar
     case terrainEvaluation
     case terrainEnvironment
     case terrainResident
-    
     
 }
 
