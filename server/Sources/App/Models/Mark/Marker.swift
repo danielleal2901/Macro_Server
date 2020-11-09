@@ -15,12 +15,6 @@ final class Marker: Model, Content {
     
     static let schema = "markers"
     
-    struct Inoutput: Content {
-        let id: UUID
-        let stageId: UUID
-        let sections: [DocumentSection]
-    }
-    
     @ID(key: .id)
     var id: UUID?
     
@@ -33,12 +27,21 @@ final class Marker: Model, Content {
     @Field(key: "isSelected")
     var isSelected: Bool
     
+    @Parent(key: "status_id")
+    var status: Status
+    
     init() {}
     
-    init(id: UUID = UUID(), title: String, color: [Double],isSelected: Bool) {
+    init(id: UUID = UUID(), title: String, color: [Double],statusID: UUID) {
         self.id = id
         self.title = title
         self.color = color
         self.isSelected = false
+        self.$status.id = statusID
+    }
+}
+extension Marker: Equatable{
+    static func == (lhs: Marker,rhs: Marker) -> Bool{
+        return rhs.id == lhs.id
     }
 }
