@@ -225,8 +225,7 @@ internal class WSDataWorker{
             
         case .markers:
             do{
-                let marker = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Marker.self)
-                
+                let marker = try CoderHelper.shared.decodeDataSingle(valueToDecode: dataRequest.data.content, intendedType: Marker.Inoutput.self)
                 let akaresponse = try dataManager.updateMarker(req: sessionRequest, newMarker: marker)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed

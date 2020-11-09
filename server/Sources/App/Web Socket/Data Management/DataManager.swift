@@ -218,7 +218,7 @@ class DataManager: DataManagerLogic{
             }
     }
     
-    internal func updateMarker(req: Request, newMarker: Marker) throws -> EventLoopFuture<HTTPStatus> {
+    internal func updateMarker(req: Request, newMarker: Marker.Inoutput) throws -> EventLoopFuture<HTTPStatus> {
         return Marker.find(newMarker.id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (marker) in

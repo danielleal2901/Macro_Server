@@ -15,6 +15,13 @@ final class Marker: Model, Content {
     
     static let schema = "markers"
     
+    struct Inoutput: Content {
+        var id: UUID
+        var title: String
+        var color: [Double]
+        var isSelected: Bool = false
+    }    
+    
     @ID(key: .id)
     var id: UUID?
     

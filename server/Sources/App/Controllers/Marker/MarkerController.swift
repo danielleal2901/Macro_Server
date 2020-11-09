@@ -52,7 +52,7 @@ class MarkerController: RouteCollection {
             .filter("status_id", .equal, id)
             .all().map { allMarkers in
             allMarkers.map { marker in
-                Marker(id: marker.id!, title: marker.title, color: marker.color, statusID: marker.status.id!)
+                Marker(id: marker.id!, title: marker.title, color: marker.color, statusID: marker.$status.id)
             }
         }
     }
