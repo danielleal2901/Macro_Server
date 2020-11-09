@@ -12,12 +12,16 @@ import Vapor
 enum MarkerRoutes: String{
     case main = "markers"
     case id = ":markerId"
-    case teamId = ":stageId"
+    case status = ":status"
+    case statusId = ":statusId"
     
-    static func getPathComponent(_ route: FarmRoutes) -> PathComponent{
+    static func getPathComponent(_ route: MarkerRoutes) -> PathComponent{
         return PathComponent(stringLiteral: route.rawValue)
     }
     
 }
 
-
+enum MarkerParameters: String{
+    case idMarker = "markerId"
+    case idStatus = "statusId"
+}

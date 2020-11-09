@@ -17,8 +17,7 @@ struct CreateMarker: Migration {
             .field("color", .array(of: .double), .required)
             .field("isSelected", .bool, .required)
             .field("status_id", .uuid,.required)
-            .unique(on: "status_id")
-            .foreignKey("status_id", references: "status", "id")
+            .foreignKey("status_id", references: "status", "id", onDelete: .cascade)
             .create()
     }
     

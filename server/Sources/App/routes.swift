@@ -85,6 +85,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: UserController())
     try app.register(collection: TeamController())
     try app.register(collection: FarmController())
+    try app.register(collection: MarkerController())
     
 }
 

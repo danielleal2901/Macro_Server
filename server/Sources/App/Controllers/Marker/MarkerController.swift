@@ -14,63 +14,53 @@ class MarkerController: RouteCollection {
         let markerMain = routes.grouped(MarkerRoutes.getPathComponent(.main))
         markerMain.post(use: insertMarker)
         
-        
         markerMain.group(MarkerRoutes.getPathComponent(.id)) { marker in
-            marker.get(use: fetchAllMarkersByTeamId)
+            markerMain.get(use: fetchAllMarkersByStatusId)
             marker.put(use: updateMarkerById)
             marker.delete(use: deleteMarkerById)
         }
+        
+        markerMain.group(MarkerRoutes.getPathComponent(.status)) { marker in
+            marker.group(MarkerRoutes.getPathComponent(.statusId)) { marker in
+                marker.get(use: fetchAllMarkersByStatusId(req: ))
+            }
+        }
+        
     }
         
     func insertMarker(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        
-        let farm = try req.content.decode(Farm.self)
-        
-        return farm.create(on: req.db).flatMapThrowing {
-            try self.setupTerritorialDiagnosisContainer(req: req, farmId: farm.id!).flatMapThrowing({ http in
-                try self.setupSocialMobContainer(req: req, farmId: farm.id!).flatMapThrowing({ (http) in
-                    try self.setupEnvironmentalContainer(req: req, farmId: farm.id!).flatMapThrowing({ (http) in
-                        try self.setupDescMemorialContainer(req: req, farmId: farm.id!).transform(to: ())
-                    })
-                })
-            })
-            
-        }.transform(to: .ok)
-
+        let marker = try req.content.decode(Marker.self)
+        return marker.create(on: req.db).transform(to: .ok)
     }
     
     func updateMarkerById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        let newFarm = try req.content.decode(Farm.self)
+        let newMarker = try req.content.decode(Marker.self)
         
-        guard let id = req.parameters.get(FarmParameters.idFarm.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+        guard let id = req.parameters.get(MarkerParameters.idMarker.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
         
-        return Farm.find(id, on: req.db)
+        return Marker.find(id, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { (farm) in
-                farm.name = newFarm.name
-                farm.desc = newFarm.desc
-                farm.teamId = newFarm.teamId
-                return farm.update(on: req.db).transform(to: .ok)
+            .flatMap { (marker) in
+                marker.title = newMarker.title
+                return marker.update(on: req.db).transform(to: .ok)
         }
     }
         
-    func fetchAllMarkersByTeamId(req: Request) throws -> EventLoopFuture<[Marker]> {
-        
-        guard let id = req.parameters.get(FarmParameters.teamId.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
-        
-        return Farm.query(on: req.db)
-            .filter("teamId", .equal, id)
-            .all().map { allFarms in
-            allFarms.map { farm in
-                Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: Data(), desc: farm.desc)
+    func fetchAllMarkersByStatusId(req: Request) throws -> EventLoopFuture<[Marker]> {
+        guard let id = req.parameters.get(MarkerParameters.idStatus.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+        return Marker.query(on: req.db)
+            .filter("status_id", .equal, id)
+            .all().map { allMarkers in
+            allMarkers.map { marker in
+                Marker(id: marker.id!, title: marker.title, color: marker.color, statusID: marker.status.id!)
             }
         }
     }
     
     func deleteMarkerById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        guard let id = req.parameters.get(FarmParameters.idFarm.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
+        guard let id = req.parameters.get(MarkerParameters.idMarker.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
             
-        return Farm.find(id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
+        return Marker.find(id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
         }
             
