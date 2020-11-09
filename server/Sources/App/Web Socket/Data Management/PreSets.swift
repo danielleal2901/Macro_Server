@@ -9,13 +9,13 @@ import Foundation
 import Vapor
 
 final class PreSets {
-    
+        
     static func setupTerrainPreSet(newContainer: StagesContainer, req: Request, stages: [Stage]) -> EventLoopFuture<HTTPStatus>{
         return newContainer.create(on: req.db).map { _ in
             stages.map { stage in
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Responsável", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db).map { _ in
+                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Responsável", items: [OverviewItem(key: "Dados Gerais", value: "")])]).create(on: req.db).map { _ in
                         return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _   in
                             return Status(id: statusID,stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [])]).create(on: req.db).map { _ in
                                 return createMarkerPreset(req: req, statusID: statusID)
@@ -33,11 +33,11 @@ final class PreSets {
                 let statusID = UUID()
                 _ =  stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections:
-                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "")]),
-                                         OverviewSection(name: "Pesquisa Documental", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
-                                         OverviewSection(name: "Pesquisa Fundiária", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
-                                         OverviewSection(name: "Estudo Territorial", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
-                                         OverviewSection(name: "Plano de Trabalho", items: [OverviewItem(key: "Informações do Responsável", value: "")])
+                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Pesquisa Documental", items: [OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Pesquisa Fundiária", items: [OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Estudo Territorial", items: [OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Plano de Trabalho", items: [OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")])
                                         ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
@@ -64,13 +64,13 @@ final class PreSets {
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections:
-                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "")]),
-                                         OverviewSection(name: "Licença Social", items: [OverviewItem(key: "Informações do Responsável", value: "")]),
-                                         OverviewSection(name: "Grupo de Acompanhamento", items: [OverviewItem(key: "Acompanhamento do Projeto ", value: "")
-                                                            OverviewItem(key: "Informações do Responsável", value: "")]),
+                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Informações do Morador", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Licença Social", items: [OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),
+                                         OverviewSection(name: "Grupo de Acompanhamento", items: [OverviewItem(key: "Acompanhamento do Projeto ", value: "Dados Gerais"),
+                                                                                                  OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),
                                          OverviewSection(name: "Engajamento Social", items: [OverviewItem(key: "Ações de Comunicação", value: ""),
                                                                                              OverviewItem(key: "Nível de Satisfação", value: ""),
-                                                            OverviewItem(key: "Informações do Responsável", value: "")]),                                                                                 ]).create(on: req.db)
+                                                                                             OverviewItem(key: "Informações do Responsável", value: "Dados Gerais")]),                                                                                 ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
                                             [Task.init(id: UUID(), title: "Estabelecer Licença social", status: .todo, tags: [], resp: []),
@@ -99,31 +99,32 @@ final class PreSets {
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections:
-                                        [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")]),
-                                         OverviewSection(name: "Licenciamento Ambiental", items: [OverviewItem(key: "Termos", value: ""),
-                                                                                                OverviewItem(key: "Dados do Responsável",value: "")
-                                         OverviewSection(name: "Relatórios Técnicos", items: [OverviewItem(key: "Relatórios", value: ""),
-                                                                                                OverviewItem(key: "Dados do Responsável",value: "")]),
-                                         OverviewSection(name: "Termos de Referência", items: [OverviewItem(key: "Termos", value: "")]),
-                                        
-                                        
-                                        ]).create(on: req.db)
-                        .map { _ in
-                            return Status(id: statusID,stageId: stage.id!, tasks:
-                                            [Task.init(id: UUID(), title: "Contratar órgão ambiental", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Verificar tipo de licença necessária", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Contratar Profissionais", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Coletar Relatórios técnicos", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Submeter relatórios ao órgão ambiental", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Obter licença ambiental", status: .todo, tags: [], resp: []),
-                                            ]).create(on: req.db)
-                                .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
-                                        return createMarkerPreset(req: req, statusID: statusID)
-                                    }
-                                }
-                        }
-                }
+                                        [OverviewSection(name: "Informações Principais", items:
+                                                            [OverviewItem(key: "Dados Gerais", value: "")]),
+                                         OverviewSection(name: "Licenciamento Ambiental", items:
+                                                            [OverviewItem(key: "Termos", value: ""),
+                                                             OverviewItem(key: "Dados do Responsável",value: "Dados Gerais")]),
+                                        OverviewSection(name: "Relatórios Técnicos", items: [OverviewItem(key: "Relatórios", value: ""),OverviewItem(key: "Dados do Responsável",value: "Dados Gerais")]),
+                                                             OverviewSection(name: "Termos de Referência", items: [OverviewItem(key: "Termos", value: "")]),
+                                                             
+                                                             
+                                                            ]).create(on: req.db)
+                                            .map { _ in
+                                                return Status(id: statusID,stageId: stage.id!, tasks:
+                                                                [Task.init(id: UUID(), title: "Contratar órgão ambiental", status: .todo, tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Verificar tipo de licença necessária", status: .todo, tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Contratar Profissionais", status: .todo, tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Coletar Relatórios técnicos", status: .todo, tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Submeter relatórios ao órgão ambiental", status: .todo, tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Obter licença ambiental", status: .todo, tags: [], resp: []),
+                                                                ]).create(on: req.db)
+                                                    .map { _ in
+                                                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                                            return createMarkerPreset(req: req, statusID: statusID)
+                                                        }
+                                                    }
+                                            }
+                                        }
             }
         }.transform(to: .ok)
     }
@@ -133,20 +134,35 @@ final class PreSets {
             stages.map { stage in
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
-                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db)
-                        .map { _ in
-                            return Status(id: statusID,stageId: stage.id!, tasks:
-                                            [Task.init(id: UUID(), title: "Contratar empresa especializada, com CREA", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Realizar Georeferenciamento", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Obter Planilha .ods", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Obter Mapas", status: .todo, tags: [], resp: [])                                             
-                                            ]).create(on: req.db)
-                                .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
-                                        return createMarkerPreset(req: req, statusID: statusID)
-                                    }
+                    return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items:
+                                                                  [OverviewItem(key: "Dados do Morador", value: "Dados Gerais")]),
+                                                                   OverviewSection(name: "Georreferenciamento", items:
+                                                                                    [OverviewItem(key: "Identificação das coordenadas", value: ""),
+                                                                                     OverviewItem(key: "Dados do Responsável", value: "Dados Gerais")]),
+                    OverviewSection(name: "Levantamento Cadastral Territorial", items:
+                                        [OverviewItem(key: "Delimitação Territorial", value: ""),
+                    OverviewItem(key: "Dados do Responsável", value: "Dados Gerais")]),
+                    OverviewSection(name: "Cadastramento", items:
+                                        [OverviewItem(key: "Cadastramento Físico", value: ""),
+                    OverviewItem(key: "Cadastramento Socioêconomico", value: ""),
+                    OverviewItem(key: "Avaliação dos imóveis", value: ""),
+                    OverviewItem(key: "Dados do Resposnável", value: "")])]
+                    ).create(on: req.db)
+                    .map { _ in
+                        return Status(id: statusID,stageId: stage.id!, tasks:
+                                        [Task.init(id: UUID(), title: "Contratar empresa especializada, com CREA", status: .todo, tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Realizar Georeferenciamento", status: .todo, tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Cadastramento dos Ocupantes", status: .todo, tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Codificar e Vistoriar os Lotes", status: .todo, tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Obter Planilha .ods", status: .todo, tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Obter Mapas", status: .todo, tags: [], resp: [])
+                                        ]).create(on: req.db)
+                            .map { _ in
+                                return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                    return createMarkerPreset(req: req, statusID: statusID)
                                 }
-                        }
+                            }
+                    }
                 }
             }
         }.transform(to: .ok)
@@ -158,7 +174,7 @@ final class PreSets {
                                  .init(title: "Médio", color: [221,211,187],statusID: statusID),
                                  .init(title: "Difícil", color: [221,187,187],statusID: statusID),
                                  .init(title: "Documento", color: [224,224,224],statusID: statusID),
-                                 .init(title: "Urgente", color: [221,187,221],statusID: statusID)]
+                                 .init(title: "Contrato", color: [221,187,221],statusID: statusID)]
         
         let promise = req.eventLoop.makePromise(of: Void.self)
         
