@@ -17,12 +17,12 @@ func routes(_ app: Application) throws {
                         to: "\(mailPackage.email)",
                         subject: "Regularize-se - Recuperação de Senha",
                         text: """
-                        Olá \(user.first!.name), nos foi submetido uma requisição informando que você esqueceu sua senha.
+                        Olá \(user.first!.name.uppercased()), nos foi submetido uma requisição informando que você esqueceu sua senha em nossa aplicação.
                         Caso não tenha solicitado nenhuma informação, favor desconsidere a mensagem.
-                        A sua senha é \(String(describing: password))
+                        O token para redefinição de sua senha é \(String(describing: password!.prefix(5)))
 
                         Atenciosamente Equipe da Regularize-se
-                        """
+                        """                        
                     )
                     req.mailgun(.mainDomain).send(message)
                 }
