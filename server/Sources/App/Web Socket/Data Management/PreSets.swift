@@ -16,7 +16,7 @@ final class PreSets {
                 let statusID = UUID()
                 _ = stage.create(on: req.db).map { _ in
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Responsável", items: [OverviewItem(key: "Nome", value: "ABPRU")])]).create(on: req.db).map { _ in
-                            return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _   in
+                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Marcados", items: []), DocumentSection(name: "Outros", items: [])]).create(on: req.db).map { _   in
                                 return Status(id: statusID,stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [])]).create(on: req.db).map { _ in
                                     return createMarkerPreset(req: req, statusID: statusID)
                                 }

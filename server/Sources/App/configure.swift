@@ -29,8 +29,8 @@ public func configure(_ app: Application) throws {
     app.mailgun.defaultDomain = .mainDomain
         
     //Enums: should be called first
-    app.migrations.add(CreateStageTypesEnum())
-    app.migrations.add(CreateStagesContainersTypesEnum())
+//    app.migrations.add(CreateStageTypesEnum())
+//    app.migrations.add(CreateStagesContainersTypesEnum())
 
     app.migrations.add(CreateTeam())
     app.migrations.add(CreateFarm())
