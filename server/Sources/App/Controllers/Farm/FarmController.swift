@@ -13,7 +13,12 @@ class FarmController: RouteCollection {
     
     func boot(routes: RoutesBuilder) throws {
         let farmMain = routes.grouped(FarmRoutes.getPathComponent(.main))
-        farmMain.post(use: insertFarm)
+        
+        farmMain.on(.POST,body:.collect(maxSize: "20mb")){
+            req in
+            try self.insertFarm(req: req)
+        }
+        
         
         
         farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
@@ -33,7 +38,8 @@ class FarmController: RouteCollection {
     
     func insertFarm(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         
-        let farm = try req.content.decode(Farm.self)
+        let farmInout = try req.content.decode(Farm.Inoutput.self)
+        let farm = Farm(id: farmInout.id, teamId: farmInout.teamId, name: farmInout.name, desc: farmInout.desc,icon: farmInout.icon)
         
         return farm.create(on: req.db).flatMapThrowing {
             try self.setupTerritorialDiagnosisContainer(req: req, farmId: farm.id!).flatMapThrowing({ http in
@@ -67,7 +73,7 @@ class FarmController: RouteCollection {
         return Farm.find(req.parameters.get(FarmParameters.idFarm.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalFarm in
-                return Farm.Inoutput(id: optionalFarm.id!, name: optionalFarm.name, teamId: optionalFarm.teamId, icon: Data(), desc: optionalFarm.desc)
+                return Farm.Inoutput(id: optionalFarm.id!, name: optionalFarm.name, teamId: optionalFarm.teamId, icon: optionalFarm.icon, desc: optionalFarm.desc)
         }
     }
     
@@ -79,7 +85,7 @@ class FarmController: RouteCollection {
             .filter("teamId", .equal, id)
             .all().map { allFarms in
             allFarms.map { farm in
-                Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: Data(), desc: farm.desc)
+                Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: farm.icon, desc: farm.desc)
             }
         }
     }
