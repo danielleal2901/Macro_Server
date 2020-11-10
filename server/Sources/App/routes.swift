@@ -17,17 +17,29 @@ func routes(_ app: Application) throws {
                         to: "\(mailPackage.email)",
                         subject: "Regularize-se - Recuperação de Senha",
                         text: """
-                        Olá \(user.first!.name), nos foi submetido uma requisição informando que você esqueceu sua senha.
+                        Olá \(user.first!.name.uppercased()), nos foi submetido uma requisição informando que você esqueceu sua senha em nossa aplicação.
                         Caso não tenha solicitado nenhuma informação, favor desconsidere a mensagem.
-                        A sua senha é \(String(describing: password))
+                        O token para redefinição de sua senha é \(String(describing: password!.prefix(12)))
 
                         Atenciosamente Equipe da Regularize-se
-                        """
+                        """                        
                     )
-                    req.mailgun(.mainDomain).send(message)
+                    _ = req.mailgun(.mainDomain).send(message)
                 }
             }.transform(to: .ok)
     }
+    
+    app.post("passwordReset") { req -> EventLoopFuture<HTTPStatus> in
+        let package = try req.content.decode(ResetPackage.self)        
+        return User.query(on: req.db)
+            .filter("email",.equal,package.email).all().map{ user in
+                if user.first!.password.prefix(12) == package.token{
+                    user.first?.password = try! Bcrypt.hash(package.password)
+                    _ = user.first?.update(on: req.db)
+                }
+            }.transform(to: .ok)
+    }
+    
     
     
     

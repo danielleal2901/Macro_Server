@@ -19,8 +19,6 @@ class FarmController: RouteCollection {
             try self.insertFarm(req: req)
         }
         
-        
-        
         farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
             farm.get(use: fetchFarmById)
             farm.put(use: updateFarmById)
