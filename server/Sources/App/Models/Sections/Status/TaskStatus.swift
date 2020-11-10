@@ -8,8 +8,8 @@
 import Foundation
 
 enum TaskStatus: String, Codable{
-    case todo = "todo"
-    case progress = "progress"
-    case done = "done"
+    case todo = "Não Começou"
+    case progress = "Em Progresso"
+    case done = "Concluída"
 }
 

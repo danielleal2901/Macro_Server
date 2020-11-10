@@ -13,8 +13,12 @@ class FarmController: RouteCollection {
     
     func boot(routes: RoutesBuilder) throws {
         let farmMain = routes.grouped(FarmRoutes.getPathComponent(.main))
-        farmMain.post(use: insertFarm)
-        farmMain.get(use: fetchAllFarms)
+        
+        farmMain.on(.POST,body:.collect(maxSize: "20mb")){
+            req in
+            try self.insertFarm(req: req)
+        }
+        
         
         
         farmMain.group(FarmRoutes.getPathComponent(.id)) { farm in            
@@ -34,7 +38,8 @@ class FarmController: RouteCollection {
     
     func insertFarm(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         
-        let farm = try req.content.decode(Farm.self)
+        let farmInout = try req.content.decode(Farm.Inoutput.self)
+        let farm = Farm(id: farmInout.id, teamId: farmInout.teamId, name: farmInout.name, desc: farmInout.desc,icon: farmInout.icon)
         
         return farm.create(on: req.db).flatMapThrowing {
             try self.setupTerritorialDiagnosisContainer(req: req, farmId: farm.id!).flatMapThrowing({ http in
@@ -68,7 +73,7 @@ class FarmController: RouteCollection {
         return Farm.find(req.parameters.get(FarmParameters.idFarm.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMapThrowing { optionalFarm in
-                return Farm.Inoutput(id: optionalFarm.id!, name: optionalFarm.name, teamId: optionalFarm.teamId, icon: Data(), desc: optionalFarm.desc)
+                return Farm.Inoutput(id: optionalFarm.id!, name: optionalFarm.name, teamId: optionalFarm.teamId, icon: optionalFarm.icon, desc: optionalFarm.desc)
         }
     }
     
@@ -88,7 +93,7 @@ class FarmController: RouteCollection {
             .filter("teamId", .equal, id)
             .all().map { allFarms in
             allFarms.map { farm in
-                Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: Data(), desc: farm.desc)
+                Farm.Inoutput(id: farm.id!, name: farm.name, teamId: farm.teamId, icon: farm.icon, desc: farm.desc)
             }
         }
     }
@@ -106,7 +111,7 @@ class FarmController: RouteCollection {
         
         let dataManager = DataManager()
         
-        let territorialStages : [StageTypes] = [.diagnosticData, .diagnosticDocumentaryResearch, .diagnosticLandResearch, .diagnosticTerritorialStudy, .diagnosticFinalReport, .diagnosticWorkPlan]
+        let territorialStages : [StageTypes] = [.diagnosticMain, .diagnosticDocumentaryResearch, .diagnosticLandResearch, .diagnosticTerritorialStudy,.diagnosticWorkPlan,.diagnosticFinalReport,]
         let territorialDiagContainer = StagesContainer.Inoutput(type: .territorialDiagnosis, stages: territorialStages, id: UUID(), farmId: farmId, name: "Diagnóstico Territorial")
         
         return try dataManager.createContainer(containerInput: territorialDiagContainer, req: req)
@@ -116,7 +121,7 @@ class FarmController: RouteCollection {
         
         let dataManager = DataManager()
         
-        let socialStages : [StageTypes] = [.socialMobilizationData]
+        let socialStages : [StageTypes] = [.socialMobilizationMain,.socialMobilizationSocialLicense,.socialMobilizationFollowUpGroup,.socialMobilizationSocialEngaging]
         
         let socialMobContainer = StagesContainer.Inoutput(type: .socialMobilization, stages: socialStages, id: UUID(), farmId: farmId, name: "Mobilização Social")
         
@@ -127,7 +132,7 @@ class FarmController: RouteCollection {
 
         let dataManager = DataManager()
 
-        let environmentStages : [StageTypes] = [.environmentalStudyData]
+        let environmentStages : [StageTypes] = [.socialMobilizationMain,.environmentalEnvironmentalLicense,.environmentalTechnicalReport]
 
         let environmentContainer = StagesContainer.Inoutput(type: .environmentalStudy, stages: environmentStages, id: UUID(), farmId: farmId, name: "Estudo Ambiental")
 
@@ -138,7 +143,7 @@ class FarmController: RouteCollection {
 
         let dataManager = DataManager()
 
-        let descMemorialStages : [StageTypes] = [.descriptiveMemorialData, .descriptiveMemorialGeoreferencing, .descriptiveMemorialTerritorialSurvey, .descriptiveMemorialPropertyRegistration, .descriptiveMemorialSocioeconomicRegistration, .descriptiveMemorialPropertyEvaluation]
+        let descMemorialStages : [StageTypes] = [.descriptiveMemorialMain, .descriptiveMemorialGeoreferencing, .descriptiveMemorialTerritorialSurvey, .descriptiveMemorialPropertyRegistration, .descriptiveMemorialSocioeconomicRegistration, .descriptiveMemorialPropertyEvaluation]
 
         let descMemorialContainer = StagesContainer.Inoutput(type: .descriptiveMemorial, stages: descMemorialStages, id: UUID(), farmId: farmId, name: "Memorial Descritivo")
 

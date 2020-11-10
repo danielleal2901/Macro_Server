@@ -25,14 +25,6 @@ struct TeamRequest: Content {
         self.employeeToken = try values.decode(String.self, forKey: .employeeToken)
         self.guestToken = try values.decode(String.self, forKey: .guestToken)
         self.image = try values.decode(Data.self, forKey: .image)
-//        do {
-//            self.activeUsers = try values.decode([UUID].self, forKey: .activeUsers)
-//            if self.activeUsers.count == 0 {
-//                throw TeamErrors.arrayError
-//            }
-//        } catch {
-//            self.activeUsers = try [values.decode(UUID.self, forKey: .activeUsers)]
-//        }
     }
 }
 

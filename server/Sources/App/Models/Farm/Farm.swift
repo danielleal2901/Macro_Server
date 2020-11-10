@@ -33,12 +33,16 @@ final class Farm: Model, Content {
     @Field(key: "desc")
     var desc: String
     
+    @Field(key: "icon")
+    var icon: Data
+    
     init() {}
      
-    init(id: UUID = UUID(), teamId: UUID, name: String, desc: String) {
+    init(id: UUID? = nil, teamId: UUID, name: String, desc: String,icon: Data) {
         self.id = id
         self.teamId = teamId
         self.name = name
         self.desc = desc
+        self.icon = icon
     }
 }
