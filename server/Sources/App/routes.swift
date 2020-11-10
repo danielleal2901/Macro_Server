@@ -29,6 +29,13 @@ func routes(_ app: Application) throws {
             }.transform(to: .ok)
     }
     
+    app.post("passwordReset") { req -> EventLoopFuture<HTTPStatus> in
+        let package = try req.content.decode(ResetPackage.self)
+        
+        return User.query(on: req.db)
+            .filter("email",.equal,package.email)
+    }
+    
     
     
     //@gui -> Going to Change Path, using for testing
