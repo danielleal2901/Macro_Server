@@ -20,6 +20,7 @@ struct CreateStagesContainer: Migration {
                 .foreignKey("farm_id", references: "farms", "id", onDelete: .cascade, onUpdate: .restrict)
                 .field("type", containerType, .required)
                 .field("name", .string, .required)
+                .field("desc", .string, .required)
                 .field("stages_names", .array(of: .string), .required)
                 .create()
             

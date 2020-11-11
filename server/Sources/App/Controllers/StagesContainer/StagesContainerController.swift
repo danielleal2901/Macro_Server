@@ -72,7 +72,7 @@ struct StagesContainerController: RouteCollection {
                 let outputs = containers.map { container in
                     StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                         return StageTypes(rawValue: stageString)
-                    }), id: container.id!, farmId: container.$farm.id, name: container.name)
+                    }), id: container.id!, farmId: container.$farm.id, name: container.name, desc: container.desc)
                 }
                 return outputs
         }
@@ -90,7 +90,7 @@ struct StagesContainerController: RouteCollection {
                 let outputs = containers.map { container in
                     StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                         return StageTypes(rawValue: stageString)
-                    }), id: container.id!, farmId: container.$farm.id, name: container.name)
+                    }), id: container.id!, farmId: container.$farm.id, name: container.name, desc: container.desc)
                 }
                 return outputs
         }
@@ -109,7 +109,7 @@ struct StagesContainerController: RouteCollection {
             let outputs = containers.map { container in
                 StagesContainer.Inoutput(type: container.type, stages: container.stages.compactMap({ stageString in
                     return StageTypes(rawValue: stageString)
-                }), id: container.id!, farmId: container.$farm.id, name: container.name)
+                }), id: container.id!, farmId: container.$farm.id, name: container.name, desc: container.desc)
             }
             return outputs
         }
@@ -129,7 +129,7 @@ struct StagesContainerController: RouteCollection {
             .flatMapThrowing {
                 return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
                     return StageTypes(rawValue: stageString)
-                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name)
+                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name, desc: $0.desc)
         }
         
     }
@@ -141,7 +141,7 @@ struct StagesContainerController: RouteCollection {
             .unwrap(or: Abort(.notFound)).flatMapThrowing {
                 return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
                     return StageTypes(rawValue: stageString)
-                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name)
+                }) , id: $0.id!, farmId: $0.$farm.id, name: $0.name, desc: $0.desc)
         }
     }
     
