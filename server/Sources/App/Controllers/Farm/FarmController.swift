@@ -110,7 +110,7 @@ class FarmController: RouteCollection {
         let dataManager = DataManager()
         
         let territorialStages : [StageTypes] = [.diagnosticMain, .diagnosticDocumentaryResearch, .diagnosticLandResearch, .diagnosticTerritorialStudy,.diagnosticWorkPlan,.diagnosticFinalReport,]
-        let territorialDiagContainer = StagesContainer.Inoutput(type: .territorialDiagnosis, stages: territorialStages, id: UUID(), farmId: farmId, name: "Diagnóstico Territorial")
+        let territorialDiagContainer = StagesContainer.Inoutput(type: .territorialDiagnosis, stages: territorialStages, id: UUID(), farmId: farmId, name: "Diagnóstico Territorial", desc: "", image: Data())
         
         return try dataManager.createContainer(containerInput: territorialDiagContainer, req: req)
     }
@@ -121,7 +121,7 @@ class FarmController: RouteCollection {
         
         let socialStages : [StageTypes] = [.socialMobilizationMain,.socialMobilizationSocialLicense,.socialMobilizationFollowUpGroup,.socialMobilizationSocialEngaging]
         
-        let socialMobContainer = StagesContainer.Inoutput(type: .socialMobilization, stages: socialStages, id: UUID(), farmId: farmId, name: "Mobilização Social")
+        let socialMobContainer = StagesContainer.Inoutput(type: .socialMobilization, stages: socialStages, id: UUID(), farmId: farmId, name: "Mobilização Social", desc: "", image: Data())
         
         return try dataManager.createContainer(containerInput: socialMobContainer, req: req)
     }
@@ -132,7 +132,7 @@ class FarmController: RouteCollection {
 
         let environmentStages : [StageTypes] = [.socialMobilizationMain,.environmentalEnvironmentalLicense,.environmentalTechnicalReport]
 
-        let environmentContainer = StagesContainer.Inoutput(type: .environmentalStudy, stages: environmentStages, id: UUID(), farmId: farmId, name: "Estudo Ambiental")
+        let environmentContainer = StagesContainer.Inoutput(type: .environmentalStudy, stages: environmentStages, id: UUID(), farmId: farmId, name: "Estudo Ambiental", desc: "", image: Data())
 
         return try dataManager.createContainer(containerInput: environmentContainer, req: req)
     }
@@ -143,7 +143,7 @@ class FarmController: RouteCollection {
 
         let descMemorialStages : [StageTypes] = [.descriptiveMemorialMain, .descriptiveMemorialGeoreferencing, .descriptiveMemorialTerritorialSurvey, .descriptiveMemorialPropertyRegistration, .descriptiveMemorialSocioeconomicRegistration, .descriptiveMemorialPropertyEvaluation]
 
-        let descMemorialContainer = StagesContainer.Inoutput(type: .descriptiveMemorial, stages: descMemorialStages, id: UUID(), farmId: farmId, name: "Memorial Descritivo")
+        let descMemorialContainer = StagesContainer.Inoutput(type: .descriptiveMemorial, stages: descMemorialStages, id: UUID(), farmId: farmId, name: "Memorial Descritivo", desc: "", image: Data())
 
         return try dataManager.createContainer(containerInput: descMemorialContainer, req: req)
     }
