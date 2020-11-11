@@ -18,6 +18,7 @@ final class StagesContainer: Model, Content {
         let farmId: UUID
         let name: String
         let desc: String
+        let image: Data
     }
     
     static let schema = "stagesContainer"
@@ -40,14 +41,19 @@ final class StagesContainer: Model, Content {
     @Field(key: "desc")
     var desc: String
     
+    @Field(key: "image")
+    var image: Data
+    
+    
     init() {}
     
-    init(id: UUID = UUID(), type: StagesContainerTypes, stages: [String], farmId: UUID, name: String,desc: String) {
+    init(id: UUID = UUID(), type: StagesContainerTypes, stages: [String], farmId: UUID, name: String,desc: String,image: Data) {
         self.id = id
         self.type = type
         self.stages = stages
         self.$farm.id = farmId
         self.name = name
         self.desc = desc
+        self.image = image
     }
 }
