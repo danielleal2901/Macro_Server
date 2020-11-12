@@ -43,6 +43,7 @@ class StageController: RouteCollection {
     }
     
     func fetchAllStages(req: Request) throws -> EventLoopFuture<[Stage.Inoutput]> {
+        try req.auth.require(User.self)
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -57,6 +58,7 @@ class StageController: RouteCollection {
     }
     
     func fetchStageById(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
+        try req.auth.require(User.self)
                 
         return Stage.find(req.parameters.get(StageParameters.stageId.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing {
@@ -65,6 +67,7 @@ class StageController: RouteCollection {
     }
     
     func fetchStageByContainerId(req: Request) throws -> EventLoopFuture<Stage.Inoutput> {
+        try req.auth.require(User.self)
         
         let stageType = try self.verifyDataRoutes(req: req)
         
@@ -88,6 +91,7 @@ class StageController: RouteCollection {
     /// - Throws: possible error in validation
     /// - Returns: returns a stage type getted from url
     func verifyDataRoutes(req: Request) throws -> StageTypes{
+        try req.auth.require(User.self)
         
         //Verifica se consegue pegar o parametro da url
         guard let reqParameter = req.parameters.get(StageParameters.stageName.rawValue, as: String.self) else {

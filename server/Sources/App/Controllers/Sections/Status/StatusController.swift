@@ -34,6 +34,8 @@ class StatusController: RouteCollection {
     }
 
     func fetchAllStatuss(req: Request) throws -> EventLoopFuture<[Status.Inoutput]> {
+        try req.auth.require(User.self)
+        
         return Status.query(on: req.db).all().map { allStatus in
             allStatus.map { status in
                 return Status.Inoutput(id: status.id!, stageId: status.$stage.id, tasks: status.tasks)
@@ -42,6 +44,8 @@ class StatusController: RouteCollection {
     }
     
     func fetchStatusById(req: Request) throws -> EventLoopFuture<Status.Inoutput> {
+        try req.auth.require(User.self)
+        
         return Status.find(req.parameters.get(StatusRoutes.id.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalStatus in
                 return Status.Inoutput(id: optionalStatus.id!, stageId: optionalStatus.$stage.id, tasks: optionalStatus.tasks)
@@ -49,6 +53,7 @@ class StatusController: RouteCollection {
     }
     
     func fetchStatusByStageId (req: Request) throws -> EventLoopFuture<Status.Inoutput> {
+        try req.auth.require(User.self)
         
         guard let stageId = req.parameters.get((StatusParameters.stageId.rawValue), as: UUID.self) else {
             throw Abort(.badRequest)

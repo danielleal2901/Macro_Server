@@ -57,12 +57,16 @@ class FilesController: RouteCollection {
     
     
     func fetchAllFiles(req: Request) throws -> EventLoopFuture<[Files.Inoutput]> {
+        try req.auth.require(User.self)
+        
         return Files.query(on: req.db).all().mapEach { files in
             return Files.Inoutput(id: files.id!, data: files.data, itemId: files.itemId, documentId: files.$document.id)
         }
     }
     
     func fetchFileById(req: Request) throws -> EventLoopFuture<Files.Inoutput> {
+        try req.auth.require(User.self)
+        
         guard let fileId = req.parameters.get(FilesParameters.id.rawValue, as: UUID.self) else {
             throw Abort(.notFound)
         }
@@ -74,6 +78,8 @@ class FilesController: RouteCollection {
     }
     
     func fetchFilesByDocumentId(req: Request) throws -> EventLoopFuture<[Files.Inoutput]> {
+        try req.auth.require(User.self)
+        
         guard let documentId = req.parameters.get(FilesParameters.documentId.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
@@ -87,6 +93,7 @@ class FilesController: RouteCollection {
     }
     
     func downloadFile(req: Request) throws -> EventLoopFuture<Files.Inoutput> {
+        try req.auth.require(User.self)
         
         guard let documentId = req.parameters.get(FilesParameters.documentId.rawValue, as: UUID.self),
             let itemId = req.parameters.get(FilesParameters.itemId.rawValue, as: UUID.self)
@@ -106,7 +113,7 @@ class FilesController: RouteCollection {
     }
     
     func insertFile(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        
+        try req.auth.require(User.self)
         
         guard let _id = req.headers.first(name: FilesParameters.id.rawValue), let id = UUID(uuidString:  _id),
          let _itemId = req.headers.first(name: FilesParameters.itemId.rawValue), let itemId = UUID(uuidString: _itemId),

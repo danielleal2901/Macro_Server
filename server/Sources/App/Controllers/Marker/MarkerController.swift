@@ -29,11 +29,15 @@ class MarkerController: RouteCollection {
     }
         
     func insertMarker(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        try req.auth.require(User.self)
+        
         let marker = try req.content.decode(Marker.self)
         return marker.create(on: req.db).transform(to: .ok)
     }
     
     func updateMarkerById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
+        try req.auth.require(User.self)
+        
         let newMarker = try req.content.decode(Marker.self)
         
         guard let id = req.parameters.get(MarkerParameters.idMarker.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
@@ -47,6 +51,8 @@ class MarkerController: RouteCollection {
     }
         
     func fetchAllMarkersByStatusId(req: Request) throws -> EventLoopFuture<[Marker]> {
+        try req.auth.require(User.self)
+        
         guard let id = req.parameters.get(MarkerParameters.idStatus.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
         return Marker.query(on: req.db)
             .filter("status_id", .equal, id)
@@ -58,6 +64,8 @@ class MarkerController: RouteCollection {
     }
     
     func deleteMarkerById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
+        try req.auth.require(User.self)
+        
         guard let id = req.parameters.get(MarkerParameters.idMarker.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
             
         return Marker.find(id, on: req.db).unwrap(or: Abort(.notFound)).flatMap {

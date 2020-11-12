@@ -24,6 +24,8 @@ class TeamController: RouteCollection {
     }
     
     func insertTeam(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        try req.auth.require(User.self)
+        
         let teamReq = try req.content.decode(TeamRequest.self)
         let team = Team(id: teamReq.id, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken, activeUsers: teamReq.activeUsers)
         return team.create(on: req.db)
@@ -32,6 +34,8 @@ class TeamController: RouteCollection {
     }
     
     func getTeamById(req: Request) throws -> EventLoopFuture<TeamResponse> {
+        try req.auth.require(User.self)
+        
         guard let teamID = req.parameters.get(TeamParameters.teamId.rawValue, as: UUID.self) else {
             throw Abort(.notFound)
         }

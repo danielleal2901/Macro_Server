@@ -33,6 +33,8 @@ class OverviewController: RouteCollection {
     }
     
     func fetchAllOverviews(req: Request) throws -> EventLoopFuture<[Overview.Inoutput]> {
+        try req.auth.require(User.self)
+        
         return Overview.query(on: req.db).all().map { allOverviews in
             return allOverviews.map { overview in
                 Overview.Inoutput(id: overview.id!, stageId: overview.stage.id!, sections: overview.sections)
@@ -41,6 +43,8 @@ class OverviewController: RouteCollection {
     }
     
     func fetchOverviewById(req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
+        try req.auth.require(User.self)
+        
         return Overview.find(req.parameters.get(OverviewRoutes.id.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalOverview in
                 return Overview.Inoutput(id: optionalOverview.id!, stageId: optionalOverview.$stage.id, sections: optionalOverview.sections)
@@ -48,6 +52,7 @@ class OverviewController: RouteCollection {
     }
     
     func fetchOverviewByStageId (req: Request) throws -> EventLoopFuture<Overview.Inoutput> {
+        try req.auth.require(User.self)
         
         guard let stageId = req.parameters.get((OverviewParameters.stageId.rawValue), as: UUID.self) else {
             throw Abort(.badRequest)
