@@ -39,7 +39,7 @@ class DocumentController: RouteCollection {
     }
     
     func insertDocument(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        try req.auth.require(User.self)
+        
         
         let input = try req.content.decode(Document.Inoutput.self)
         let doc = Document(id: input.id, stageId: input.stageId, sections: input.sections)
@@ -47,7 +47,7 @@ class DocumentController: RouteCollection {
     }
     
     func fetchAllDocuments(req: Request) throws -> EventLoopFuture<[Document.Inoutput]> {
-        try req.auth.require(User.self)
+        
         
         return Document.query(on: req.db).all().map { allDocs in
             allDocs.map { doc in
@@ -57,7 +57,7 @@ class DocumentController: RouteCollection {
     }
     
     func fetchDocById(req: Request) throws -> EventLoopFuture<Document.Inoutput> {
-        try req.auth.require(User.self)
+        
         
         return Document.find(req.parameters.get(DocumentParameters.documentId.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing { optionalDoc in
@@ -66,7 +66,7 @@ class DocumentController: RouteCollection {
     }
     
     func fetchDocByStageId (req: Request) throws -> EventLoopFuture<Document.Inoutput> {
-        try req.auth.require(User.self)
+        
         
         guard let stageId = req.parameters.get((DocumentParameters.stageId.rawValue), as: UUID.self) else {
             throw Abort(.badRequest)

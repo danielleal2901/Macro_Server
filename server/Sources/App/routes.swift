@@ -143,7 +143,7 @@ func routes(_ app: Application) throws {
     //        try req.auth.require(User.self)
     //    }
     
-    let tokenProtected = app.grouped(UserToken.authenticator())
+    let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
     
     
     try tokenProtected.register(collection: StagesContainerController())
@@ -194,18 +194,12 @@ func webSockets(_ app: Application) throws{
     
     //    }
     
-    let tokenProtected = app.grouped(UserToken.authenticator())
+    let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
     
     tokenProtected.webSocket("DataExchange", maxFrameSize: .init(integerLiteral: 1 << 30)) { request,ws in
         let currentWsId: UUID = UUID()
         // MARK - Variables
         // Actions for control of User Sessions
-        
-        do {
-            try request.auth.require(User.self)
-        } catch {
-            print("fudeo")
-        }
         
         ws.onText { (ws, data) in
             if let dataCov = data.data(using: .utf8){

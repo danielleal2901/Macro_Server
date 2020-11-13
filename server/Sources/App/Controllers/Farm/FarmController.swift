@@ -14,6 +14,8 @@ class FarmController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let farmMain = routes.grouped(FarmRoutes.getPathComponent(.main))
         
+        farmMain.get(use: self.fetchAllFarms(req:))
+        
         farmMain.on(.POST,body:.collect(maxSize: "20mb")){
             req in
             try self.insertFarm(req: req)
@@ -35,7 +37,7 @@ class FarmController: RouteCollection {
     
     
     func insertFarm(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        try req.auth.require(User.self)
+        
         
         let farmInout = try req.content.decode(Farm.Inoutput.self)
         let farm = Farm(id: farmInout.id, teamId: farmInout.teamId, name: farmInout.name, desc: farmInout.desc,icon: farmInout.icon)
@@ -54,7 +56,7 @@ class FarmController: RouteCollection {
     }
     
     func updateFarmById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
         
         let newFarm = try req.content.decode(Farm.self)
         
@@ -71,7 +73,7 @@ class FarmController: RouteCollection {
     }
 
     func fetchFarmById(req: Request) throws -> EventLoopFuture<Farm.Inoutput> {
-        try req.auth.require(User.self)
+        
         
         return Farm.find(req.parameters.get(FarmParameters.idFarm.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -81,7 +83,7 @@ class FarmController: RouteCollection {
     }
     
     func fetchAllFarms(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
-        try req.auth.require(User.self)
+        
         
             return Farm.query(on: req.db).all().map { allFarms in
                 allFarms.map { farm in
@@ -91,7 +93,7 @@ class FarmController: RouteCollection {
         }
     
     func fetchAllFarmsByTeamId(req: Request) throws -> EventLoopFuture<[Farm.Inoutput]> {
-        try req.auth.require(User.self)
+        
         
         guard let id = req.parameters.get(FarmParameters.teamId.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
         
@@ -105,7 +107,7 @@ class FarmController: RouteCollection {
     }
     
     func deleteFarmById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
         
         guard let id = req.parameters.get(FarmParameters.idFarm.rawValue, as: UUID.self) else { throw Abort(.badRequest) }
             
@@ -116,7 +118,7 @@ class FarmController: RouteCollection {
     }
     
     private func setupTerritorialDiagnosisContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
         
         let dataManager = DataManager()
         
@@ -127,7 +129,7 @@ class FarmController: RouteCollection {
     }
     
     private func setupSocialMobContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
         
         let dataManager = DataManager()
         
@@ -139,7 +141,7 @@ class FarmController: RouteCollection {
     }
     
     private func setupEnvironmentalContainer (req: Request, farmId: UUID) throws ->  EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
 
         let dataManager = DataManager()
 
@@ -151,7 +153,7 @@ class FarmController: RouteCollection {
     }
     
     private func setupDescMemorialContainer (req: Request, farmId: UUID) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
 
         let dataManager = DataManager()
 

@@ -29,7 +29,6 @@ class UserController: RouteCollection {
     
     
     func fetchAllUsers(req: Request) throws -> EventLoopFuture<[UserResponse]>  {
-        try req.auth.require(User.self)
         
         return User.query(on: req.db).all().map { (users) in
             var usersResponse = [UserResponse]()
@@ -47,14 +46,14 @@ class UserController: RouteCollection {
     }
 
     func fetchUserById(req: Request) throws -> EventLoopFuture<User> {
-        try req.auth.require(User.self)
+        
         
         return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound))
     }
     
     func deleteUserById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
 
         return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db).unwrap(or: Abort(.notFound)).flatMap {
             $0.delete(on: req.db).transform(to: .ok)
@@ -62,7 +61,7 @@ class UserController: RouteCollection {
     }
     
     func updateUserById(req: Request) throws -> EventLoopFuture<HTTPStatus>{
-        try req.auth.require(User.self)
+        
 
         let newUser = try req.content.decode(AuthEntity.self)
         return User.find(req.parameters.get(UserParameters.idUser.rawValue), on: req.db)
