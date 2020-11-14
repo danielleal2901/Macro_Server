@@ -62,6 +62,8 @@ struct StagesContainerController: RouteCollection {
     }
     
     func fetchAllContainersByParentId(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
+        
+        
         guard let parentId = req.parameters.get(StagesContainerParameters.withParent.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
         }
@@ -81,6 +83,7 @@ struct StagesContainerController: RouteCollection {
     
     func fetchAllWithTypeContainers(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
         
+        
         let containerType = try self.verifyContainerTypes(req: req)
         
         
@@ -97,6 +100,7 @@ struct StagesContainerController: RouteCollection {
     }
     
     func fetchTerrainContainersByParentId(req: Request) throws -> EventLoopFuture<[StagesContainer.Inoutput]>  {
+        
         
         guard let parentId = req.parameters.get(StagesContainerParameters.withParent.rawValue, as: UUID.self) else {
             throw Abort(.badRequest)
@@ -116,6 +120,7 @@ struct StagesContainerController: RouteCollection {
     }
     
     func fetchContainerByTypeAndParentId(req: Request) throws -> EventLoopFuture<StagesContainer.Inoutput>  {
+        
         
         let containerType = try self.verifyContainerTypes(req: req)
         guard let parentId = req.parameters.get(StagesContainerParameters.withParent.rawValue, as: UUID.self) else {
@@ -137,6 +142,7 @@ struct StagesContainerController: RouteCollection {
     
     func fetchContainerById(req: Request) throws -> EventLoopFuture<StagesContainer.Inoutput> {
         
+        
         return StagesContainer.find(req.parameters.get(StagesContainerRoutes.id.rawValue), on: req.db)
             .unwrap(or: Abort(.notFound)).flatMapThrowing {
                 return StagesContainer.Inoutput(type: $0.type, stages: $0.stages.compactMap({ (stageString) in
@@ -150,6 +156,7 @@ struct StagesContainerController: RouteCollection {
     /// - Throws: possible error in validation
     /// - Returns: returns a container type getted from url
     func verifyContainerTypes(req: Request) throws -> StagesContainerTypes{
+        
         
         //Verifica se consegue pegar o parametro da url
         guard let reqParameter = req.parameters.get(StagesContainerParameters.containerType.rawValue, as: String.self) else {

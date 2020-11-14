@@ -13,17 +13,21 @@ class TeamController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let teamMain = routes.grouped(TeamRoutes.getPathComponent(.main))
         
+        let tokenProtected = teamMain.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
+
         teamMain.on(.POST, body: .collect(maxSize: "20mb")) { req in
             try self.insertTeam(req: req)
         }
         
-        teamMain.group(TeamRoutes.getPathComponent(.id)) { (teams) in
+        tokenProtected.group(TeamRoutes.getPathComponent(.id)) { (teams) in
             teams.get(use: getTeamById(req:))
         }
         
     }
     
     func insertTeam(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        
+        
         let teamReq = try req.content.decode(TeamRequest.self)
         let team = Team(id: teamReq.id, name: teamReq.name, description: teamReq.description, image: teamReq.image, employeeToken: teamReq.employeeToken, guestToken: teamReq.guestToken, activeUsers: teamReq.activeUsers)
         return team.create(on: req.db)
@@ -32,6 +36,8 @@ class TeamController: RouteCollection {
     }
     
     func getTeamById(req: Request) throws -> EventLoopFuture<TeamResponse> {
+        
+        
         guard let teamID = req.parameters.get(TeamParameters.teamId.rawValue, as: UUID.self) else {
             throw Abort(.notFound)
         }
