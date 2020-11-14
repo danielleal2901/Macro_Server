@@ -153,9 +153,10 @@ func routes(_ app: Application) throws {
     try tokenProtected.register(collection: DocumentController())
     try tokenProtected.register(collection: FilesController())
     try tokenProtected.register(collection: UserController())
-    try tokenProtected.register(collection: TeamController())
     try tokenProtected.register(collection: FarmController())
     try tokenProtected.register(collection: MarkerController())
+    
+    try app.register(collection: TeamController())
     
 }
 

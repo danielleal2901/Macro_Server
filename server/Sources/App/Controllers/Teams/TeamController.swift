@@ -13,11 +13,13 @@ class TeamController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let teamMain = routes.grouped(TeamRoutes.getPathComponent(.main))
         
+        let tokenProtected = teamMain.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
+
         teamMain.on(.POST, body: .collect(maxSize: "20mb")) { req in
             try self.insertTeam(req: req)
         }
         
-        teamMain.group(TeamRoutes.getPathComponent(.id)) { (teams) in
+        tokenProtected.group(TeamRoutes.getPathComponent(.id)) { (teams) in
             teams.get(use: getTeamById(req:))
         }
         
