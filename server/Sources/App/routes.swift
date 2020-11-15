@@ -145,16 +145,28 @@ func routes(_ app: Application) throws {
     
     let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
     
+//
+//    try tokenProtected.register(collection: StagesContainerController())
+//    try tokenProtected.register(collection: StageController())
+//    try tokenProtected.register(collection: OverviewController())
+//    try tokenProtected.register(collection: StatusController())
+//    try tokenProtected.register(collection: DocumentController())
+//    try tokenProtected.register(collection: FilesController())
+//    try tokenProtected.register(collection: UserController())
+//    try tokenProtected.register(collection: FarmController())
+//    try tokenProtected.register(collection: MarkerController())
     
-    try tokenProtected.register(collection: StagesContainerController())
-    try tokenProtected.register(collection: StageController())
-    try tokenProtected.register(collection: OverviewController())
-    try tokenProtected.register(collection: StatusController())
-    try tokenProtected.register(collection: DocumentController())
-    try tokenProtected.register(collection: FilesController())
-    try tokenProtected.register(collection: UserController())
-    try tokenProtected.register(collection: FarmController())
-    try tokenProtected.register(collection: MarkerController())
+        try app.register(collection: StagesContainerController())
+        try app.register(collection: StageController())
+        try app.register(collection: OverviewController())
+        try app.register(collection: StatusController())
+        try app.register(collection: DocumentController())
+        try app.register(collection: FilesController())
+        try app.register(collection: UserController())
+        try app.register(collection: FarmController())
+        try app.register(collection: MarkerController())
+    
+    
     
     try app.register(collection: TeamController())
     
