@@ -70,8 +70,12 @@ func routes(_ app: Application) throws {
         let user = try req.content.decode(User.self)
         let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
         let token = try user.generateToken()
-        let response = LoginPackage(user: userResponse, userToken: token)
-        return user.save(on: req.db).transform(to: response)
+        
+        return user.save(on: req.db).flatMap { _ -> EventLoopFuture<LoginPackage> in
+            let response = LoginPackage(user: userResponse, userToken: token)
+            return token.save(on: req.db).transform(to: response)
+        }
+        
     }
     
     //Creates an User
@@ -96,9 +100,11 @@ func routes(_ app: Application) throws {
                 do {
                     let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
                     let token = try user.generateToken()
-                    let response = LoginPackage(user: userResponse, userToken: token)
-                    user.save(on: req.db).whenSuccess { (_) in
-                        promise.succeed(response)
+                    user.save(on: req.db).whenSuccess {
+                        let response = LoginPackage(user: userResponse, userToken: token)
+                        token.save(on: req.db).whenSuccess { _ in
+                            promise.succeed(response)
+                        }
                     }
                 } catch {
                     promise.fail(Abort(.badRequest))
