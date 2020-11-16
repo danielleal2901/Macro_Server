@@ -117,12 +117,12 @@ func routes(_ app: Application) throws {
     app.post("userlogin") { req -> EventLoopFuture<LoginPackage> in
         let authEntity = try req.content.decode(AuthEntity.self)
         
-        return User.query(on: req.db).filter("email", .equal, authEntity.email).first().unwrap(or: Abort(.notFound)).flatMap { (user) in
+        return User.query(on: req.db).filter("email", .equal, authEntity.email).first().unwrap(or: Abort(.notFound, reason: "Usuário ou senha inválidos.")).flatMap { (user) in
             
             let promise = req.eventLoop.makePromise(of: LoginPackage.self)
             do {
                 if try !Bcrypt.verify(authEntity.password, created: user.password) {
-                    promise.fail(Abort(.unauthorized))
+                    promise.fail(Abort(.unauthorized, reason: "Usuário ou senha inválidos."))
                 }
             } catch {
                 promise.fail(Abort(.badRequest))
