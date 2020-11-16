@@ -141,6 +141,10 @@ internal class WSDataWorker{
                     response.actionStatus = .Completed
                     completion(response)
                 }
+                akaresponse.whenFailure { _ in
+                    response.actionStatus = .Error
+                    completion(response)
+                }
             } catch(let error) {
                 print(error.localizedDescription)
                 response.actionStatus = .Error
@@ -154,6 +158,10 @@ internal class WSDataWorker{
                 let akaresponse = try dataManager.updateStage(req: sessionRequest, newStage: stageInoutput)
                 akaresponse.whenSuccess { _ in
                     response.actionStatus = .Completed
+                    completion(response)
+                }
+                akaresponse.whenFailure { _ in
+                    response.actionStatus = .Error
                     completion(response)
                 }
             } catch (let error){

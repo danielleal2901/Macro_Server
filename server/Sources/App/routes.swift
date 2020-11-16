@@ -70,8 +70,12 @@ func routes(_ app: Application) throws {
         let user = try req.content.decode(User.self)
         let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
         let token = try user.generateToken()
-        let response = LoginPackage(user: userResponse, userToken: token)
-        return user.save(on: req.db).transform(to: response)
+        
+        return user.save(on: req.db).flatMap { _ -> EventLoopFuture<LoginPackage> in
+            let response = LoginPackage(user: userResponse, userToken: token)
+            return token.save(on: req.db).transform(to: response)
+        }
+        
     }
     
     //Creates an User
@@ -96,9 +100,11 @@ func routes(_ app: Application) throws {
                 do {
                     let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
                     let token = try user.generateToken()
-                    let response = LoginPackage(user: userResponse, userToken: token)
-                    user.save(on: req.db).whenSuccess { (_) in
-                        promise.succeed(response)
+                    user.save(on: req.db).whenSuccess {
+                        let response = LoginPackage(user: userResponse, userToken: token)
+                        token.save(on: req.db).whenSuccess { _ in
+                            promise.succeed(response)
+                        }
                     }
                 } catch {
                     promise.fail(Abort(.badRequest))
@@ -143,31 +149,28 @@ func routes(_ app: Application) throws {
     //        try req.auth.require(User.self)
     //    }
     
-//    let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
-//
-//
-//    try tokenProtected.register(collection: StagesContainerController())
-//    try tokenProtected.register(collection: StageController())
-//    try tokenProtected.register(collection: OverviewController())
-//    try tokenProtected.register(collection: StatusController())
-//    try tokenProtected.register(collection: DocumentController())
-//    try tokenProtected.register(collection: FilesController())
-//    try tokenProtected.register(collection: UserController())
-//    try tokenProtected.register(collection: FarmController())
-//    try tokenProtected.register(collection: MarkerController())
-//
-//    try app.register(collection: TeamController())
+    let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
     
-        try app.register(collection: StagesContainerController())
-        try app.register(collection: StageController())
-        try app.register(collection: OverviewController())
-        try app.register(collection: StatusController())
-        try app.register(collection: DocumentController())
-        try app.register(collection: FilesController())
-        try app.register(collection: UserController())
-        try app.register(collection: FarmController())
-        try app.register(collection: MarkerController())
-        try app.register(collection: TeamController())
+    try tokenProtected.register(collection: StagesContainerController())
+    try tokenProtected.register(collection: StageController())
+    try tokenProtected.register(collection: OverviewController())
+    try tokenProtected.register(collection: StatusController())
+    try tokenProtected.register(collection: DocumentController())
+    try tokenProtected.register(collection: FilesController())
+    try tokenProtected.register(collection: UserController())
+    try tokenProtected.register(collection: FarmController())
+    try tokenProtected.register(collection: MarkerController())
+    
+//    try app.register(collection: StagesContainerController())
+//    try app.register(collection: StageController())
+//    try app.register(collection: OverviewController())
+//    try app.register(collection: StatusController())
+//    try app.register(collection: DocumentController())
+//    try app.register(collection: FilesController())
+//    try app.register(collection: UserController())
+//    try app.register(collection: FarmController())
+//    try app.register(collection: MarkerController())
+    try app.register(collection: TeamController())
     
 }
 

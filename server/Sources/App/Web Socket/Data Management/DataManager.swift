@@ -39,6 +39,9 @@ class DataManager: DataManagerLogic{
         return StagesContainer.find(newContainer.id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { (oldContainer) in
+                oldContainer.name = newContainer.name
+                oldContainer.desc = newContainer.desc
+                oldContainer.image = newContainer.image
                 oldContainer.type = newContainer.type
                 oldContainer.stages = newContainer.stages.map({$0.rawValue})
                 return oldContainer.update(on: req.db).transform(to: .ok)
