@@ -143,14 +143,7 @@ func routes(_ app: Application) throws {
         }
     }
     
-    //    let tokenProtected = app.grouped(UserToken.authenticator())
-    //
-    //    tokenProtected.get("me") { req -> User in
-    //        try req.auth.require(User.self)
-    //    }
-    
     let tokenProtected = app.grouped(UserToken.authenticator()).grouped(UserToken.guardMiddleware())
-    
     
     try tokenProtected.register(collection: StagesContainerController())
     try tokenProtected.register(collection: StageController())
@@ -162,6 +155,7 @@ func routes(_ app: Application) throws {
     try tokenProtected.register(collection: FarmController())
     try tokenProtected.register(collection: MarkerController())
     
+    try app.register(collection: TeamController())
 //    try app.register(collection: StagesContainerController())
 //    try app.register(collection: StageController())
 //    try app.register(collection: OverviewController())
@@ -171,7 +165,6 @@ func routes(_ app: Application) throws {
 //    try app.register(collection: UserController())
 //    try app.register(collection: FarmController())
 //    try app.register(collection: MarkerController())
-    try app.register(collection: TeamController())
     
 }
 
