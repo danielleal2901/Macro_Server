@@ -18,7 +18,7 @@ final class PreSets {
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Dados Gerais", value: "")]),
                                                                    OverviewSection(name: "Informações do Responsável", items: [OverviewItem(key: "Dados Gerais", value: "")])
                                                                   ]).create(on: req.db).map { _ in
-                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Marcados", items: []), DocumentSection(name: "Outros", items: [])]).create(on: req.db).map { _   in
+                        return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _   in
                             return Status(id: statusID,stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [])]).create(on: req.db).map { _ in
                                 return createMarkerPreset(req: req, statusID: statusID)
                             }
@@ -47,7 +47,7 @@ final class PreSets {
                                              Task.init(id: UUID(), title: "Levantamento de Características Históricas, Físicas e Geográficas", status: .todo, tags: [], resp: []),
                                             ]).create(on: req.db)
                                 .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                    return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                         return createMarkerPreset(req: req, statusID: statusID)
                                     }
                                 }
@@ -78,7 +78,7 @@ final class PreSets {
                                              
                                             ]).create(on: req.db)
                                 .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                    return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                         return createMarkerPreset(req: req, statusID: statusID)
                                     }
                                 }
@@ -107,7 +107,7 @@ final class PreSets {
                                                                  Task.init(id: UUID(), title: "Obter licença ambiental", status: .todo, tags: [], resp: []),
                                                                 ]).create(on: req.db)
                                                     .map { _ in
-                                                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                                        return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                                             return createMarkerPreset(req: req, statusID: statusID)
                                                         }
                                                     }
@@ -136,7 +136,7 @@ final class PreSets {
                                          Task.init(id: UUID(), title: "Obter Mapas", status: .todo, tags: [], resp: [])
                                         ]).create(on: req.db)
                             .map { _ in
-                                return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                     return createMarkerPreset(req: req, statusID: statusID)
                                 }
                             }
@@ -165,6 +165,10 @@ final class PreSets {
         }
         return promise.futureResult.transform(to: .ok)
         
+    }
+    
+    static func createDocumentPreset(idStage: UUID) -> Document {
+        return Document(stageId: idStage, sections: [DocumentSection(name: "Marcados", items: []), DocumentSection(name: "Outros", items: [])])
     }
     
 }
