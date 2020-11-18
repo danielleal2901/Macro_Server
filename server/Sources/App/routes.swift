@@ -40,79 +40,6 @@ func routes(_ app: Application) throws {
             }.transform(to: .ok)
     }
     
-    
-    
-    
-    //@gui -> Going to Change Path, using for testing
-    //    app.post("userstates") { (req) -> EventLoopFuture<WSUserState> in
-    //        let create = try req.content.decode(WSUserState.self)
-    //        let state = WSUserState(create.name,create.photo,create.containerID,create.respUserID, create.destTeamID)
-    //
-    //        return User.find(state.respUserID, on: req.db)
-    //            .unwrap(or: Abort(.notFound))
-    //            .flatMap { (optionalUserState) -> EventLoopFuture<WSUserState> in
-    //                state.name = optionalUserState.name
-    //                state.photo = optionalUserState.name
-    //                return state.save(on: req.db).transform(to: state)
-    //        }
-    //    }
-    //
-    //    //@gui - > Change to Post for specified with Team
-    //    app.get("userStates",":teamid") { (req) -> EventLoopFuture<[WSUserState]> in
-    //        if let teamID = req.parameters.get("teamid"){
-    //            return WSUserState.query(on: req.db).filter("destTeamID", .equal, UUID(uuidString: teamID)).all()
-    //        }
-    //        return WSUserState.query(on: req.db).all()
-    //    }
-    
-    //Creates an Administrator
-    app.on(.POST, UserRoutes.getPathComponent(.main), body: .collect(maxSize: "20mb")) {req -> EventLoopFuture<LoginPackage> in
-        let user = try req.content.decode(User.self)
-        let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
-        let token = try user.generateToken()
-        
-        return user.save(on: req.db).flatMap { _ -> EventLoopFuture<LoginPackage> in
-            let response = LoginPackage(user: userResponse, userToken: token)
-            return token.save(on: req.db).transform(to: response)
-        }
-        
-    }
-    
-    //Creates an User
-    app.on(.POST, UserRoutes.getPathComponent(.employeeToken), body: .collect(maxSize: "20mb")) { req -> EventLoopFuture<LoginPackage> in
-        guard let employeeToken = req.parameters.get(UserParameters.employeeToken.rawValue) else {
-            throw Abort(.notFound)
-        }
-        
-        let promise = req.eventLoop.makePromise(of: LoginPackage.self)
-        
-        return Team.query(on: req.db)
-            .filter(\.$employeeToken == employeeToken)
-            .first()
-            .unwrap(or: Abort(.unauthorized, reason: "Token de Acesso Inválido"))
-            .flatMapThrowing { (optionalTeam) -> User in
-                let team = Team(id: optionalTeam.id, name: optionalTeam.name, description: optionalTeam.description, image: optionalTeam.image, employeeToken: optionalTeam.employeeToken, guestToken: optionalTeam.guestToken,activeUsers: [])
-                
-                let user = try req.content.decode(User.self)
-                user.$team.id = team.id!
-                return user
-            }.flatMap { (user) in
-                do {
-                    let userResponse = UserResponse(id: user.id!, name: user.name, email: user.email, password: user.password, isAdmin: user.isAdmin, image: user.image, teamId: user.$team.id)
-                    let token = try user.generateToken()
-                    user.save(on: req.db).whenSuccess {
-                        let response = LoginPackage(user: userResponse, userToken: token)
-                        token.save(on: req.db).whenSuccess { _ in
-                            promise.succeed(response)
-                        }
-                    }
-                } catch {
-                    promise.fail(Abort(.badRequest))
-                }
-                return promise.futureResult
-            }
-    }
-    
     //Do Login
     app.post("userlogin") { req -> EventLoopFuture<LoginPackage> in
         let authEntity = try req.content.decode(AuthEntity.self)
@@ -151,11 +78,11 @@ func routes(_ app: Application) throws {
     try tokenProtected.register(collection: StatusController())
     try tokenProtected.register(collection: DocumentController())
     try tokenProtected.register(collection: FilesController())
-    try tokenProtected.register(collection: UserController())
     try tokenProtected.register(collection: FarmController())
     try tokenProtected.register(collection: MarkerController())
     
     try app.register(collection: TeamController())
+    try app.register(collection: UserController())
 //    try app.register(collection: StagesContainerController())
 //    try app.register(collection: StageController())
 //    try app.register(collection: OverviewController())

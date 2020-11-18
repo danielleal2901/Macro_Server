@@ -38,7 +38,10 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateUser())
     app.migrations.add(CreateUserToken())
     app.migrations.add(CreateMarker())
-
+    
+    //!IMPORTANT
+    //Removes all active users from all teams when server fall
+    Team.removeActiveUsersFromAllTeams(db: app.db)
 
     // register routes
     try routes(app)
