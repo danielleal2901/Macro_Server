@@ -148,11 +148,12 @@ final class PreSets {
     
     static func createMarkerPreset(req: Request,statusID: UUID) -> EventLoopFuture<HTTPStatus> {
         
-        let markers: [Marker] = [.init(title: "Fácil", color: [187,221,191],statusID: statusID),
-                                 .init(title: "Médio", color: [221,211,187],statusID: statusID),
-                                 .init(title: "Difícil", color: [221,187,187],statusID: statusID),
-                                 .init(title: "Documento", color: [224,224,224],statusID: statusID),
-                                 .init(title: "Contrato", color: [221,187,221],statusID: statusID)]
+        let markers: [Marker] = [.init(title: "Fácil", color: [191,230,195],statusID: statusID),
+                                 .init(title: "Médio", color: [247,226,177],statusID: statusID),
+                                 .init(title: "Difícil", color: [237,188,188],statusID: statusID),
+                                 .init(title: "Documento", color: [185,228,229],statusID: statusID),
+                                 .init(title: "Contrato", color: [235,183,235],statusID: statusID),
+                                 .init(title: "Imagem", color: [227,235,181],statusID: statusID)]
         
         let promise = req.eventLoop.makePromise(of: Void.self)
         
