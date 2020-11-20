@@ -8,5 +8,5 @@
 import Mailgun
 
 extension MailgunDomain{
-    static var mainDomain: MailgunDomain { .init("email.mg.regularizevapor.com", .us)}
+    static var mainDomain: MailgunDomain { .init("mg.regularizevapor.com", .us)}
 }
