@@ -47,7 +47,7 @@ final class PreSets {
                                              Task.init(id: UUID(), title: "Levantamento de Características Históricas, Físicas e Geográficas",  columnTitle: "Fazer", tags: [], resp: []),
                                             ]).create(on: req.db)
                                 .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                    return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                         return createMarkerPreset(req: req, statusID: statusID)
                                     }
                                 }
@@ -78,7 +78,7 @@ final class PreSets {
                                              
                                             ]).create(on: req.db)
                                 .map { _ in
-                                    return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                    return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                         return createMarkerPreset(req: req, statusID: statusID)
                                     }
                                 }
@@ -107,7 +107,7 @@ final class PreSets {
                                                                  Task.init(id: UUID(), title: "Obter licença ambiental", columnTitle: "Fazer", tags: [], resp: []),
                                                                 ]).create(on: req.db)
                                                     .map { _ in
-                                                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                                        return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                                             return createMarkerPreset(req: req, statusID: statusID)
                                                         }
                                                     }
@@ -136,7 +136,7 @@ final class PreSets {
                                          Task.init(id: UUID(), title: "Obter Mapas", columnTitle: "Fazer", tags: [], resp: [])
                                         ]).create(on: req.db)
                             .map { _ in
-                                return Document(stageId: stage.id!, sections: [DocumentSection(name: "Importantes", items: [])]).create(on: req.db).map { _ in
+                                return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
                                     return createMarkerPreset(req: req, statusID: statusID)
                                 }
                             }
@@ -148,11 +148,12 @@ final class PreSets {
     
     static func createMarkerPreset(req: Request,statusID: UUID) -> EventLoopFuture<HTTPStatus> {
         
-        let markers: [Marker] = [.init(title: "Fácil", color: [187,221,191],statusID: statusID),
-                                 .init(title: "Médio", color: [221,211,187],statusID: statusID),
-                                 .init(title: "Difícil", color: [221,187,187],statusID: statusID),
-                                 .init(title: "Documento", color: [224,224,224],statusID: statusID),
-                                 .init(title: "Contrato", color: [221,187,221],statusID: statusID)]
+        let markers: [Marker] = [.init(title: "Fácil", color: [191,230,195],statusID: statusID),
+                                 .init(title: "Médio", color: [247,226,177],statusID: statusID),
+                                 .init(title: "Difícil", color: [237,188,188],statusID: statusID),
+                                 .init(title: "Documento", color: [185,228,229],statusID: statusID),
+                                 .init(title: "Contrato", color: [235,183,235],statusID: statusID),
+                                 .init(title: "Imagem", color: [227,235,181],statusID: statusID)]
         
         let promise = req.eventLoop.makePromise(of: Void.self)
         
@@ -165,6 +166,10 @@ final class PreSets {
         }
         return promise.futureResult.transform(to: .ok)
         
+    }
+    
+    static func createDocumentPreset(idStage: UUID) -> Document {
+        return Document(stageId: idStage, sections: [DocumentSection(name: "Marcados", items: []), DocumentSection(name: "Outros", items: [])])
     }
     
 }

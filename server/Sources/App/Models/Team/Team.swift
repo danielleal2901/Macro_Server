@@ -45,3 +45,12 @@ final class Team: Model {
         self.activeUsers = activeUsers
     }
 }
+
+extension Team {
+    public static func removeActiveUsersFromAllTeams(db: Database) {
+        _ = Team.query(on: db).all().mapEach { (team) -> Void in
+            team.activeUsers = []
+            _ = team.update(on: db)
+        }
+    }
+}
