@@ -24,7 +24,15 @@ func routes(_ app: Application) throws {
                         Atenciosamente Equipe da Regularize-se
                         """                        
                     )
-                    _ = req.mailgun(.mainDomain).send(message)
+                    let value = req.mailgun(.mainDomain).send(message)
+                    print(value.whenComplete({ (result) in
+                        switch result{
+                        case .success(let response):
+                            print(response)
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }))
                 }
             }.transform(to: .ok)
     }

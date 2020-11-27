@@ -10,8 +10,9 @@ import Vapor
 
 struct Task: Content {
     let id: UUID
-    let title: String
-    let status: TaskStatus
+    let title: String    
+    var columnTitle: String
     let tags: [UUID]
     let resp: [UUID]
+    var done: Bool = false
 }
