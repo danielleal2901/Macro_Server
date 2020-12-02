@@ -13,18 +13,26 @@ func routes(_ app: Application) throws {
                 if !user.isEmpty{
                 let password = user.first?.password
                     let message = MailgunMessage(
-                        from: "Regularize-se <gmdalosto@gmail.com>",
+                        from: "Regularize <regularizeapp@gmail.com>",
                         to: "\(mailPackage.email)",
-                        subject: "Regularize-se - Recuperação de Senha",
+                        subject: "Regularize - Recuperação de Senha",
                         text: """
                         Olá \(user.first!.name.uppercased()), nos foi submetido uma requisição informando que você esqueceu sua senha em nossa aplicação.
                         Caso não tenha solicitado nenhuma informação, favor desconsidere a mensagem.
                         O token para redefinição de sua senha é \(String(describing: password!.prefix(12)))
 
-                        Atenciosamente Equipe da Regularize-se
+                        Atenciosamente Equipe da Regularize
                         """                        
                     )
-                    _ = req.mailgun(.mainDomain).send(message)
+                    let value = req.mailgun(.mainDomain).send(message)
+                    print(value.whenComplete({ (result) in
+                        switch result{
+                        case .success(let response):
+                            print(response)
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }))
                 }
             }.transform(to: .ok)
     }

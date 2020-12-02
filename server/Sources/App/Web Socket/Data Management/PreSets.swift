@@ -18,8 +18,8 @@ final class PreSets {
                     return Overview(stageId: stage.id!, sections: [OverviewSection(name: "Informações Principais", items: [OverviewItem(key: "Dados Gerais", value: "")]),
                                                                    OverviewSection(name: "Informações do Responsável", items: [OverviewItem(key: "Dados Gerais", value: "")])
                                                                   ]).create(on: req.db).map { _ in
-                        return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _   in
-                            return Status(id: statusID,stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", status: .todo, tags: [], resp: [])]).create(on: req.db).map { _ in
+                        return Document(stageId: stage.id!, sections: [DocumentSection(name: "Marcados", items: []), DocumentSection(name: "Outros", items: [])]).create(on: req.db).map { _   in
+                            return Status(id: statusID,stageId: stage.id!, tasks: [Task.init(id: UUID(), title: "Fazer relatório", columnTitle: "Fazer", tags: [], resp: [])]).create(on: req.db).map { _ in
                                 return createMarkerPreset(req: req, statusID: statusID)
                             }
                         }
@@ -40,11 +40,11 @@ final class PreSets {
                                         ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
-                                            [Task.init(id: UUID(), title: "Coleta de elementos descritivos - Memoriais, matrículas e etc", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Buscar documentos em órgãos públicos e cartórios", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Realizar Cartografia Básica: Georeferenciamento", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Levantamento de Potencialidades e Fragilidades", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Levantamento de Características Históricas, Físicas e Geográficas", status: .todo, tags: [], resp: []),
+                                            [Task.init(id: UUID(), title: "Coleta de elementos descritivos - Memoriais, matrículas e etc", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Buscar documentos em órgãos públicos e cartórios", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Realizar Cartografia Básica: Georeferenciamento", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Levantamento de Potencialidades e Fragilidades",  columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Levantamento de Características Históricas, Físicas e Geográficas",  columnTitle: "Fazer", tags: [], resp: []),
                                             ]).create(on: req.db)
                                 .map { _ in
                                     return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
@@ -68,11 +68,11 @@ final class PreSets {
                                         ]).create(on: req.db)
                         .map { _ in
                             return Status(id: statusID,stageId: stage.id!, tasks:
-                                            [Task.init(id: UUID(), title: "Estabelecer Licença social", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Assegurar condições de acompanhamento da comunidade", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Realizar evento de encerramento das atividades do Projeto de Trabalho Social", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Apresentar resultado de pesquisa de pós ocupação", status: .todo, tags: [], resp: []),
-                                             Task.init(id: UUID(), title: "Revelar o nível de satisfação da população beneficiada", status: .todo, tags: [], resp: []),
+                                            [Task.init(id: UUID(), title: "Estabelecer Licença social", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Assegurar condições de acompanhamento da comunidade",  columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Realizar evento de encerramento das atividades do Projeto de Trabalho Social", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Apresentar resultado de pesquisa de pós ocupação", columnTitle: "Fazer", tags: [], resp: []),
+                                             Task.init(id: UUID(), title: "Revelar o nível de satisfação da população beneficiada", columnTitle: "Fazer", tags: [], resp: []),
                                              
                                              
                                              
@@ -99,12 +99,12 @@ final class PreSets {
                                         ]).create(on: req.db)
                                             .map { _ in
                                                 return Status(id: statusID,stageId: stage.id!, tasks:
-                                                                [Task.init(id: UUID(), title: "Contratar órgão ambiental", status: .todo, tags: [], resp: []),
-                                                                 Task.init(id: UUID(), title: "Verificar tipo de licença necessária", status: .todo, tags: [], resp: []),
-                                                                 Task.init(id: UUID(), title: "Contratar Profissionais", status: .todo, tags: [], resp: []),
-                                                                 Task.init(id: UUID(), title: "Coletar Relatórios técnicos", status: .todo, tags: [], resp: []),
-                                                                 Task.init(id: UUID(), title: "Submeter relatórios ao órgão ambiental", status: .todo, tags: [], resp: []),
-                                                                 Task.init(id: UUID(), title: "Obter licença ambiental", status: .todo, tags: [], resp: []),
+                                                                [Task.init(id: UUID(), title: "Contratar órgão ambiental", columnTitle: "Fazer", tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Verificar tipo de licença necessária", columnTitle: "Fazer", tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Contratar Profissionais", columnTitle: "Fazer", tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Coletar Relatórios técnicos", columnTitle: "Fazer", tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Submeter relatórios ao órgão ambiental", columnTitle: "Fazer", tags: [], resp: []),
+                                                                 Task.init(id: UUID(), title: "Obter licença ambiental", columnTitle: "Fazer", tags: [], resp: []),
                                                                 ]).create(on: req.db)
                                                     .map { _ in
                                                         return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in
@@ -128,12 +128,12 @@ final class PreSets {
                     ).create(on: req.db)
                     .map { _ in
                         return Status(id: statusID,stageId: stage.id!, tasks:
-                                        [Task.init(id: UUID(), title: "Contratar empresa especializada, com CREA", status: .todo, tags: [], resp: []),
-                                         Task.init(id: UUID(), title: "Realizar Georeferenciamento", status: .todo, tags: [], resp: []),
-                                         Task.init(id: UUID(), title: "Cadastramento dos Ocupantes", status: .todo, tags: [], resp: []),
-                                         Task.init(id: UUID(), title: "Codificar e Vistoriar os Lotes", status: .todo, tags: [], resp: []),
-                                         Task.init(id: UUID(), title: "Obter Planilha .ods", status: .todo, tags: [], resp: []),
-                                         Task.init(id: UUID(), title: "Obter Mapas", status: .todo, tags: [], resp: [])
+                                        [Task.init(id: UUID(), title: "Contratar empresa especializada, com CREA", columnTitle: "Fazer", tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Realizar Georeferenciamento", columnTitle: "Fazer", tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Cadastramento dos Ocupantes", columnTitle: "Fazer", tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Codificar e Vistoriar os Lotes", columnTitle: "Fazer", tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Obter Planilha .ods", columnTitle: "Fazer", tags: [], resp: []),
+                                         Task.init(id: UUID(), title: "Obter Mapas", columnTitle: "Fazer", tags: [], resp: [])
                                         ]).create(on: req.db)
                             .map { _ in
                                 return PreSets.createDocumentPreset(idStage: stage.id!).create(on: req.db).map { _ in

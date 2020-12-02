@@ -14,6 +14,7 @@ struct CreateUser: Migration {
             .id()
             .field("name", .string, .required)
             .field("email", .string, .required)
+            .unique(on: "email")
             .field("password", .string, .required)
             .field("is_admin", .bool, .required)
             .field("image", .data, .required)
